@@ -5,11 +5,9 @@ import { cn } from "@/lib/utils";
 
 function DirButton({
   direction,
-  className,
   children,
 }: {
   direction: Direction;
-  className?: string;
   children: React.ReactNode;
 }) {
   const pressDirection = useGameStore((s) => s.pressDirection);
@@ -21,10 +19,8 @@ function DirButton({
         event.preventDefault();
         pressDirection(direction);
       }}
-      className={cn(
-        "pixel-border-cyan bg-surface-2 text-accent flex h-14 w-14 items-center justify-center rounded-xl transition-transform active:scale-95",
-        className,
-      )}
+      className="border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid h-13 w-13 place-items-center rounded-full border backdrop-blur transition-all active:scale-95"
+      style={{ height: "3.25rem", width: "3.25rem" }}
     >
       {children}
     </button>
@@ -41,10 +37,10 @@ function ActBtn({ action, label }: { action: ActionButton; label: string }) {
         pressAction(action);
       }}
       className={cn(
-        "ui-label flex h-16 w-16 items-center justify-center rounded-full text-xs transition-transform active:scale-95",
+        "bg-surface/40 grid h-14 w-14 place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform active:scale-95",
         action === "a"
-          ? "bg-primary text-primary-foreground pixel-border-magenta rounded-full"
-          : "bg-accent text-accent-foreground pixel-border-cyan rounded-full",
+          ? "border-primary/50 text-primary shadow-[0_0_24px_-10px_var(--neon-magenta)]"
+          : "border-accent/50 text-accent shadow-[0_0_24px_-10px_var(--neon-cyan)]",
       )}
     >
       {label}
@@ -57,26 +53,26 @@ export function DPad({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "glass flex w-full items-center justify-between gap-6 p-4",
+        "border-foreground/10 bg-surface/35 flex w-full items-center justify-between gap-6 rounded-3xl border p-5 backdrop-blur-xl",
         className,
       )}
     >
-      <div className="grid grid-cols-3 grid-rows-3 gap-1">
+      <div className="grid grid-cols-3 grid-rows-3 place-items-center gap-1.5">
         <span />
         <DirButton direction="up">
-          <ChevronUp className="h-6 w-6" />
+          <ChevronUp className="h-5 w-5" strokeWidth={1.2} />
         </DirButton>
         <span />
         <DirButton direction="left">
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.2} />
         </DirButton>
         <span />
         <DirButton direction="right">
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5" strokeWidth={1.2} />
         </DirButton>
         <span />
         <DirButton direction="down">
-          <ChevronDown className="h-6 w-6" />
+          <ChevronDown className="h-5 w-5" strokeWidth={1.2} />
         </DirButton>
         <span />
       </div>
