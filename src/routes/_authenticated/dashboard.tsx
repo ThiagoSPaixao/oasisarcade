@@ -68,9 +68,16 @@ function DashboardPage() {
   return (
     <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
       <div className="mx-auto w-full max-w-5xl">
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex items-center justify-between">
+          <Link
+            to="/ranking"
+            className="border-accent/40 text-accent inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-semibold"
+          >
+            <Trophy className="h-3.5 w-3.5" strokeWidth={1.4} /> RANKING GLOBAL
+          </Link>
           <SettingsMenu />
         </div>
+
 
         <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
 
