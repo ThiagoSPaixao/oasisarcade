@@ -18,8 +18,10 @@ export function SoundToggle({ className }: { className?: string }) {
         aria-label={sfx ? "Desativar efeitos sonoros" : "Ativar efeitos sonoros"}
         title={sfx ? "Efeitos: ligados" : "Efeitos: desligados"}
         className={cn(
-          "pixel-border grid h-10 w-10 shrink-0 place-items-center transition-transform active:scale-95",
-          sfx ? "bg-accent text-accent-foreground pixel-border-cyan" : "bg-surface-2 text-muted-foreground",
+          "grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-transform active:scale-95",
+          sfx
+            ? "bg-accent/15 text-accent border-accent/50"
+            : "bg-surface/40 text-muted-foreground border-border/60",
         )}
       >
         {sfx ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
