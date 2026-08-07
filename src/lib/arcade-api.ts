@@ -42,6 +42,22 @@ export async function fetchScores(): Promise<Record<string, number>> {
   return map;
 }
 
+export type LeaderboardRow = {
+  rank: number;
+  user_id: string;
+  username: string;
+  level: number;
+  score: number;
+  created_at: string;
+};
+
+export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {
+  const { data, error } = await supabase.rpc("get_leaderboard", { _game_slug: slug, _limit: limit });
+  if (error) throw error;
+  return (data ?? []) as LeaderboardRow[];
+}
+
+
 export async function fetchBestScore(slug: string): Promise<number> {
   const { data, error } = await supabase
     .from("user_scores")

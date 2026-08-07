@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
 import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticated/upgrade'
 import { Route as AuthenticatedGameSlugRouteImport } from './routes/_authenticated/game.$slug'
 
@@ -41,6 +42,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRankingRoute = AuthenticatedRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUpgradeRoute = AuthenticatedUpgradeRouteImport.update({
   id: '/upgrade',
   path: '/upgrade',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/ranking': typeof AuthenticatedRankingRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/game/$slug': typeof AuthenticatedGameSlugRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/ranking': typeof AuthenticatedRankingRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
   '/game/$slug': typeof AuthenticatedGameSlugRoute
 }
@@ -75,15 +83,29 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/ranking': typeof AuthenticatedRankingRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
   '/_authenticated/game/$slug': typeof AuthenticatedGameSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/register' | '/dashboard' | '/upgrade' | '/game/$slug'
+    | '/'
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/ranking'
+    | '/upgrade'
+    | '/game/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/dashboard' | '/upgrade' | '/game/$slug'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/ranking'
+    | '/upgrade'
+    | '/game/$slug'
   id:
     | '__root__'
     | '/'
@@ -91,6 +113,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_authenticated/dashboard'
+    | '/_authenticated/ranking'
     | '/_authenticated/upgrade'
     | '/_authenticated/game/$slug'
   fileRoutesById: FileRoutesById
@@ -139,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ranking': {
+      id: '/_authenticated/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AuthenticatedRankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/upgrade': {
       id: '/_authenticated/upgrade'
       path: '/upgrade'
@@ -158,12 +188,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
   AuthenticatedUpgradeRoute: typeof AuthenticatedUpgradeRoute
   AuthenticatedGameSlugRoute: typeof AuthenticatedGameSlugRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedRankingRoute: AuthenticatedRankingRoute,
   AuthenticatedUpgradeRoute: AuthenticatedUpgradeRoute,
   AuthenticatedGameSlugRoute: AuthenticatedGameSlugRoute,
 }
