@@ -19,8 +19,7 @@ function DirButton({
         event.preventDefault();
         pressDirection(direction);
       }}
-      className="border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid h-13 w-13 place-items-center rounded-full border backdrop-blur transition-all active:scale-95"
-      style={{ height: "3.25rem", width: "3.25rem" }}
+      className="border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid h-11 w-11 shrink-0 place-items-center rounded-full border backdrop-blur transition-all active:scale-95 sm:h-13 sm:w-13"
     >
       {children}
     </button>
