@@ -8,10 +8,10 @@ export const Route = createFileRoute("/login")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Entrar — Retrô Arcade" },
-      { name: "description", content: "Entre na sua conta do Retrô Arcade e continue jogando os clássicos." },
-      { property: "og:title", content: "Entrar — Retrô Arcade" },
-      { property: "og:description", content: "Acesse sua conta do Retrô Arcade e volte para o fliperama." },
+      { title: "Entrar — Oásis Arcade" },
+      { name: "description", content: "Entre na sua conta do Oásis Arcade e continue jogando os clássicos." },
+      { property: "og:title", content: "Entrar — Oásis Arcade" },
+      { property: "og:description", content: "Acesse sua conta do Oásis Arcade e volte para o fliperama." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -44,7 +44,7 @@ function LoginPage() {
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-base">
-          RETRÔ ARCADE
+          OÁSIS ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
           <h1 className="ui-label glow-cyan text-accent text-sm">INSERT COIN</h1>

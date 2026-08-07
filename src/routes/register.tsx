@@ -8,15 +8,15 @@ export const Route = createFileRoute("/register")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Criar conta — Retrô Arcade" },
+      { title: "Criar conta — Oásis Arcade" },
       {
         name: "description",
-        content: "Crie sua conta grátis no Retrô Arcade e comece a jogar clássicos 8-bits agora.",
+        content: "Crie sua conta grátis no Oásis Arcade e comece a jogar clássicos 8-bits agora.",
       },
-      { property: "og:title", content: "Criar conta — Retrô Arcade" },
+      { property: "og:title", content: "Criar conta — Oásis Arcade" },
       {
         property: "og:description",
-        content: "Cadastro rápido no Retrô Arcade: jogue Snake e outros clássicos e acumule XP.",
+        content: "Cadastro rápido no Oásis Arcade: jogue Snake e outros clássicos e acumule XP.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -55,7 +55,7 @@ function RegisterPage() {
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-base">
-          RETRÔ ARCADE
+          OÁSIS ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
           <h1 className="ui-label glow-cyan text-accent text-sm">NEW PLAYER</h1>
