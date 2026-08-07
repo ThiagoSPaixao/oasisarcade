@@ -33,8 +33,10 @@ export function SoundToggle({ className }: { className?: string }) {
         aria-label={music ? "Desativar trilha sonora" : "Ativar trilha sonora"}
         title={music ? "Trilha: ligada" : "Trilha: desligada"}
         className={cn(
-          "pixel-border grid h-10 w-10 shrink-0 place-items-center transition-transform active:scale-95",
-          music ? "bg-primary text-primary-foreground pixel-border-magenta" : "bg-surface-2 text-muted-foreground",
+          "grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-transform active:scale-95",
+          music
+            ? "bg-primary/15 text-primary border-primary/50"
+            : "bg-surface/40 text-muted-foreground border-border/60",
         )}
       >
         {music ? <Music4 className="h-4 w-4" /> : <Music className="h-4 w-4" />}
