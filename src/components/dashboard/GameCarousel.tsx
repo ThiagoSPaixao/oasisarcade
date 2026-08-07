@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Heart, Lock, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Lock } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
 import { useSoundStore } from "@/stores/sound-store";
@@ -51,25 +51,25 @@ export function GameCarousel({
   if (games.length === 0) return null;
 
   return (
-    <section className="mt-6">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="ui-label glow-cyan text-accent text-sm">ESCOLHA SEU JOGO</h2>
+    <section className="mt-8">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-accent/80 text-[11px] font-semibold tracking-[0.22em]">ESCOLHA SEU JOGO</h2>
         <div className="flex gap-2">
           <button
             type="button"
             aria-label="Jogo anterior"
             onClick={() => embla?.scrollPrev()}
-            className="pixel-border bg-surface/70 text-accent grid h-9 w-9 place-items-center rounded-lg backdrop-blur active:scale-95"
+            className="border-accent/30 text-accent hover:border-accent/60 grid h-8 w-8 place-items-center rounded-full border transition-colors active:scale-95"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" strokeWidth={1.3} />
           </button>
           <button
             type="button"
             aria-label="Próximo jogo"
             onClick={() => embla?.scrollNext()}
-            className="pixel-border bg-surface/70 text-accent grid h-9 w-9 place-items-center rounded-lg backdrop-blur active:scale-95"
+            className="border-accent/30 text-accent hover:border-accent/60 grid h-8 w-8 place-items-center rounded-full border transition-colors active:scale-95"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" strokeWidth={1.3} />
           </button>
         </div>
       </div>
@@ -86,28 +86,24 @@ export function GameCarousel({
                 key={game.slug}
                 className={cn(
                   "min-w-0 shrink-0 grow-0 basis-[82%] pr-3 transition-all duration-300 sm:basis-[52%] lg:basis-[36%]",
-                  active ? "scale-100 opacity-100" : "scale-[0.92] opacity-60",
+                  active ? "scale-100 opacity-100" : "scale-[0.92] opacity-50",
                 )}
               >
-                <div className="bg-surface panel-magenta flex h-full flex-col overflow-hidden">
+                <div className="flex h-full flex-col">
                   <div
                     className={cn(
-                      "relative grid aspect-[4/3] w-full place-items-center bg-gradient-to-br",
+                      "relative grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl bg-gradient-to-br",
                       art.from,
                       art.to,
+                      active && "shadow-[0_0_44px_-18px_var(--neon-magenta)]",
                     )}
                   >
                     <span className="text-5xl drop-shadow-lg sm:text-6xl">{art.emoji}</span>
-                    <span
-                      className={cn(
-                        "ui-label absolute top-2 left-2 rounded-md px-2 py-1 text-[10px]",
-                        game.is_premium
-                          ? "bg-neon-yellow text-primary-foreground"
-                          : "bg-neon-green text-primary-foreground",
-                      )}
-                    >
-                      {game.is_premium ? "PREMIUM" : "GRÁTIS"}
-                    </span>
+                    {game.is_premium ? (
+                      <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-wide backdrop-blur">
+                        PREMIUM
+                      </span>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => {
@@ -115,30 +111,33 @@ export function GameCarousel({
                         onToggleFavorite(game.slug);
                       }}
                       aria-label={isFavorite ? `Remover ${game.name} dos favoritos` : `Favoritar ${game.name}`}
-                      className="bg-background/60 absolute top-2 right-2 grid h-9 w-9 place-items-center rounded-full backdrop-blur"
+                      className="bg-background/50 border-foreground/10 absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full border backdrop-blur"
                     >
                       <Heart
-                        className={cn("h-4 w-4", isFavorite ? "text-primary fill-current" : "text-muted-foreground")}
+                        className={cn(
+                          "h-4 w-4",
+                          isFavorite ? "text-primary fill-current" : "text-muted-foreground",
+                        )}
+                        strokeWidth={1.3}
                       />
                     </button>
                     {game.state !== "playable" ? (
-                      <span className="ui-label bg-background/70 text-neon-yellow absolute bottom-2 left-2 rounded-md px-2 py-1 text-[10px] backdrop-blur">
+                      <span className="bg-background/60 text-neon-yellow absolute bottom-2 left-2 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
                         EM BREVE
                       </span>
                     ) : null}
                   </div>
 
-                  <div className="flex flex-1 flex-col gap-2 p-4">
-                    <h3 className="ui-label text-foreground text-base leading-snug">{game.name}</h3>
-                    <p className="text-muted-foreground text-xs">{game.description}</p>
-                    <p className="text-accent text-[10px]">Seu recorde: {scores[game.slug] ?? 0}</p>
+                  <div className="flex flex-1 flex-col items-start gap-1 px-1 pt-3">
+                    <h3 className="text-foreground text-base font-semibold tracking-tight">{game.name}</h3>
+                    <p className="text-muted-foreground text-[11px]">High Score · {scores[game.slug] ?? 0}</p>
                     <Link
                       to="/game/$slug"
                       params={{ slug: game.slug }}
                       onClick={() => play("coin")}
-                      className="ui-label bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-xs transition-transform active:scale-95"
+                      className="bg-primary text-primary-foreground mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.12em] shadow-[0_0_22px_-8px_var(--neon-magenta)] transition-transform active:scale-95"
                     >
-                      {locked ? <Lock className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                      {locked ? <Lock className="h-3 w-3" strokeWidth={1.6} /> : null}
                       JOGAR AGORA
                     </Link>
                   </div>
@@ -149,7 +148,7 @@ export function GameCarousel({
         </div>
       </div>
 
-      <div className="mt-4 flex justify-center gap-2">
+      <div className="mt-5 flex justify-center gap-2">
         {games.map((game, index) => (
           <button
             key={game.slug}
@@ -158,7 +157,7 @@ export function GameCarousel({
             onClick={() => embla?.scrollTo(index)}
             className={cn(
               "h-1.5 rounded-full transition-all",
-              index === selected ? "bg-primary w-6" : "bg-surface-2 w-2",
+              index === selected ? "bg-accent w-6" : "bg-foreground/20 w-1.5",
             )}
           />
         ))}
