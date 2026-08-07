@@ -9,7 +9,7 @@ function DirButton({
   children,
 }: {
   direction: Direction;
-  compact?: boolean;
+  compact?: boolean | undefined;
   children: React.ReactNode;
 }) {
   const pressDirection = useGameStore((s) => s.pressDirection);
@@ -38,7 +38,7 @@ function ActBtn({
 }: {
   action: ActionButton;
   label: string;
-  compact?: boolean;
+  compact?: boolean | undefined;
 }) {
   const pressAction = useGameStore((s) => s.pressAction);
   return (
