@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Gamepad2, Play } from "lucide-react";
+import { Gamepad2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { SoundToggle } from "@/components/arcade/SoundToggle";
