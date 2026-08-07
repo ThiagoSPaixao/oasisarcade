@@ -51,7 +51,8 @@ function LandingPage() {
 
   return (
     <ArcadeShell className="grid min-h-screen place-items-center px-5 py-10">
-      <main className="relative mx-auto flex w-full max-w-lg flex-col items-center text-center">
+      <main className="relative mx-auto flex w-full max-w-lg min-w-0 flex-col items-center text-center">
+
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full opacity-40 blur-3xl"
