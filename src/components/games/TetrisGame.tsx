@@ -59,11 +59,6 @@ const PIECES: { shape: Shape; color: string }[] = [
 type Piece = { shape: Shape; color: string; x: number; y: number };
 type Cell = string | null;
 
-function cssVar(name: string, fallback: string) {
-  if (typeof window === "undefined") return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
-
 function emptyBoard(): Cell[][] {
   return Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => null));
 }
@@ -91,28 +86,26 @@ function fromDef(def: PieceDef): Piece {
   };
 }
 
-function spawn(): Piece {
-  return fromDef(randomDef());
-}
-
-/** Miniatura da próxima peça. */
-function PiecePreview({ def }: { def: PieceDef }) {
+/** Miniatura da próxima peça (coluna lateral). */
+function PiecePreview({ def, size = 8 }: { def: PieceDef; size?: number }) {
   const cols = def.shape[0]!.length;
   return (
     <div
-      className="border-foreground/10 bg-surface/40 grid gap-[2px] rounded-lg border p-1.5 backdrop-blur"
-      style={{ gridTemplateColumns: `repeat(${cols}, 10px)` }}
+      className="border-foreground/10 bg-surface/40 grid gap-[2px] rounded-lg border p-1 backdrop-blur"
+      style={{ gridTemplateColumns: `repeat(${cols}, ${size}px)` }}
     >
       {def.shape.flatMap((row, y) =>
         row.map((value, x) => (
           <span
             key={`${y}-${x}`}
-            className="h-[10px] w-[10px] rounded-[2px]"
-            style={
-              value
+            className="rounded-[2px]"
+            style={{
+              height: size,
+              width: size,
+              ...(value
                 ? { background: `var(${def.color})`, boxShadow: `0 0 8px -2px var(${def.color})` }
-                : undefined
-            }
+                : {}),
+            }}
           />
         )),
       )}
@@ -122,12 +115,16 @@ function PiecePreview({ def }: { def: PieceDef }) {
 
 export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gridLayerRef = useRef<HTMLCanvasElement | null>(null);
+  const colorCacheRef = useRef<Record<string, string>>({});
   const boardRef = useRef<Cell[][]>(emptyBoard());
-  const pieceRef = useRef<Piece>(spawn());
+  const pieceRef = useRef<Piece>(fromDef(randomDef()));
   const queueRef = useRef<PieceDef[]>([randomDef(), randomDef(), randomDef()]);
   const scoreRef = useRef(0);
   const linesRef = useRef(0);
-  const lastTickRef = useRef(0);
+  const accumulatorRef = useRef(0);
+  const lastFrameRef = useRef(0);
+  const dirtyRef = useRef(true);
   const rafRef = useRef<number | null>(null);
   const [lines, setLines] = useState(0);
   const [nextPieces, setNextPieces] = useState<PieceDef[]>(() => queueRef.current);
@@ -140,43 +137,78 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const play = useSoundStore((s) => s.play);
   const musicOn = useSoundStore((s) => s.music);
 
+  /** Cor do tema lida uma única vez por nome (evita getComputedStyle por frame). */
+  const color = useCallback((name: string, fallback: string) => {
+    const cache = colorCacheRef.current;
+    const hit = cache[name];
+    if (hit) return hit;
+    if (typeof window === "undefined") return fallback;
+    const value =
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+    cache[name] = value;
+    return value;
+  }, []);
+
+  /** Grade pré-renderizada em camada separada. */
+  const buildGridLayer = useCallback(
+    (width: number, height: number) => {
+      const layer = gridLayerRef.current ?? document.createElement("canvas");
+      gridLayerRef.current = layer;
+      layer.width = width;
+      layer.height = height;
+      const ctx = layer.getContext("2d");
+      if (!ctx) return;
+      const cell = width / COLS;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = color("--background", "#12101c");
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = color("--border", "#3a2f52");
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 1; x < COLS; x += 1) {
+        ctx.moveTo(Math.round(x * cell) + 0.5, 0);
+        ctx.lineTo(Math.round(x * cell) + 0.5, height);
+      }
+      for (let y = 1; y < ROWS; y += 1) {
+        ctx.moveTo(0, Math.round(y * cell) + 0.5);
+        ctx.lineTo(width, Math.round(y * cell) + 0.5);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    },
+    [color],
+  );
+
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
     const cell = canvas.width / COLS;
-    ctx.fillStyle = cssVar("--background", "#12101c");
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle = cssVar("--border", "#3a2f52");
-    ctx.globalAlpha = 0.3;
-    for (let x = 1; x < COLS; x += 1) {
-      ctx.beginPath();
-      ctx.moveTo(x * cell, 0);
-      ctx.lineTo(x * cell, canvas.height);
-      ctx.stroke();
+    const layer = gridLayerRef.current;
+    if (layer && layer.width === canvas.width) ctx.drawImage(layer, 0, 0);
+    else {
+      ctx.fillStyle = color("--background", "#12101c");
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    for (let y = 1; y < ROWS; y += 1) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * cell);
-      ctx.lineTo(canvas.width, y * cell);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
 
     const block = (x: number, y: number, colorVar: string, glow: number) => {
-      ctx.fillStyle = cssVar(colorVar, "#ff4fd8");
-      ctx.shadowColor = ctx.fillStyle;
+      const value = color(colorVar, "#ff4fd8");
+      ctx.fillStyle = value;
+      ctx.shadowColor = value;
       ctx.shadowBlur = glow;
       ctx.fillRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
       ctx.shadowBlur = 0;
     };
 
-    boardRef.current.forEach((row, y) =>
-      row.forEach((color, x) => {
-        if (color) block(x, y, color, 5);
-      }),
-    );
+    for (let y = 0; y < ROWS; y += 1) {
+      const row = boardRef.current[y]!;
+      for (let x = 0; x < COLS; x += 1) {
+        const c = row[x];
+        if (c) block(x, y, c, 5);
+      }
+    }
 
     const piece = pieceRef.current;
     piece.shape.forEach((row, dy) =>
@@ -184,7 +216,8 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         if (value) block(piece.x + dx, piece.y + dy, piece.color, 12);
       }),
     );
-  }, []);
+    dirtyRef.current = false;
+  }, [color]);
 
   const collides = useCallback((piece: Piece) => {
     return piece.shape.some((row, dy) =>
@@ -211,9 +244,11 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     pieceRef.current = fromDef(randomDef());
     scoreRef.current = 0;
     linesRef.current = 0;
-    lastTickRef.current = 0;
+    accumulatorRef.current = 0;
+    lastFrameRef.current = 0;
     setLines(0);
     setScore(0);
+    dirtyRef.current = true;
     draw();
   }, [draw, setScore]);
 
@@ -246,6 +281,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     }
 
     const next = pullNext();
+    dirtyRef.current = true;
     if (collides(next)) {
       setStatus("over");
       play("gameover");
@@ -261,12 +297,12 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       const next = { ...piece, x: piece.x + dx, y: piece.y + dy };
       if (!collides(next)) {
         pieceRef.current = next;
-        draw();
+        dirtyRef.current = true;
         return true;
       }
       return false;
     },
-    [collides, draw],
+    [collides],
   );
 
   const rotatePiece = useCallback(() => {
@@ -277,11 +313,11 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       if (!collides(candidate)) {
         pieceRef.current = candidate;
         play("rotate");
-        draw();
+        dirtyRef.current = true;
         return;
       }
     }
-  }, [collides, draw, play]);
+  }, [collides, play]);
 
   /** Descida rápida (hard drop) — exclusiva do Tetris. */
   const hardDrop = useCallback(() => {
@@ -292,46 +328,77 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       setScore(scoreRef.current);
     }
     lockPiece();
-    draw();
-  }, [draw, lockPiece, move, setScore]);
+  }, [lockPiece, move, setScore]);
 
-  const tick = useCallback(() => {
-    if (!move(0, 1)) lockPiece();
-    draw();
-  }, [draw, lockPiece, move]);
+  const softDrop = useCallback(() => {
+    if (move(0, 1)) {
+      scoreRef.current += 1;
+      setScore(scoreRef.current);
+      accumulatorRef.current = 0;
+    }
+  }, [move, setScore]);
 
+  /** Loop com passo lógico fixo (acumulador) + desenho apenas quando muda. */
   useEffect(() => {
     if (status !== "running") return;
+    lastFrameRef.current = 0;
     const loop = (time: number) => {
-      const speed = Math.max(140, BASE_SPEED - linesRef.current * 25);
-      if (time - lastTickRef.current >= speed) {
-        lastTickRef.current = time;
-        tick();
+      if (!lastFrameRef.current) lastFrameRef.current = time;
+      const delta = Math.min(time - lastFrameRef.current, 120);
+      lastFrameRef.current = time;
+      const step = Math.max(120, BASE_SPEED - linesRef.current * 25);
+      accumulatorRef.current += delta;
+      let guard = 4;
+      while (accumulatorRef.current >= step && guard > 0) {
+        accumulatorRef.current -= step;
+        guard -= 1;
+        if (!move(0, 1)) lockPiece();
       }
+      if (dirtyRef.current) draw();
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [status, tick]);
+  }, [draw, lockPiece, move, status]);
+
+  // Evita salto ao voltar para a aba
+  useEffect(() => {
+    const onVisible = () => {
+      lastFrameRef.current = 0;
+      accumulatorRef.current = 0;
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(rect.width * dpr);
+      if (rect.width < 2) return;
+      const isMobile = window.innerWidth < 768;
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+      const width = Math.floor(rect.width * dpr);
+      canvas.width = width;
       canvas.height = Math.floor(((rect.width * ROWS) / COLS) * dpr);
+      buildGridLayer(canvas.width, canvas.height);
+      dirtyRef.current = true;
       draw();
     };
     resize();
     window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, [draw]);
+    window.addEventListener("orientationchange", resize);
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("orientationchange", resize);
+    };
+  }, [buildGridLayer, draw]);
 
   useEffect(() => {
+    const held = new Set<string>();
     const onKey = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       const running = useGameStore.getState().status === "running";
@@ -343,13 +410,11 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         move(1, 0);
       } else if (["arrowdown", "s"].includes(key) && running) {
         event.preventDefault();
-        if (move(0, 1)) {
-          scoreRef.current += 1;
-          setScore(scoreRef.current);
-        }
+        softDrop();
       } else if (["arrowup", "w"].includes(key) && running) {
         event.preventDefault();
-        rotatePiece();
+        if (!held.has(key)) rotatePiece();
+        held.add(key);
       } else if (key === " " || key === "p") {
         event.preventDefault();
         const current = useGameStore.getState().status;
@@ -361,9 +426,14 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         if (current !== "running") start();
       }
     };
+    const onKeyUp = (event: KeyboardEvent) => held.delete(event.key.toLowerCase());
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [move, rotatePiece, setScore, setStatus, start]);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, [move, rotatePiece, setStatus, softDrop, start]);
 
   useEffect(() => {
     if (!directionInput) return;
@@ -371,9 +441,9 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     const { direction } = directionInput;
     if (direction === "left") move(-1, 0);
     else if (direction === "right") move(1, 0);
-    else if (direction === "down") move(0, 1);
+    else if (direction === "down") softDrop();
     else rotatePiece();
-  }, [directionInput, move, rotatePiece]);
+  }, [directionInput, move, rotatePiece, softDrop]);
 
   useEffect(() => {
     if (!actionInput) return;
@@ -397,46 +467,56 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     return () => setMusicTheme("arcade");
   }, [musicOn]);
 
+  const level = Math.floor(lines / 10) + 1;
+
   return (
-    <div
-      className="game-fit relative"
-      style={
-        {
-          "--game-max": "340px",
-          "--game-aspect": `${COLS / ROWS}`,
-          "--game-reserve": "360px",
-        } as React.CSSProperties
-      }
-    >
-      <div className="mb-2 flex items-center justify-center gap-2">
-        <span className="ui-label text-muted-foreground text-[9px] tracking-widest">PRÓXIMAS</span>
-        {nextPieces.map((def, index) => (
-          <PiecePreview key={`${def.color}-${index}`} def={def} />
-        ))}
+    <div className="flex w-full min-w-0 items-stretch justify-center gap-2 sm:gap-3">
+      <div
+        className="game-fit relative"
+        style={
+          {
+            "--game-max": "460px",
+            "--game-aspect": `${COLS / ROWS}`,
+            "--game-reserve": "252px",
+          } as React.CSSProperties
+        }
+      >
+        <canvas
+          ref={canvasRef}
+          className="bg-background pixel-border-cyan block w-full"
+          style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
+        />
+        <GameOverlay
+          title="TETRIS"
+          hint="Setas movem · ↑ ou A gira · B desce rápido"
+          onStart={() => (status === "paused" ? setStatus("running") : start())}
+        />
       </div>
-      <canvas
-        ref={canvasRef}
-        className="bg-background pixel-border-cyan block w-full"
-        style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
-      />
-      <div className="mt-2 flex items-center justify-between gap-3">
-        <span className="ui-label text-muted-foreground text-[11px]">LINHAS {lines}</span>
+
+      <aside className="flex w-14 shrink-0 flex-col items-center gap-2 sm:w-20">
+        <span className="ui-label text-muted-foreground text-[8px] tracking-widest sm:text-[9px]">
+          PRÓX.
+        </span>
+        {nextPieces.map((def, index) => (
+          <PiecePreview key={`${def.color}-${index}`} def={def} size={index === 0 ? 9 : 7} />
+        ))}
+        <div className="mt-1 text-center">
+          <p className="ui-label text-muted-foreground text-[8px] tracking-widest">LINHAS</p>
+          <p className="text-accent text-xs font-bold sm:text-sm">{lines}</p>
+          <p className="ui-label text-muted-foreground mt-1 text-[8px] tracking-widest">NÍVEL</p>
+          <p className="text-neon-yellow text-xs font-bold sm:text-sm">{level}</p>
+        </div>
         <button
           type="button"
           onPointerDown={(event) => {
             event.preventDefault();
             if (useGameStore.getState().status === "running") hardDrop();
           }}
-          className="border-accent/45 text-accent bg-surface/40 rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-wide backdrop-blur transition-transform active:scale-95"
+          className="border-accent/45 text-accent bg-surface/40 mt-auto w-full rounded-lg border py-1.5 text-[9px] font-semibold tracking-wide backdrop-blur transition-transform active:scale-95"
         >
-          DESCER ↓↓
+          ↓↓
         </button>
-      </div>
-      <GameOverlay
-        title="TETRIS"
-        hint="Setas movem · ↑ ou A gira · B desce rápido"
-        onStart={() => (status === "paused" ? setStatus("running") : start())}
-      />
+      </aside>
     </div>
   );
 }
