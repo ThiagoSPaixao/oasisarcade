@@ -222,7 +222,16 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
   }, [actionInput, setStatus, start]);
 
   return (
-    <div className="relative mx-auto w-full max-w-[360px]">
+    <div
+      className="game-fit relative"
+      style={
+        {
+          "--game-max": "360px",
+          "--game-aspect": `${W / H}`,
+          "--game-reserve": "300px",
+        } as React.CSSProperties
+      }
+    >
       <canvas
         ref={canvasRef}
         className="bg-background pixel-border-cyan block w-full"
