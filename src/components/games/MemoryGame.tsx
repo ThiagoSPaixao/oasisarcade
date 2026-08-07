@@ -90,7 +90,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
 
   return (
     <div className="relative mx-auto w-full max-w-[380px]">
-      <div className="bg-surface pixel-border-cyan grid grid-cols-4 gap-2 p-2">
+      <div className="bg-surface panel-cyan grid grid-cols-4 gap-2 p-3">
         {cards.map((card, index) => {
           const open = card.flipped || card.matched;
           return (
@@ -113,13 +113,13 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
           );
         })}
       </div>
-      <p className="font-pixel text-muted-foreground mt-2 text-center text-[9px]">
+      <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">
         PARES {matched}/{SYMBOLS.length} · JOGADAS {moves}
       </p>
 
       {status !== "running" ? (
         <div className="bg-background/85 absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center backdrop-blur-sm">
-          <p className="font-pixel glow-cyan text-accent text-sm">
+          <p className="ui-label glow-cyan text-accent text-sm">
             {status === "over" ? "PARABÉNS!" : "JOGO DA MEMÓRIA"}
           </p>
           <p className="text-muted-foreground text-xs">
@@ -134,7 +134,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
               play("coin");
               start();
             }}
-            className="font-pixel bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
+            className="ui-label bg-primary text-primary-foreground rounded-lg px-6 py-3 text-sm transition-transform active:scale-95"
           >
             {status === "over" ? "JOGAR DE NOVO" : "INSERIR FICHA"}
           </button>

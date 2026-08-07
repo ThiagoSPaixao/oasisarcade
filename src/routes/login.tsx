@@ -43,11 +43,11 @@ function LoginPage() {
   return (
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-lg">
+        <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-base">
           RETRÔ ARCADE
         </p>
-        <form onSubmit={onSubmit} className="bg-surface pixel-border flex flex-col gap-4 p-5">
-          <h1 className="font-pixel glow-cyan text-accent text-xs">INSERT COIN</h1>
+        <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
+          <h1 className="ui-label glow-cyan text-accent text-sm">INSERT COIN</h1>
           <label className="flex flex-col gap-1 text-xs">
             <span className="text-muted-foreground">E-mail</span>
             <input
@@ -73,7 +73,7 @@ function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="font-pixel bg-primary text-primary-foreground px-3 py-3 text-[10px] transition-transform active:scale-95 disabled:opacity-60"
+            className="ui-label bg-primary text-primary-foreground rounded-lg px-3 py-3.5 text-xs transition-transform active:scale-95 disabled:opacity-60"
           >
             {loading ? "CARREGANDO..." : "ENTRAR"}
           </button>

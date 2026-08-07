@@ -41,7 +41,7 @@ export function PlanCards({
         return (
           <div
             key={plan.id}
-            className={`bg-surface flex flex-col gap-3 p-5 ${premium ? "pixel-border-magenta" : "pixel-border-cyan"}`}
+            className={`bg-surface flex flex-col gap-3 p-5 ${premium ? "panel-magenta" : "panel-cyan"}`}
           >
             <div className="flex items-center gap-2">
               {premium ? (
@@ -49,11 +49,11 @@ export function PlanCards({
               ) : (
                 <Gamepad2 className="text-accent h-4 w-4" />
               )}
-              <h3 className={`font-pixel text-[11px] ${premium ? "text-primary glow-magenta" : "text-accent"}`}>
+              <h3 className={`ui-label text-[11px] ${premium ? "text-primary glow-magenta" : "text-accent"}`}>
                 {plan.name}
               </h3>
             </div>
-            <p className="font-pixel text-foreground text-base">{plan.price}</p>
+            <p className="ui-label text-foreground text-base">{plan.price}</p>
             <p className="text-muted-foreground text-xs">{plan.period}</p>
             <ul className="mt-2 flex flex-col gap-2">
               {plan.perks.map((perk) => (
@@ -67,7 +67,7 @@ export function PlanCards({
               type="button"
               disabled={active || pending}
               onClick={() => onSelect(plan.id)}
-              className={`font-pixel mt-auto px-3 py-3 text-[9px] transition-transform active:scale-95 disabled:opacity-60 ${
+              className={`ui-label mt-auto rounded-lg px-4 py-3 text-xs transition-transform active:scale-95 disabled:opacity-60 ${
                 premium ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
               }`}
             >

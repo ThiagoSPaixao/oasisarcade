@@ -334,7 +334,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         className="bg-background pixel-border-cyan block w-full"
         style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
       />
-      <p className="font-pixel text-muted-foreground mt-2 text-center text-[9px]">LINHAS {lines}</p>
+      <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">LINHAS {lines}</p>
       <GameOverlay
         title="TETRIS"
         hint="Setas para mover · ↑ ou A gira · ↓ desce"

@@ -42,11 +42,11 @@ function UpgradePage() {
           <Link
             to="/dashboard"
             aria-label="Voltar ao dashboard"
-            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 place-items-center"
+            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 rounded-lg place-items-center"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="font-pixel glow-magenta text-primary text-xs sm:text-base">ESCOLHA SEU PLAYER</h1>
+          <h1 className="font-pixel glow-magenta text-primary text-[11px] sm:text-sm">ESCOLHA SEU PLAYER</h1>
         </div>
         <p className="text-muted-foreground mt-4 text-sm">
           Preços de demonstração — nenhuma cobrança real é feita. A assinatura é simulada e libera os jogos

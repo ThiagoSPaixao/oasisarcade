@@ -76,14 +76,14 @@ export function GamePlayer({
           <Link
             to="/dashboard"
             aria-label="Voltar ao dashboard"
-            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 shrink-0 place-items-center"
+            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 rounded-lg shrink-0 place-items-center"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="font-pixel glow-magenta text-primary truncate text-xs sm:text-base">{game.name}</h1>
+          <h1 className="font-pixel glow-magenta text-primary truncate text-[11px] sm:text-sm">{game.name}</h1>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          <div className="font-pixel text-right text-[9px]">
+          <div className="ui-label text-right text-[11px]">
             <p className="text-accent">SCORE {score}</p>
             <p className="text-neon-yellow">HI {Math.max(storeBest, score)}</p>
           </div>

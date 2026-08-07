@@ -22,7 +22,7 @@ function DirButton({
         pressDirection(direction);
       }}
       className={cn(
-        "pixel-border-cyan bg-surface-2 text-accent flex h-14 w-14 items-center justify-center transition-transform active:scale-95",
+        "pixel-border-cyan bg-surface-2 text-accent flex h-14 w-14 items-center justify-center rounded-xl transition-transform active:scale-95",
         className,
       )}
     >
@@ -41,7 +41,7 @@ function ActBtn({ action, label }: { action: ActionButton; label: string }) {
         pressAction(action);
       }}
       className={cn(
-        "font-pixel flex h-16 w-16 items-center justify-center rounded-full text-xs transition-transform active:scale-95",
+        "ui-label flex h-16 w-16 items-center justify-center rounded-full text-xs transition-transform active:scale-95",
         action === "a"
           ? "bg-primary text-primary-foreground pixel-border-magenta rounded-full"
           : "bg-accent text-accent-foreground pixel-border-cyan rounded-full",
@@ -57,7 +57,7 @@ export function DPad({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "bg-surface/80 pixel-border flex w-full items-center justify-between gap-6 p-4 backdrop-blur",
+        "glass flex w-full items-center justify-between gap-6 p-4",
         className,
       )}
     >
