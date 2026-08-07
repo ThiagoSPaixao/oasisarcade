@@ -43,43 +43,46 @@ function LoginPage() {
   return (
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-base">
-          OÁSIS ARCADE
-        </p>
-        <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
-          <h1 className="ui-label glow-cyan text-accent text-sm">INSERT COIN</h1>
-          <label className="flex flex-col gap-1 text-xs">
-            <span className="text-muted-foreground">E-mail</span>
+        <h1 className="font-pixel glow-magenta text-primary mb-8 text-center text-[20px] leading-tight font-normal">
+          OÁSIS <span className="glow-cyan text-accent">ARCADE</span>
+        </h1>
+        <form
+          onSubmit={onSubmit}
+          className="border-accent/35 bg-surface/45 flex flex-col gap-4 rounded-2xl border p-6 shadow-[0_0_44px_-16px_color-mix(in_oklab,var(--neon-cyan)_55%,transparent)] backdrop-blur-xl"
+        >
+          <h2 className="glow-cyan text-accent text-sm font-semibold tracking-[0.14em]">INSERT COIN</h2>
+          <label className="flex flex-col gap-1.5 text-xs">
+            <span className="text-muted-foreground font-medium">E-mail</span>
             <input
               type="email"
               required
               autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="bg-background text-foreground pixel-border-cyan px-3 py-2 text-sm outline-none"
+              className="bg-surface-2/70 text-foreground border-accent/30 placeholder:text-muted-foreground/60 focus:border-accent/70 rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs">
-            <span className="text-muted-foreground">Senha</span>
+          <label className="flex flex-col gap-1.5 text-xs">
+            <span className="text-muted-foreground font-medium">Senha</span>
             <input
               type="password"
               required
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="bg-background text-foreground pixel-border-cyan px-3 py-2 text-sm outline-none"
+              className="bg-surface-2/70 text-foreground border-accent/30 placeholder:text-muted-foreground/60 focus:border-accent/70 rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors"
             />
           </label>
           <button
             type="submit"
             disabled={loading}
-            className="ui-label bg-primary text-primary-foreground rounded-lg px-3 py-3.5 text-xs transition-transform active:scale-95 disabled:opacity-60"
+            className="bg-primary text-primary-foreground mt-1 rounded-full px-3 py-3.5 text-sm font-bold tracking-[0.18em] shadow-[0_0_40px_-10px_color-mix(in_oklab,var(--neon-magenta)_75%,transparent)] transition-transform active:scale-95 disabled:opacity-60"
           >
             {loading ? "CARREGANDO..." : "ENTRAR"}
           </button>
           <p className="text-muted-foreground text-center text-xs">
             Sem conta?{" "}
-            <Link to="/register" className="text-accent underline">
+            <Link to="/register" className="text-accent font-medium no-underline hover:underline hover:decoration-1">
               Criar player
             </Link>
           </p>
