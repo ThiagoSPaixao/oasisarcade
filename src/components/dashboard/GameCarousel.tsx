@@ -1,21 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Heart, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Lock, Play } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
+import { gameCover } from "@/lib/game-covers";
 import { useSoundStore } from "@/stores/sound-store";
 
-const ART: Record<string, { emoji: string; from: string; to: string }> = {
-  tetris: { emoji: "🧱", from: "from-neon-cyan/30", to: "to-neon-magenta/20" },
-  snake: { emoji: "🐍", from: "from-neon-green/30", to: "to-neon-cyan/20" },
-  memoria: { emoji: "🃏", from: "from-neon-yellow/30", to: "to-neon-magenta/20" },
-  "space-shooter": { emoji: "🚀", from: "from-neon-magenta/30", to: "to-neon-cyan/20" },
-  breakout: { emoji: "🧊", from: "from-neon-cyan/25", to: "to-neon-yellow/20" },
-  pong: { emoji: "🏓", from: "from-neon-green/25", to: "to-neon-magenta/20" },
-};
-
-/** Carrossel de jogos com swipe, um slide grande por vez. */
+/** Carrossel de jogos com swipe; o slide inteiro é clicável para abrir o jogo. */
 export function GameCarousel({
   games,
   scores,
@@ -75,74 +67,100 @@ export function GameCarousel({
       </div>
 
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex touch-pan-y">
+        <div className="-ml-3 flex touch-pan-y">
           {games.map((game, index) => {
-            const art = ART[game.slug] ?? { emoji: "🕹️", from: "from-primary/25", to: "to-accent/20" };
             const locked = game.is_premium && !isPremiumUser;
             const isFavorite = favorites.includes(game.slug);
             const active = index === selected;
+            const cover = gameCover(game.slug, game.thumbnail);
             return (
-              <article
+              <div
                 key={game.slug}
-                className={cn(
-                  "min-w-0 shrink-0 grow-0 basis-[82%] pr-3 transition-all duration-300 sm:basis-[52%] lg:basis-[36%]",
-                  active ? "scale-100 opacity-100" : "scale-[0.92] opacity-50",
-                )}
+                className="min-w-0 shrink-0 grow-0 basis-[80%] pl-3 sm:basis-[52%] lg:basis-[36%]"
               >
-                <div className="flex h-full flex-col">
-                  <div
+                <div
+                  className={cn(
+                    "relative transition-all duration-300",
+                    active ? "opacity-100" : "scale-[0.95] opacity-45",
+                  )}
+                >
+                  <Link
+                    to="/game/$slug"
+                    params={{ slug: game.slug }}
+                    onClick={() => play("coin")}
+                    aria-label={`Jogar ${game.name}`}
                     className={cn(
-                      "relative grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl bg-gradient-to-br",
-                      art.from,
-                      art.to,
-                      active && "shadow-[0_0_44px_-18px_var(--neon-magenta)]",
+                      "border-foreground/10 bg-surface-2 block overflow-hidden rounded-2xl border transition-transform active:scale-[0.98]",
+                      active && "border-primary/40 shadow-[0_0_48px_-18px_var(--neon-magenta)]",
                     )}
                   >
-                    <span className="text-5xl drop-shadow-lg sm:text-6xl">{art.emoji}</span>
-                    {game.is_premium ? (
-                      <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-wide backdrop-blur">
-                        PREMIUM
-                      </span>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        play("select");
-                        onToggleFavorite(game.slug);
-                      }}
-                      aria-label={isFavorite ? `Remover ${game.name} dos favoritos` : `Favoritar ${game.name}`}
-                      className="bg-background/50 border-foreground/10 absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full border backdrop-blur"
-                    >
-                      <Heart
-                        className={cn(
-                          "h-4 w-4",
-                          isFavorite ? "text-primary fill-current" : "text-muted-foreground",
-                        )}
-                        strokeWidth={1.3}
-                      />
-                    </button>
-                    {game.state !== "playable" ? (
-                      <span className="bg-background/60 text-neon-yellow absolute bottom-2 left-2 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
-                        EM BREVE
-                      </span>
-                    ) : null}
-                  </div>
+                    <div className="relative aspect-[4/3] w-full">
+                      {cover ? (
+                        <img
+                          src={cover}
+                          alt={`Capa do jogo ${game.name}`}
+                          loading="lazy"
+                          width={768}
+                          height={576}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="arcade-grid grid h-full w-full place-items-center">
+                          <span className="glow-magenta text-primary text-xs font-semibold">
+                            {game.name.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
 
-                  <div className="flex flex-1 flex-col items-start gap-1 px-1 pt-3">
-                    <h3 className="text-foreground text-base font-semibold tracking-tight">{game.name}</h3>
-                    <p className="text-muted-foreground text-[11px]">High Score · {scores[game.slug] ?? 0}</p>
-                    <Link
-                      to="/game/$slug"
-                      params={{ slug: game.slug }}
-                      onClick={() => play("coin")}
-                      className="bg-primary text-primary-foreground mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.12em] shadow-[0_0_22px_-8px_var(--neon-magenta)] transition-transform active:scale-95"
-                    >
-                      {locked ? <Lock className="h-3 w-3" strokeWidth={1.6} /> : null}
-                      JOGAR AGORA
-                    </Link>
-                  </div>
+                      <div className="from-background via-background/30 absolute inset-0 bg-gradient-to-t to-transparent" />
+
+                      {game.is_premium ? (
+                        <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-wide backdrop-blur">
+                          PREMIUM
+                        </span>
+                      ) : null}
+                      {game.state !== "playable" ? (
+                        <span className="bg-background/60 text-neon-yellow absolute bottom-2 left-2 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
+                          EM BREVE
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 px-4 pt-1 pb-4">
+                      <div className="min-w-0">
+                        <h3 className="text-foreground truncate text-base font-semibold tracking-tight">
+                          {game.name}
+                        </h3>
+                        <p className="text-muted-foreground text-[11px]">
+                          High Score · {scores[game.slug] ?? 0}
+                        </p>
+                      </div>
+                      <span className="bg-primary text-primary-foreground grid h-11 w-11 shrink-0 place-items-center rounded-full shadow-[0_0_26px_-8px_var(--neon-magenta)]">
+                        {locked ? (
+                          <Lock className="h-4 w-4" strokeWidth={1.8} />
+                        ) : (
+                          <Play className="h-4 w-4 fill-current" strokeWidth={1.8} />
+                        )}
+                      </span>
+                    </div>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      play("select");
+                      onToggleFavorite(game.slug);
+                    }}
+                    aria-label={isFavorite ? `Remover ${game.name} dos favoritos` : `Favoritar ${game.name}`}
+                    className="bg-background/50 border-foreground/10 absolute top-2 right-2 grid h-9 w-9 place-items-center rounded-full border backdrop-blur"
+                  >
+                    <Heart
+                      className={cn("h-4 w-4", isFavorite ? "text-primary fill-current" : "text-muted-foreground")}
+                      strokeWidth={1.3}
+                    />
+                  </button>
                 </div>
-              </article>
+              </div>
             );
           })}
         </div>
