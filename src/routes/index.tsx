@@ -10,13 +10,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Retrô Arcade — fliperama de jogos clássicos 8-bits" },
+      { title: "Oásis Arcade — fliperama de jogos clássicos 8-bits" },
       {
         name: "description",
         content:
-          "Retrô Arcade por ThiagoS.Paixão: Tetris, Snake, Jogo da Memória, Space Shooter e mais clássicos 8-bits com sons retrô direto no navegador.",
+          "Oásis Arcade por ThiagoS.Paixão: Tetris, Snake, Jogo da Memória, Space Shooter e mais clássicos 8-bits com sons retrô direto no navegador.",
       },
-      { property: "og:title", content: "Retrô Arcade — clássicos 8-bits no navegador" },
+      { property: "og:title", content: "Oásis Arcade — clássicos 8-bits no navegador" },
       {
         property: "og:description",
         content: "Entre no fliperama neon e jogue Tetris, Snake, Memória e Space Shooter com sons 8-bit.",
