@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { setMusicTheme, startMusic } from "@/lib/sound";
 import { GameOverlay } from "./GameOverlay";
 
 const COLS = 10;
@@ -75,25 +76,61 @@ function rotate(shape: Shape): Shape {
   );
 }
 
-function spawn(): Piece {
-  const piece = PIECES[Math.floor(Math.random() * PIECES.length)]!;
+type PieceDef = { shape: Shape; color: string };
+
+function randomDef(): PieceDef {
+  return PIECES[Math.floor(Math.random() * PIECES.length)]!;
+}
+
+function fromDef(def: PieceDef): Piece {
   return {
-    shape: piece.shape,
-    color: piece.color,
-    x: Math.floor((COLS - piece.shape[0]!.length) / 2),
+    shape: def.shape,
+    color: def.color,
+    x: Math.floor((COLS - def.shape[0]!.length) / 2),
     y: 0,
   };
+}
+
+function spawn(): Piece {
+  return fromDef(randomDef());
+}
+
+/** Miniatura da próxima peça. */
+function PiecePreview({ def }: { def: PieceDef }) {
+  const cols = def.shape[0]!.length;
+  return (
+    <div
+      className="border-foreground/10 bg-surface/40 grid gap-[2px] rounded-lg border p-1.5 backdrop-blur"
+      style={{ gridTemplateColumns: `repeat(${cols}, 10px)` }}
+    >
+      {def.shape.flatMap((row, y) =>
+        row.map((value, x) => (
+          <span
+            key={`${y}-${x}`}
+            className="h-[10px] w-[10px] rounded-[2px]"
+            style={
+              value
+                ? { background: `var(${def.color})`, boxShadow: `0 0 8px -2px var(${def.color})` }
+                : undefined
+            }
+          />
+        )),
+      )}
+    </div>
+  );
 }
 
 export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boardRef = useRef<Cell[][]>(emptyBoard());
   const pieceRef = useRef<Piece>(spawn());
+  const queueRef = useRef<PieceDef[]>([randomDef(), randomDef(), randomDef()]);
   const scoreRef = useRef(0);
   const linesRef = useRef(0);
   const lastTickRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const [lines, setLines] = useState(0);
+  const [nextPieces, setNextPieces] = useState<PieceDef[]>(() => queueRef.current);
 
   const status = useGameStore((s) => s.status);
   const setStatus = useGameStore((s) => s.setStatus);
@@ -101,6 +138,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
+  const musicOn = useSoundStore((s) => s.music);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -159,9 +197,18 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     );
   }, []);
 
+  const pullNext = useCallback(() => {
+    const def = queueRef.current.shift() ?? randomDef();
+    queueRef.current = [...queueRef.current, randomDef()];
+    setNextPieces(queueRef.current);
+    return fromDef(def);
+  }, []);
+
   const reset = useCallback(() => {
     boardRef.current = emptyBoard();
-    pieceRef.current = spawn();
+    queueRef.current = [randomDef(), randomDef(), randomDef()];
+    setNextPieces(queueRef.current);
+    pieceRef.current = fromDef(randomDef());
     scoreRef.current = 0;
     linesRef.current = 0;
     lastTickRef.current = 0;
@@ -198,7 +245,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       play("line");
     }
 
-    const next = spawn();
+    const next = pullNext();
     if (collides(next)) {
       setStatus("over");
       play("gameover");
@@ -206,7 +253,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       return;
     }
     pieceRef.current = next;
-  }, [collides, onGameOver, play, setScore, setStatus]);
+  }, [collides, onGameOver, play, pullNext, setScore, setStatus]);
 
   const move = useCallback(
     (dx: number, dy: number) => {
