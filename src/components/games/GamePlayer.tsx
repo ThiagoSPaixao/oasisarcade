@@ -17,7 +17,7 @@ import type { Game } from "@/types/arcade";
 
 const HINTS: Record<string, string> = {
   snake: "Setas / WASD ou D-Pad · A reinicia · B pausa",
-  tetris: "← → move · ↑ ou A gira · ↓ acelera · B pausa",
+  tetris: "← → move · ↑ ou A gira · B desce rápido",
   "space-shooter": "← → move · A atira · B pausa",
   breakout: "← → move a raquete · A começa · B pausa",
   pong: "← → move a raquete · A começa · B pausa",

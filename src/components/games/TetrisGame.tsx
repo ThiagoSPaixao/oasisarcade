@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { setMusicTheme, startMusic } from "@/lib/sound";
 import { GameOverlay } from "./GameOverlay";
 
 const COLS = 10;
@@ -75,25 +76,61 @@ function rotate(shape: Shape): Shape {
   );
 }
 
-function spawn(): Piece {
-  const piece = PIECES[Math.floor(Math.random() * PIECES.length)]!;
+type PieceDef = { shape: Shape; color: string };
+
+function randomDef(): PieceDef {
+  return PIECES[Math.floor(Math.random() * PIECES.length)]!;
+}
+
+function fromDef(def: PieceDef): Piece {
   return {
-    shape: piece.shape,
-    color: piece.color,
-    x: Math.floor((COLS - piece.shape[0]!.length) / 2),
+    shape: def.shape,
+    color: def.color,
+    x: Math.floor((COLS - def.shape[0]!.length) / 2),
     y: 0,
   };
+}
+
+function spawn(): Piece {
+  return fromDef(randomDef());
+}
+
+/** Miniatura da próxima peça. */
+function PiecePreview({ def }: { def: PieceDef }) {
+  const cols = def.shape[0]!.length;
+  return (
+    <div
+      className="border-foreground/10 bg-surface/40 grid gap-[2px] rounded-lg border p-1.5 backdrop-blur"
+      style={{ gridTemplateColumns: `repeat(${cols}, 10px)` }}
+    >
+      {def.shape.flatMap((row, y) =>
+        row.map((value, x) => (
+          <span
+            key={`${y}-${x}`}
+            className="h-[10px] w-[10px] rounded-[2px]"
+            style={
+              value
+                ? { background: `var(${def.color})`, boxShadow: `0 0 8px -2px var(${def.color})` }
+                : undefined
+            }
+          />
+        )),
+      )}
+    </div>
+  );
 }
 
 export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boardRef = useRef<Cell[][]>(emptyBoard());
   const pieceRef = useRef<Piece>(spawn());
+  const queueRef = useRef<PieceDef[]>([randomDef(), randomDef(), randomDef()]);
   const scoreRef = useRef(0);
   const linesRef = useRef(0);
   const lastTickRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const [lines, setLines] = useState(0);
+  const [nextPieces, setNextPieces] = useState<PieceDef[]>(() => queueRef.current);
 
   const status = useGameStore((s) => s.status);
   const setStatus = useGameStore((s) => s.setStatus);
@@ -101,6 +138,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
+  const musicOn = useSoundStore((s) => s.music);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -159,9 +197,18 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     );
   }, []);
 
+  const pullNext = useCallback(() => {
+    const def = queueRef.current.shift() ?? randomDef();
+    queueRef.current = [...queueRef.current, randomDef()];
+    setNextPieces(queueRef.current);
+    return fromDef(def);
+  }, []);
+
   const reset = useCallback(() => {
     boardRef.current = emptyBoard();
-    pieceRef.current = spawn();
+    queueRef.current = [randomDef(), randomDef(), randomDef()];
+    setNextPieces(queueRef.current);
+    pieceRef.current = fromDef(randomDef());
     scoreRef.current = 0;
     linesRef.current = 0;
     lastTickRef.current = 0;
@@ -198,7 +245,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       play("line");
     }
 
-    const next = spawn();
+    const next = pullNext();
     if (collides(next)) {
       setStatus("over");
       play("gameover");
@@ -206,7 +253,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       return;
     }
     pieceRef.current = next;
-  }, [collides, onGameOver, play, setScore, setStatus]);
+  }, [collides, onGameOver, play, pullNext, setScore, setStatus]);
 
   const move = useCallback(
     (dx: number, dy: number) => {
@@ -235,6 +282,18 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       }
     }
   }, [collides, draw, play]);
+
+  /** Descida rápida (hard drop) — exclusiva do Tetris. */
+  const hardDrop = useCallback(() => {
+    let dropped = 0;
+    while (move(0, 1)) dropped += 1;
+    if (dropped > 0) {
+      scoreRef.current += dropped * 2;
+      setScore(scoreRef.current);
+    }
+    lockPiece();
+    draw();
+  }, [draw, lockPiece, move, setScore]);
 
   const tick = useCallback(() => {
     if (!move(0, 1)) lockPiece();
@@ -323,9 +382,20 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       if (current === "running") rotatePiece();
       else if (current === "paused") setStatus("running");
       else start();
-    } else if (current === "running") setStatus("paused");
-    else if (current === "paused") setStatus("running");
-  }, [actionInput, rotatePiece, setStatus, start]);
+    } else if (actionInput.action === "b") {
+      // No Tetris o B faz a peça descer rápido (não pausa).
+      if (current === "running") hardDrop();
+      else if (current === "paused") setStatus("running");
+      else start();
+    }
+  }, [actionInput, hardDrop, rotatePiece, setStatus, start]);
+
+  // Trilha clássica do Tetris enquanto o jogo estiver aberto
+  useEffect(() => {
+    setMusicTheme("tetris");
+    if (musicOn) startMusic();
+    return () => setMusicTheme("arcade");
+  }, [musicOn]);
 
   return (
     <div
@@ -334,19 +404,37 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         {
           "--game-max": "340px",
           "--game-aspect": `${COLS / ROWS}`,
-          "--game-reserve": "300px",
+          "--game-reserve": "360px",
         } as React.CSSProperties
       }
     >
+      <div className="mb-2 flex items-center justify-center gap-2">
+        <span className="ui-label text-muted-foreground text-[9px] tracking-widest">PRÓXIMAS</span>
+        {nextPieces.map((def, index) => (
+          <PiecePreview key={`${def.color}-${index}`} def={def} />
+        ))}
+      </div>
       <canvas
         ref={canvasRef}
         className="bg-background pixel-border-cyan block w-full"
         style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
       />
-      <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">LINHAS {lines}</p>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <span className="ui-label text-muted-foreground text-[11px]">LINHAS {lines}</span>
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            if (useGameStore.getState().status === "running") hardDrop();
+          }}
+          className="border-accent/45 text-accent bg-surface/40 rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-wide backdrop-blur transition-transform active:scale-95"
+        >
+          DESCER ↓↓
+        </button>
+      </div>
       <GameOverlay
         title="TETRIS"
-        hint="Setas para mover · ↑ ou A gira · ↓ desce"
+        hint="Setas movem · ↑ ou A gira · B desce rápido"
         onStart={() => (status === "paused" ? setStatus("running") : start())}
       />
     </div>
