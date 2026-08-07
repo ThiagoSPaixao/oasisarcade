@@ -50,7 +50,7 @@ function LandingPage() {
   };
 
   return (
-    <ArcadeShell className="grid min-h-screen place-items-center px-5 py-10">
+    <ArcadeShell className="grid min-h-screen grid-cols-[minmax(0,1fr)] place-items-center px-5 py-10">
       <main className="relative mx-auto flex w-full max-w-lg min-w-0 flex-col items-center text-center">
 
         <div
@@ -87,12 +87,12 @@ function LandingPage() {
           <span className="glow-cyan text-accent">ARCADE</span>
         </h1>
 
-        <p className="text-muted-foreground mt-5 max-w-xs text-sm leading-relaxed">
+        <p className="text-muted-foreground mt-5 max-w-[min(20rem,100%)] text-sm leading-relaxed">
           Os clássicos de fliperama que você jogava — agora no seu bolso, com som 8-bit de verdade.
         </p>
 
-        <div className="mt-6 w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
-          <ul className="flex w-max gap-2 [animation:arcade-marquee_22s_linear_infinite]">
+        <div className="relative mt-6 h-8 w-full max-w-full min-w-0 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
+          <ul className="absolute inset-y-0 left-0 flex w-max items-center gap-2 [animation:arcade-marquee_22s_linear_infinite]">
             {[...HIGHLIGHTS, ...HIGHLIGHTS].map((game, index) => (
               <li
                 key={`${game}-${index}`}
@@ -103,6 +103,7 @@ function LandingPage() {
             ))}
           </ul>
         </div>
+
 
 
         <button
