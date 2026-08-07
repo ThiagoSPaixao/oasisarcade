@@ -71,24 +71,25 @@ export function GamePlayer({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <Link
-            to="/dashboard"
-            aria-label="Voltar ao dashboard"
-            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 rounded-lg shrink-0 place-items-center"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <h1 className="font-pixel glow-magenta text-primary truncate text-[11px] sm:text-sm">{game.name}</h1>
+      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
+        <Link
+          to="/dashboard"
+          aria-label="Voltar ao dashboard"
+          className="border-foreground/15 text-muted-foreground hover:text-primary hover:border-primary/40 grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.3} />
+        </Link>
+        <div className="min-w-0 text-center">
+          <h1 className="glow-magenta text-primary truncate text-base font-bold tracking-tight sm:text-lg">
+            {game.name}
+          </h1>
+          <p className="text-muted-foreground mt-0.5 text-[11px]">
+            <span className="text-accent font-semibold">Score {score}</span>
+            <span className="opacity-40"> · </span>
+            <span className="text-neon-yellow font-semibold">High {Math.max(storeBest, score)}</span>
+          </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="ui-label text-right text-[11px]">
-            <p className="text-accent">SCORE {score}</p>
-            <p className="text-neon-yellow">HI {Math.max(storeBest, score)}</p>
-          </div>
-          <SoundToggle />
-        </div>
+        <SoundToggle />
       </div>
 
       <div className="flex flex-col items-center gap-5 lg:flex-row lg:items-start lg:justify-center">
@@ -97,7 +98,7 @@ export function GamePlayer({
         {needsDPad ? (
           <div className="w-full lg:max-w-xs">
             <DPad />
-            <p className="text-muted-foreground mt-2 text-center text-[10px]">
+            <p className="text-muted-foreground/80 mt-3 text-center text-[10px] leading-relaxed">
               {HINTS[game.slug] ?? "A = jogar/reiniciar · B = pausar"}
             </p>
           </div>
