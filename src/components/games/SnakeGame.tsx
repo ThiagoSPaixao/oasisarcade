@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
 import type { Direction } from "@/types/arcade";
@@ -8,6 +8,9 @@ const BASE_SPEED = 160;
 const MIN_SPEED = 70;
 const BONUS_INTERVAL = 13000;
 const BONUS_LIFE = 7000;
+const FRAME_MS = 1000 / 60;
+const MAX_FRAME_DELTA = 80;
+const MAX_PARTICLES = 40;
 
 type Point = { x: number; y: number };
 type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: string };
@@ -74,6 +77,8 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   const bonusRef = useRef<{ x: number; y: number; born: number } | null>(null);
   const nextBonusRef = useRef(0);
   const lastTickRef = useRef(0);
+  const lastFrameRef = useRef(0);
+  const accumulatorRef = useRef(0);
   const tickSpeedRef = useRef(BASE_SPEED);
   const scoreRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -96,7 +101,6 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
-  const [, forceRender] = useState(0);
 
   const buildGridLayer = useCallback((size: number) => {
     const layer = gridLayerRef.current ?? document.createElement("canvas");
@@ -131,7 +135,8 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   }, []);
 
   const spawnParticles = useCallback((cell: number, cx: number, cy: number, color: string, count: number) => {
-    for (let i = 0; i < count; i += 1) {
+    const available = Math.max(0, MAX_PARTICLES - particlesRef.current.length);
+    for (let i = 0; i < Math.min(count, available); i += 1) {
       const angle = Math.random() * Math.PI * 2;
       const speed = cell * (0.04 + Math.random() * 0.09);
       particlesRef.current.push({
@@ -146,7 +151,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   }, []);
 
   const draw = useCallback(
-    (time: number) => {
+    (time: number, frameDelta = FRAME_MS, progress?: number) => {
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext("2d");
       if (!canvas || !ctx) return;
@@ -165,12 +170,12 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       if (shakeRef.current > 0.01) {
         const s = shakeRef.current * cell * 0.35;
         ctx.translate((Math.random() - 0.5) * s, (Math.random() - 0.5) * s);
-        shakeRef.current *= 0.86;
+        shakeRef.current *= Math.pow(0.86, frameDelta / FRAME_MS);
       }
 
       const running = useGameStore.getState().status === "running";
       const t = running
-        ? Math.min(1, (time - lastTickRef.current) / Math.max(1, tickSpeedRef.current))
+        ? Math.min(1, progress ?? (time - lastTickRef.current) / Math.max(1, tickSpeedRef.current))
         : 1;
 
       const center = (px: number, py: number) => ({ cx: px * cell + cell / 2, cy: py * cell + cell / 2 });
@@ -346,13 +351,15 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       // Partículas de comida
       const particles = particlesRef.current;
       if (particles.length) {
+        const frameScale = Math.min(3, frameDelta / FRAME_MS);
+        const damping = Math.pow(0.94, frameScale);
         for (let i = particles.length - 1; i >= 0; i -= 1) {
           const pt = particles[i]!;
-          pt.x += pt.vx;
-          pt.y += pt.vy;
-          pt.vx *= 0.94;
-          pt.vy *= 0.94;
-          pt.life -= 0.035;
+          pt.x += pt.vx * frameScale;
+          pt.y += pt.vy * frameScale;
+          pt.vx *= damping;
+          pt.vy *= damping;
+          pt.life -= 0.035 * frameScale;
           if (pt.life <= 0) {
             particles.splice(i, 1);
             continue;
@@ -380,12 +387,15 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     bonusRef.current = null;
     nextBonusRef.current = performance.now() + BONUS_INTERVAL;
     scoreRef.current = 0;
-    lastTickRef.current = performance.now();
+    const now = performance.now();
+    lastTickRef.current = now;
+    lastFrameRef.current = now;
+    accumulatorRef.current = 0;
     tickSpeedRef.current = BASE_SPEED;
     particlesRef.current = [];
     shakeRef.current = 0;
     setScore(0);
-    draw(performance.now());
+    draw(now, 0, 1);
   }, [draw, setScore]);
 
   const turn = useCallback((direction: Direction) => {
@@ -451,8 +461,14 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   // Game loop
   useEffect(() => {
     if (status !== "running") return;
-    lastTickRef.current = performance.now();
+    const startedAt = performance.now();
+    lastFrameRef.current = startedAt;
+    lastTickRef.current = startedAt - accumulatorRef.current;
+
     const loop = (time: number) => {
+      const frameDelta = Math.min(MAX_FRAME_DELTA, Math.max(0, time - lastFrameRef.current));
+      lastFrameRef.current = time;
+
       const bonus = bonusRef.current;
       if (bonus && time - bonus.born > BONUS_LIFE) {
         bonusRef.current = null;
@@ -463,16 +479,32 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       }
 
       tickSpeedRef.current = Math.max(MIN_SPEED, BASE_SPEED - Math.floor(scoreRef.current / 30) * 8);
-      if (time - lastTickRef.current >= tickSpeedRef.current) {
-        lastTickRef.current = time;
+      accumulatorRef.current += frameDelta;
+      let steps = 0;
+      while (accumulatorRef.current >= tickSpeedRef.current && steps < 3) {
+        accumulatorRef.current -= tickSpeedRef.current;
         step();
+        steps += 1;
+        if (useGameStore.getState().status !== "running") break;
       }
-      draw(time);
-      rafRef.current = requestAnimationFrame(loop);
+      if (steps === 3 && accumulatorRef.current >= tickSpeedRef.current) {
+        accumulatorRef.current %= tickSpeedRef.current;
+      }
+      lastTickRef.current = time - accumulatorRef.current;
+      draw(time, frameDelta, accumulatorRef.current / tickSpeedRef.current);
+      if (useGameStore.getState().status === "running") {
+        rafRef.current = requestAnimationFrame(loop);
+      }
     };
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) lastFrameRef.current = performance.now();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [draw, status, step]);
 
@@ -484,14 +516,16 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     let raf = 0;
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+      const dprLimit = mobile ? 1.25 : 1.5;
+      const dpr = Math.min(window.devicePixelRatio || 1, dprLimit);
       const px = Math.floor(rect.width * dpr);
       if (px <= 0) return;
+      if (canvas.width === px && canvas.height === px) return;
       canvas.width = px;
       canvas.height = px;
       buildGridLayer(px);
-      draw(performance.now());
-      forceRender((n) => n + 1);
+      draw(performance.now(), 0);
     };
     resize();
     const onResize = () => {
