@@ -9,7 +9,9 @@ import { BreakoutGame } from "./BreakoutGame";
 import { PongGame } from "./PongGame";
 import { ComingSoon } from "./ComingSoon";
 import { DPad } from "./DPad";
-import { SoundToggle } from "@/components/arcade/SoundToggle";
+import { SettingsMenu } from "@/components/arcade/SettingsMenu";
+import { AnalogPad } from "./AnalogPad";
+import { useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
 import type { Game } from "@/types/arcade";
 
@@ -58,6 +60,14 @@ export function GamePlayer({
   const score = useGameStore((s) => s.score);
   const storeBest = useGameStore((s) => s.best);
 
+  const controlMode = useSettingsStore((s) => s.controlMode);
+
+  // Trava o scroll enquanto o jogo está aberto: tudo cabe na tela do aparelho.
+  useEffect(() => {
+    document.documentElement.classList.add("game-locked");
+    return () => document.documentElement.classList.remove("game-locked");
+  }, []);
+
   useEffect(() => {
     setActiveGame(game.slug);
     return () => setActiveGame(null);
@@ -70,7 +80,7 @@ export function GamePlayer({
   const needsDPad = game.state === "playable" && game.slug !== "memoria";
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4">
+    <div className="flex h-full min-h-0 flex-col gap-2 sm:gap-4">
       <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3">
         <Link
           to="/dashboard"
@@ -89,15 +99,15 @@ export function GamePlayer({
             <span className="text-neon-yellow font-semibold">High {Math.max(storeBest, score)}</span>
           </p>
         </div>
-        <SoundToggle />
+        <SettingsMenu />
       </div>
 
-      <div className="flex flex-col items-center gap-3 sm:gap-5 lg:flex-row lg:items-start lg:justify-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:gap-5 lg:flex-row lg:items-center lg:justify-center">
         <GameScreen game={game} onGameOver={onGameOver} />
 
         {needsDPad ? (
-          <div className="mx-auto w-full max-w-sm lg:max-w-xs">
-            <DPad />
+          <div className="mx-auto w-full max-w-sm shrink-0 lg:max-w-xs">
+            {controlMode === "analog" ? <AnalogPad /> : <DPad />}
             <p className="text-muted-foreground/80 mt-2 text-center text-[10px] leading-relaxed sm:mt-3">
               {HINTS[game.slug] ?? "A = jogar/reiniciar · B = pausar"}
             </p>

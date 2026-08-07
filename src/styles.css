@@ -103,6 +103,42 @@
   --sidebar-ring: oklch(0.71 0.28 342);
 }
 
+/* Modo claro (opcional nas configurações) */
+:root.light {
+  --background: oklch(0.97 0.008 285);
+  --foreground: oklch(0.22 0.03 285);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.94 0.012 285);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 285);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.03 285);
+  --primary: oklch(0.58 0.24 342);
+  --primary-foreground: oklch(0.99 0.005 280);
+  --secondary: oklch(0.93 0.015 285);
+  --secondary-foreground: oklch(0.25 0.03 285);
+  --muted: oklch(0.93 0.012 285);
+  --muted-foreground: oklch(0.45 0.02 285);
+  --accent: oklch(0.55 0.13 210);
+  --accent-foreground: oklch(0.99 0.005 280);
+  --border: oklch(0.86 0.015 285);
+  --input: oklch(0.88 0.015 285);
+  --ring: oklch(0.58 0.24 342);
+  --neon-magenta: oklch(0.58 0.24 342);
+  --neon-cyan: oklch(0.55 0.13 210);
+  --neon-yellow: oklch(0.72 0.15 85);
+  --neon-green: oklch(0.6 0.18 150);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.22 0.03 285);
+  --sidebar-accent: oklch(0.94 0.012 285);
+  --sidebar-accent-foreground: oklch(0.25 0.03 285);
+  --sidebar-border: oklch(0.86 0.015 285);
+}
+
+:root.light .scanlines::after {
+  opacity: 0.05;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -275,4 +311,17 @@
   .game-fit {
     max-width: var(--game-max, 520px);
   }
+}
+
+/* Tela de jogo: ocupa exatamente a viewport, sem scroll */
+html.game-locked,
+html.game-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+.game-screen {
+  height: 100dvh;
+  overflow: hidden;
 }
