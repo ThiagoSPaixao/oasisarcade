@@ -248,7 +248,12 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   }, [actionInput, setStatus, start]);
 
   return (
-    <div className="relative w-full max-w-[520px]">
+    <div
+      className="game-fit relative"
+      style={
+        { "--game-max": "520px", "--game-aspect": "1", "--game-reserve": "300px" } as React.CSSProperties
+      }
+    >
       <canvas
         ref={canvasRef}
         className="bg-background border-primary/50 block aspect-square w-full rounded-2xl border shadow-[0_0_44px_-18px_var(--neon-magenta)]"
