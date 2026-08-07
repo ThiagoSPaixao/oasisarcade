@@ -251,11 +251,11 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     <div className="relative w-full max-w-[520px]">
       <canvas
         ref={canvasRef}
-        className="bg-background pixel-border-magenta block aspect-square w-full"
+        className="bg-background border-primary/50 block aspect-square w-full rounded-2xl border shadow-[0_0_44px_-18px_var(--neon-magenta)]"
         style={{ imageRendering: "pixelated" }}
       />
       {status !== "running" && (
-        <div className="bg-background/80 absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="bg-background/80 absolute inset-0 flex rounded-2xl flex-col items-center justify-center gap-4 px-6 text-center">
           <p className="ui-label glow-cyan text-accent text-sm sm:text-base">
             {status === "over" ? "GAME OVER" : status === "paused" ? "PAUSADO" : "SNAKE"}
           </p>
@@ -267,7 +267,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
           <button
             type="button"
             onClick={() => (status === "paused" ? setStatus("running") : start())}
-            className="ui-label bg-primary text-primary-foreground rounded-lg px-6 py-3 text-sm transition-transform active:scale-95"
+            className="bg-primary text-primary-foreground rounded-full px-6 py-3 text-xs font-bold tracking-[0.14em] shadow-[0_0_26px_-8px_var(--neon-magenta)] transition-transform active:scale-95"
           >
             {status === "over" ? "JOGAR DE NOVO" : status === "paused" ? "CONTINUAR" : "INSERIR FICHA"}
           </button>
