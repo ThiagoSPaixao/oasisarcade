@@ -158,16 +158,57 @@ export function playSfx(name: Sfx) {
   }
 }
 
-// --- Looping arcade theme -------------------------------------------------
-const MELODY = [
+// --- Looping themes -------------------------------------------------------
+export type MusicTheme = "arcade" | "tetris";
+
+const ARCADE_MELODY = [
   659, 0, 523, 0, 587, 0, 494, 0, 523, 0, 440, 0, 392, 0, 0, 0, 587, 0, 523, 0, 494, 0, 440, 0, 392,
   0, 440, 0, 494, 0, 0, 0,
 ];
-const BASS = [
+const ARCADE_BASS = [
   131, 0, 0, 0, 165, 0, 0, 0, 131, 0, 0, 0, 98, 0, 0, 0, 147, 0, 0, 0, 110, 0, 0, 0, 131, 0, 0, 0,
   98, 0, 0, 0,
 ];
-const STEP_MS = 150;
+
+/** Korobeiniki (tema clássico do Tetris), grade de colcheias. */
+const TETRIS_MELODY = [
+  659, 0, 494, 523, 587, 0, 523, 494,
+  440, 0, 440, 523, 659, 0, 587, 523,
+  494, 0, 0, 523, 587, 0, 659, 0,
+  523, 0, 440, 0, 440, 0, 0, 0,
+  587, 0, 0, 698, 880, 0, 784, 698,
+  659, 0, 0, 523, 659, 0, 587, 523,
+  494, 0, 494, 523, 587, 0, 659, 0,
+  523, 0, 440, 0, 440, 0, 0, 0,
+];
+const TETRIS_BASS = [
+  220, 0, 165, 0, 220, 0, 165, 0,
+  220, 0, 165, 0, 220, 0, 165, 0,
+  247, 0, 196, 0, 247, 0, 196, 0,
+  220, 0, 165, 0, 220, 0, 165, 0,
+  294, 0, 220, 0, 294, 0, 220, 0,
+  262, 0, 196, 0, 262, 0, 196, 0,
+  247, 0, 196, 0, 247, 0, 196, 0,
+  220, 0, 165, 0, 220, 0, 165, 0,
+];
+
+const TRACKS: Record<MusicTheme, { melody: number[]; bass: number[]; step: number }> = {
+  arcade: { melody: ARCADE_MELODY, bass: ARCADE_BASS, step: 150 },
+  tetris: { melody: TETRIS_MELODY, bass: TETRIS_BASS, step: 148 },
+};
+
+let currentTheme: MusicTheme = "arcade";
+
+/** Troca a trilha em execução (ex.: tema do Tetris dentro do jogo). */
+export function setMusicTheme(theme: MusicTheme) {
+  if (currentTheme === theme) return;
+  currentTheme = theme;
+  musicStep = 0;
+  if (musicTimer) {
+    stopMusic();
+    startMusic();
+  }
+}
 
 export function startMusic() {
   if (!musicEnabled || musicTimer) return;
@@ -175,12 +216,13 @@ export function startMusic() {
   if (!audio) return;
   const tick = () => {
     if (!musicEnabled) return stopMusic();
-    const lead = MELODY[musicStep % MELODY.length];
-    const bass = BASS[musicStep % BASS.length];
+    const track = TRACKS[currentTheme];
+    const lead = track.melody[musicStep % track.melody.length];
+    const bass = track.bass[musicStep % track.bass.length];
     if (lead) tone({ freq: lead, duration: 0.13, type: "square", gain: 0.12 });
-    if (bass) tone({ freq: bass, duration: 0.2, type: "triangle", gain: 0.18 });
+    if (bass) tone({ freq: bass, duration: 0.2, type: "triangle", gain: 0.16 });
     musicStep += 1;
-    musicTimer = setTimeout(tick, STEP_MS);
+    musicTimer = setTimeout(tick, track.step);
   };
   tick();
 }
@@ -189,3 +231,4 @@ export function stopMusic() {
   if (musicTimer) clearTimeout(musicTimer);
   musicTimer = null;
 }
+
