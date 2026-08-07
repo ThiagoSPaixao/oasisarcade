@@ -78,6 +78,8 @@ export function GamePlayer({
   }, [best, setBest]);
 
   const needsDPad = game.state === "playable" && game.slug !== "memoria";
+  // Tetris prioriza a área de jogo: controles compactos, como nos clássicos.
+  const compactPad = game.slug === "tetris";
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 sm:gap-4">
@@ -106,9 +108,19 @@ export function GamePlayer({
         <GameScreen game={game} onGameOver={onGameOver} />
 
         {needsDPad ? (
-          <div className="mx-auto w-full max-w-sm shrink-0 lg:max-w-xs">
-            {controlMode === "analog" ? <AnalogPad /> : <DPad />}
-            <p className="text-muted-foreground/80 mt-2 text-center text-[10px] leading-relaxed sm:mt-3">
+          <div
+            className={
+              compactPad
+                ? "mx-auto w-full max-w-[300px] shrink-0 lg:max-w-[260px]"
+                : "mx-auto w-full max-w-sm shrink-0 lg:max-w-xs"
+            }
+          >
+            {controlMode === "analog" ? (
+              <AnalogPad compact={compactPad} />
+            ) : (
+              <DPad compact={compactPad} />
+            )}
+            <p className="text-muted-foreground/80 mt-1.5 text-center text-[10px] leading-relaxed sm:mt-3">
               {HINTS[game.slug] ?? "A = jogar/reiniciar · B = pausar"}
             </p>
           </div>
