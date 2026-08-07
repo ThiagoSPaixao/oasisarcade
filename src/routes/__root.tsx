@@ -80,10 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Retrô Arcade — fliperama de clássicos 8-bits" },
+      { title: "Oásis Arcade — fliperama de clássicos 8-bits" },
       {
         name: "description",
-        content: "Jogue clássicos 8-bits no navegador, bata recordes e suba de nível no Retrô Arcade.",
+        content: "Jogue clássicos 8-bits no navegador, bata recordes e suba de nível no Oásis Arcade.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -101,7 +101,7 @@ function DashboardPage() {
         </GameRail>
 
         <p className="ui-label text-muted-foreground mt-10 text-center text-[10px] leading-relaxed">
-          RETRÔ ARCADE · DESENVOLVIDO POR{" "}
+          OÁSIS ARCADE · DESENVOLVIDO POR{" "}
           <span className="text-neon-green">ThiagoS.Paixão</span>
         </p>
       </div>

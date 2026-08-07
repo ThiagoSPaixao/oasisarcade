@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Gamepad2, Play } from "lucide-react";
+import { Gamepad2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { SoundToggle } from "@/components/arcade/SoundToggle";
@@ -10,13 +10,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Retrô Arcade — fliperama de jogos clássicos 8-bits" },
+      { title: "Oásis Arcade — fliperama de jogos clássicos 8-bits" },
       {
         name: "description",
         content:
-          "Retrô Arcade por ThiagoS.Paixão: Tetris, Snake, Jogo da Memória, Space Shooter e mais clássicos 8-bits com sons retrô direto no navegador.",
+          "Oásis Arcade por ThiagoS.Paixão: Tetris, Snake, Jogo da Memória, Space Shooter e mais clássicos 8-bits com sons retrô direto no navegador.",
       },
-      { property: "og:title", content: "Retrô Arcade — clássicos 8-bits no navegador" },
+      { property: "og:title", content: "Oásis Arcade — clássicos 8-bits no navegador" },
       {
         property: "og:description",
         content: "Entre no fliperama neon e jogue Tetris, Snake, Memória e Space Shooter com sons 8-bit.",
@@ -53,21 +53,21 @@ function LandingPage() {
   return (
     <ArcadeShell className="grid min-h-screen place-items-center px-5 py-10">
       <main className="mx-auto flex w-full max-w-lg flex-col items-center text-center">
-        <div className="panel-cyan bg-surface/60 mb-6 grid h-20 w-20 place-items-center backdrop-blur">
-          <Gamepad2 className="text-accent h-10 w-10" />
+        <div className="border-accent/40 bg-surface/40 mb-6 grid h-20 w-20 place-items-center rounded-full border shadow-[0_0_36px_-12px_color-mix(in_oklab,var(--neon-cyan)_60%,transparent)] backdrop-blur">
+          <Gamepad2 className="text-accent h-9 w-9" strokeWidth={1.1} />
         </div>
 
         <p className="ui-label text-neon-yellow glow-yellow animate-pulse text-[11px] tracking-widest">
           INSIRA UMA FICHA
         </p>
 
-        <h1 className="font-pixel glow-magenta text-primary mt-4 text-[26px] leading-tight sm:text-4xl">
-          RETRÔ
+        <h1 className="font-pixel glow-magenta text-primary mt-4 text-[24px] leading-tight font-normal sm:text-4xl">
+          OÁSIS
           <br />
           <span className="glow-cyan text-accent">ARCADE</span>
         </h1>
 
-        <p className="text-muted-foreground mt-5 text-sm">
+        <p className="text-muted-foreground mt-5 text-sm leading-relaxed">
           Os clássicos de fliperama que você jogava — agora no seu bolso, com som 8-bit de verdade.
         </p>
 
@@ -75,7 +75,7 @@ function LandingPage() {
           {HIGHLIGHTS.map((game) => (
             <li
               key={game}
-              className="ui-label bg-surface/60 pixel-border text-foreground/80 rounded-lg px-2.5 py-1.5 text-[10px] backdrop-blur"
+              className="border-accent/35 bg-surface/40 text-foreground/80 rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide backdrop-blur"
             >
               {game}
             </li>
@@ -86,9 +86,8 @@ function LandingPage() {
           type="button"
           onClick={enter}
           disabled={checking}
-          className="ui-label bg-primary text-primary-foreground mt-9 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 text-sm transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-12"
+          className="bg-primary text-primary-foreground mt-9 w-full rounded-full px-6 py-4 text-sm font-bold tracking-[0.18em] shadow-[0_0_40px_-10px_color-mix(in_oklab,var(--neon-magenta)_75%,transparent)] transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-14"
         >
-          <Play className="h-4 w-4" />
           ENTRAR
         </button>
 
