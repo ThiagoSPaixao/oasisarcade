@@ -61,7 +61,7 @@ function LandingPage() {
           INSIRA UMA FICHA
         </p>
 
-        <h1 className="ui-label glow-magenta text-primary mt-4 text-[26px] leading-tight sm:text-4xl">
+        <h1 className="font-pixel glow-magenta text-primary mt-4 text-[26px] leading-tight sm:text-4xl">
           RETRÔ
           <br />
           <span className="glow-cyan text-accent">ARCADE</span>

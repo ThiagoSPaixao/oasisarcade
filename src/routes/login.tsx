@@ -43,7 +43,7 @@ function LoginPage() {
   return (
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <p className="ui-label glow-magenta text-primary neon-pulse mb-8 text-center text-lg">
+        <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-lg">
           RETRÔ ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface pixel-border flex flex-col gap-4 p-5">

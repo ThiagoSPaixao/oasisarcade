@@ -8,7 +8,7 @@ export function DailyBanner({ game }: { game: Game }) {
       <div className="arcade-grid absolute inset-0 opacity-40" aria-hidden="true" />
       <div className="relative flex flex-col gap-4">
         <span className="ui-label glow-yellow text-neon-yellow text-[9px]">JOGO DO DIA</span>
-        <h2 className="ui-label glow-magenta text-primary neon-pulse text-xl sm:text-3xl">{game.name}</h2>
+        <h2 className="font-pixel glow-magenta text-primary neon-pulse text-lg sm:text-3xl">{game.name}</h2>
         <p className="text-muted-foreground max-w-md text-sm">{game.description}</p>
         <Link
           to="/game/$slug"

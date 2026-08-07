@@ -20,7 +20,7 @@ export function GameOverlay({
 
   return (
     <div className="bg-background/85 absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center backdrop-blur-sm">
-      <p className="ui-label glow-cyan text-accent text-sm sm:text-base">
+      <p className="font-pixel glow-cyan text-accent text-sm sm:text-base">
         {status === "over" ? "GAME OVER" : status === "paused" ? "PAUSADO" : title}
       </p>
       {status === "over" ? (

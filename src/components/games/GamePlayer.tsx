@@ -80,7 +80,7 @@ export function GamePlayer({
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="ui-label glow-magenta text-primary truncate text-xs sm:text-base">{game.name}</h1>
+          <h1 className="font-pixel glow-magenta text-primary truncate text-[11px] sm:text-sm">{game.name}</h1>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <div className="ui-label text-right text-[9px]">

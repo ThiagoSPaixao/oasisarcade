@@ -11,6 +11,6 @@ export function ArcadeShell({ children, className }: { children: ReactNode; clas
 
 export function NeonTitle({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <h1 className={cn("ui-label glow-magenta text-primary text-lg sm:text-2xl", className)}>{children}</h1>
+    <h1 className={cn("font-pixel glow-magenta text-primary text-base sm:text-2xl", className)}>{children}</h1>
   );
 }
