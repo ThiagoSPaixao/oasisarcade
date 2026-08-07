@@ -17,7 +17,7 @@ export function UpgradeDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-background pixel-border max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="glass max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="ui-label glow-magenta text-primary text-xs">
             JOGO PREMIUM — FAÇA UPGRADE

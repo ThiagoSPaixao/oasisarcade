@@ -41,7 +41,7 @@ export function PlanCards({
         return (
           <div
             key={plan.id}
-            className={`bg-surface flex flex-col gap-3 p-5 ${premium ? "pixel-border-magenta" : "pixel-border-cyan"}`}
+            className={`bg-surface flex flex-col gap-3 p-5 ${premium ? "panel-magenta" : "panel-cyan"}`}
           >
             <div className="flex items-center gap-2">
               {premium ? (
@@ -67,7 +67,7 @@ export function PlanCards({
               type="button"
               disabled={active || pending}
               onClick={() => onSelect(plan.id)}
-              className={`ui-label mt-auto px-3 py-3 text-[9px] transition-transform active:scale-95 disabled:opacity-60 ${
+              className={`ui-label mt-auto rounded-lg px-4 py-3 text-xs transition-transform active:scale-95 disabled:opacity-60 ${
                 premium ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
               }`}
             >

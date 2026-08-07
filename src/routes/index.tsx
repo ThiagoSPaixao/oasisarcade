@@ -53,7 +53,7 @@ function LandingPage() {
   return (
     <ArcadeShell className="grid min-h-screen place-items-center px-5 py-10">
       <main className="mx-auto flex w-full max-w-lg flex-col items-center text-center">
-        <div className="pixel-border-cyan bg-surface/60 mb-6 grid h-20 w-20 place-items-center backdrop-blur">
+        <div className="panel-cyan bg-surface/60 mb-6 grid h-20 w-20 place-items-center backdrop-blur">
           <Gamepad2 className="text-accent h-10 w-10" />
         </div>
 
@@ -75,7 +75,7 @@ function LandingPage() {
           {HIGHLIGHTS.map((game) => (
             <li
               key={game}
-              className="ui-label bg-surface/70 pixel-border text-foreground/80 px-2 py-1.5 text-[8px]"
+              className="ui-label bg-surface/60 pixel-border text-foreground/80 rounded-lg px-2.5 py-1.5 text-[10px] backdrop-blur"
             >
               {game}
             </li>
@@ -86,7 +86,7 @@ function LandingPage() {
           type="button"
           onClick={enter}
           disabled={checking}
-          className="ui-label bg-primary text-primary-foreground pixel-border-magenta mt-9 flex w-full items-center justify-center gap-2 px-6 py-4 text-xs transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-12"
+          className="ui-label bg-primary text-primary-foreground mt-9 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 text-sm transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-12"
         >
           <Play className="h-4 w-4" />
           ENTRAR

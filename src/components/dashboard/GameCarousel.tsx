@@ -59,7 +59,7 @@ export function GameCarousel({
             type="button"
             aria-label="Jogo anterior"
             onClick={() => embla?.scrollPrev()}
-            className="pixel-border bg-surface text-accent grid h-9 w-9 place-items-center active:scale-95"
+            className="pixel-border bg-surface/70 text-accent grid h-9 w-9 place-items-center rounded-lg backdrop-blur active:scale-95"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -67,7 +67,7 @@ export function GameCarousel({
             type="button"
             aria-label="Próximo jogo"
             onClick={() => embla?.scrollNext()}
-            className="pixel-border bg-surface text-accent grid h-9 w-9 place-items-center active:scale-95"
+            className="pixel-border bg-surface/70 text-accent grid h-9 w-9 place-items-center rounded-lg backdrop-blur active:scale-95"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -89,7 +89,7 @@ export function GameCarousel({
                   active ? "scale-100 opacity-100" : "scale-[0.92] opacity-60",
                 )}
               >
-                <div className="bg-surface pixel-border-magenta flex h-full flex-col">
+                <div className="bg-surface panel-magenta flex h-full flex-col overflow-hidden">
                   <div
                     className={cn(
                       "relative grid aspect-[4/3] w-full place-items-center bg-gradient-to-br",
@@ -100,7 +100,7 @@ export function GameCarousel({
                     <span className="text-5xl drop-shadow-lg sm:text-6xl">{art.emoji}</span>
                     <span
                       className={cn(
-                        "ui-label absolute top-2 left-2 px-1.5 py-1 text-[8px]",
+                        "ui-label absolute top-2 left-2 rounded-md px-2 py-1 text-[10px]",
                         game.is_premium
                           ? "bg-neon-yellow text-primary-foreground"
                           : "bg-neon-green text-primary-foreground",
@@ -115,14 +115,14 @@ export function GameCarousel({
                         onToggleFavorite(game.slug);
                       }}
                       aria-label={isFavorite ? `Remover ${game.name} dos favoritos` : `Favoritar ${game.name}`}
-                      className="bg-background/70 absolute top-2 right-2 grid h-9 w-9 place-items-center"
+                      className="bg-background/60 absolute top-2 right-2 grid h-9 w-9 place-items-center rounded-full backdrop-blur"
                     >
                       <Heart
                         className={cn("h-4 w-4", isFavorite ? "text-primary fill-current" : "text-muted-foreground")}
                       />
                     </button>
                     {game.state !== "playable" ? (
-                      <span className="ui-label bg-background/80 text-neon-yellow absolute bottom-2 left-2 px-1.5 py-1 text-[8px]">
+                      <span className="ui-label bg-background/70 text-neon-yellow absolute bottom-2 left-2 rounded-md px-2 py-1 text-[10px] backdrop-blur">
                         EM BREVE
                       </span>
                     ) : null}
@@ -136,7 +136,7 @@ export function GameCarousel({
                       to="/game/$slug"
                       params={{ slug: game.slug }}
                       onClick={() => play("coin")}
-                      className="ui-label bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 px-3 py-3 text-[10px] transition-transform active:scale-95"
+                      className="ui-label bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-xs transition-transform active:scale-95"
                     >
                       {locked ? <Lock className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                       JOGAR AGORA
@@ -157,7 +157,7 @@ export function GameCarousel({
             aria-label={`Ir para ${game.name}`}
             onClick={() => embla?.scrollTo(index)}
             className={cn(
-              "h-2 transition-all",
+              "h-1.5 rounded-full transition-all",
               index === selected ? "bg-primary w-6" : "bg-surface-2 w-2",
             )}
           />

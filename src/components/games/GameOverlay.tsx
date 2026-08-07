@@ -36,7 +36,7 @@ export function GameOverlay({
           play("coin");
           onStart();
         }}
-        className="ui-label bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
+        className="ui-label bg-primary text-primary-foreground rounded-lg px-6 py-3 text-sm transition-transform active:scale-95"
       >
         {status === "over" ? "JOGAR DE NOVO" : status === "paused" ? "CONTINUAR" : "INSERIR FICHA"}
       </button>

@@ -76,7 +76,7 @@ export function GamePlayer({
           <Link
             to="/dashboard"
             aria-label="Voltar ao dashboard"
-            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 shrink-0 place-items-center"
+            className="pixel-border text-muted-foreground hover:text-primary grid h-9 w-9 rounded-lg shrink-0 place-items-center"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
