@@ -325,3 +325,12 @@ html.game-locked body {
   height: 100dvh;
   overflow: hidden;
 }
+
+@keyframes arcade-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
