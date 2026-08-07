@@ -1,7 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { Trophy } from "lucide-react";
 import { toast } from "sonner";
+
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { SettingsMenu } from "@/components/arcade/SettingsMenu";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
