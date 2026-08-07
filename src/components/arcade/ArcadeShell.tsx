@@ -10,8 +10,8 @@ export function ArcadeShell({ children, className }: { children: ReactNode; clas
   }, [theme]);
 
   return (
-    <div className={cn("scanlines arcade-grid min-h-screen w-full max-w-full min-w-0 overflow-x-hidden", className)}>
-      <div className="crt-flicker relative z-10 h-full w-full max-w-full min-w-0">{children}</div>
+    <div className={cn("scanlines arcade-grid min-h-dvh w-full max-w-full min-w-0 overflow-x-hidden", className)}>
+      <div className="crt-flicker relative z-10 w-full max-w-full min-w-0">{children}</div>
 
     </div>
   );
