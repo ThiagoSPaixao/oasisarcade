@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
+import { useSoundStore } from "@/stores/sound-store";
 import type { Direction } from "@/types/arcade";
 
 const GRID = 20;
@@ -51,6 +52,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   const setScore = useGameStore((s) => s.setScore);
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
+  const play = useSoundStore((s) => s.play);
   const [, forceRender] = useState(0);
 
   const draw = useCallback(() => {
@@ -129,6 +131,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     const hitSelf = snake.some((s) => s.x === head.x && s.y === head.y);
     if (hitWall || hitSelf) {
       setStatus("over");
+      play("gameover");
       onGameOver(scoreRef.current);
       return;
     }
@@ -137,13 +140,14 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
       scoreRef.current += 10;
       setScore(scoreRef.current);
+      play("eat");
       foodRef.current = randomFood(next);
     } else {
       next.pop();
     }
     snakeRef.current = next;
     draw();
-  }, [draw, onGameOver, setScore, setStatus]);
+  }, [draw, onGameOver, play, setScore, setStatus]);
 
   // Game loop
   useEffect(() => {
