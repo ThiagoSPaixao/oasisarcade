@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_leaderboard(text, integer) FROM anon;
