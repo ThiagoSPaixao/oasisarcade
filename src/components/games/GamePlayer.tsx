@@ -70,8 +70,8 @@ export function GamePlayer({
   const needsDPad = game.state === "playable" && game.slug !== "memoria";
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
+    <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3">
         <Link
           to="/dashboard"
           aria-label="Voltar ao dashboard"
@@ -92,13 +92,13 @@ export function GamePlayer({
         <SoundToggle />
       </div>
 
-      <div className="flex flex-col items-center gap-5 lg:flex-row lg:items-start lg:justify-center">
+      <div className="flex flex-col items-center gap-3 sm:gap-5 lg:flex-row lg:items-start lg:justify-center">
         <GameScreen game={game} onGameOver={onGameOver} />
 
         {needsDPad ? (
-          <div className="w-full lg:max-w-xs">
+          <div className="mx-auto w-full max-w-sm lg:max-w-xs">
             <DPad />
-            <p className="text-muted-foreground/80 mt-3 text-center text-[10px] leading-relaxed">
+            <p className="text-muted-foreground/80 mt-2 text-center text-[10px] leading-relaxed sm:mt-3">
               {HINTS[game.slug] ?? "A = jogar/reiniciar · B = pausar"}
             </p>
           </div>
