@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
-import { SettingsMenu } from "@/components/arcade/SettingsMenu";
 import { useSoundStore } from "@/stores/sound-store";
 
 export const Route = createFileRoute("/")({
@@ -90,11 +89,6 @@ function LandingPage() {
         >
           ENTRAR
         </button>
-
-        <div className="mt-6 flex flex-col items-center gap-3">
-          <SettingsMenu />
-          <p className="text-muted-foreground text-[10px]">Som e trilha 8-bit: ligue ou desligue quando quiser</p>
-        </div>
 
         {!loggedIn && !checking ? (
           <p className="text-muted-foreground mt-6 text-xs">
