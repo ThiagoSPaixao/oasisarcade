@@ -46,7 +46,7 @@ function UpgradePage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="font-pixel glow-magenta text-primary text-xs sm:text-base">ESCOLHA SEU PLAYER</h1>
+          <h1 className="ui-label glow-magenta text-primary text-xs sm:text-base">ESCOLHA SEU PLAYER</h1>
         </div>
         <p className="text-muted-foreground mt-4 text-sm">
           Preços de demonstração — nenhuma cobrança real é feita. A assinatura é simulada e libera os jogos

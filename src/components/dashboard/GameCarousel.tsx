@@ -53,7 +53,7 @@ export function GameCarousel({
   return (
     <section className="mt-6">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-pixel glow-cyan text-accent text-[11px] sm:text-sm">ESCOLHA SEU JOGO</h2>
+        <h2 className="ui-label glow-cyan text-accent text-[11px] sm:text-sm">ESCOLHA SEU JOGO</h2>
         <div className="flex gap-2">
           <button
             type="button"
@@ -100,7 +100,7 @@ export function GameCarousel({
                     <span className="text-5xl drop-shadow-lg sm:text-6xl">{art.emoji}</span>
                     <span
                       className={cn(
-                        "font-pixel absolute top-2 left-2 px-1.5 py-1 text-[8px]",
+                        "ui-label absolute top-2 left-2 px-1.5 py-1 text-[8px]",
                         game.is_premium
                           ? "bg-neon-yellow text-primary-foreground"
                           : "bg-neon-green text-primary-foreground",
@@ -122,21 +122,21 @@ export function GameCarousel({
                       />
                     </button>
                     {game.state !== "playable" ? (
-                      <span className="font-pixel bg-background/80 text-neon-yellow absolute bottom-2 left-2 px-1.5 py-1 text-[8px]">
+                      <span className="ui-label bg-background/80 text-neon-yellow absolute bottom-2 left-2 px-1.5 py-1 text-[8px]">
                         EM BREVE
                       </span>
                     ) : null}
                   </div>
 
                   <div className="flex flex-1 flex-col gap-2 p-4">
-                    <h3 className="font-pixel text-foreground text-[11px] leading-relaxed">{game.name}</h3>
+                    <h3 className="ui-label text-foreground text-[11px] leading-relaxed">{game.name}</h3>
                     <p className="text-muted-foreground text-xs">{game.description}</p>
                     <p className="text-accent text-[10px]">Seu recorde: {scores[game.slug] ?? 0}</p>
                     <Link
                       to="/game/$slug"
                       params={{ slug: game.slug }}
                       onClick={() => play("coin")}
-                      className="font-pixel bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 px-3 py-3 text-[10px] transition-transform active:scale-95"
+                      className="ui-label bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 px-3 py-3 text-[10px] transition-transform active:scale-95"
                     >
                       {locked ? <Lock className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                       JOGAR AGORA

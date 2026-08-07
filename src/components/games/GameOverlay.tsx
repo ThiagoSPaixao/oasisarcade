@@ -20,11 +20,11 @@ export function GameOverlay({
 
   return (
     <div className="bg-background/85 absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center backdrop-blur-sm">
-      <p className="font-pixel glow-cyan text-accent text-sm sm:text-base">
+      <p className="ui-label glow-cyan text-accent text-sm sm:text-base">
         {status === "over" ? "GAME OVER" : status === "paused" ? "PAUSADO" : title}
       </p>
       {status === "over" ? (
-        <p className="font-pixel text-neon-yellow text-[10px]">PONTOS {score}</p>
+        <p className="ui-label text-neon-yellow text-[10px]">PONTOS {score}</p>
       ) : null}
       <p className="text-muted-foreground max-w-xs text-xs">
         {status === "paused" ? "Aperte B ou espaço para continuar" : hint}
@@ -36,7 +36,7 @@ export function GameOverlay({
           play("coin");
           onStart();
         }}
-        className="font-pixel bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
+        className="ui-label bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
       >
         {status === "over" ? "JOGAR DE NOVO" : status === "paused" ? "CONTINUAR" : "INSERIR FICHA"}
       </button>

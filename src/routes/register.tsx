@@ -54,11 +54,11 @@ function RegisterPage() {
   return (
     <ArcadeShell className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-pixel glow-magenta text-primary neon-pulse mb-8 text-center text-lg">
+        <p className="ui-label glow-magenta text-primary neon-pulse mb-8 text-center text-lg">
           RETRÔ ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface pixel-border flex flex-col gap-4 p-5">
-          <h1 className="font-pixel glow-cyan text-accent text-xs">NEW PLAYER</h1>
+          <h1 className="ui-label glow-cyan text-accent text-xs">NEW PLAYER</h1>
           <label className="flex flex-col gap-1 text-xs">
             <span className="text-muted-foreground">Nome de player</span>
             <input
@@ -94,7 +94,7 @@ function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="font-pixel bg-primary text-primary-foreground px-3 py-3 text-[10px] transition-transform active:scale-95 disabled:opacity-60"
+            className="ui-label bg-primary text-primary-foreground px-3 py-3 text-[10px] transition-transform active:scale-95 disabled:opacity-60"
           >
             {loading ? "CRIANDO..." : "CRIAR CONTA"}
           </button>

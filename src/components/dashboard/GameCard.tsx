@@ -23,12 +23,12 @@ export function GameCard({
           <img src={game.thumbnail} alt={game.name} loading="lazy" className="h-full w-full object-cover" />
         ) : (
           <div className="arcade-grid grid h-full w-full place-items-center">
-            <span className="font-pixel glow-magenta text-primary text-[10px]">{game.name.toUpperCase()}</span>
+            <span className="ui-label glow-magenta text-primary text-[10px]">{game.name.toUpperCase()}</span>
           </div>
         )}
         <span
           className={cn(
-            "font-pixel absolute top-2 left-2 px-1.5 py-1 text-[8px]",
+            "ui-label absolute top-2 left-2 px-1.5 py-1 text-[8px]",
             game.is_premium
               ? "bg-neon-yellow text-primary-foreground"
               : "bg-neon-green text-primary-foreground",
@@ -47,13 +47,13 @@ export function GameCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <h3 className="font-pixel text-foreground text-[10px] leading-relaxed">{game.name}</h3>
+        <h3 className="ui-label text-foreground text-[10px] leading-relaxed">{game.name}</h3>
         <p className="text-muted-foreground line-clamp-2 text-xs">{game.description}</p>
         <p className="text-accent text-[10px]">Recorde: {best ?? 0}</p>
         <Link
           to="/game/$slug"
           params={{ slug: game.slug }}
-          className="font-pixel bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-1 px-2 py-2 text-[9px] transition-transform active:scale-95"
+          className="ui-label bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-1 px-2 py-2 text-[9px] transition-transform active:scale-95"
         >
           {locked ? <Lock className="h-3 w-3" /> : <Play className="h-3 w-3" />}
           JOGAR

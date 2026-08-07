@@ -41,7 +41,7 @@ function ActBtn({ action, label }: { action: ActionButton; label: string }) {
         pressAction(action);
       }}
       className={cn(
-        "font-pixel flex h-16 w-16 items-center justify-center rounded-full text-xs transition-transform active:scale-95",
+        "ui-label flex h-16 w-16 items-center justify-center rounded-full text-xs transition-transform active:scale-95",
         action === "a"
           ? "bg-primary text-primary-foreground pixel-border-magenta rounded-full"
           : "bg-accent text-accent-foreground pixel-border-cyan rounded-full",

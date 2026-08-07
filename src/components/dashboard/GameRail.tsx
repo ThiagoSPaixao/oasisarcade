@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export function GameRail({ title, children, empty }: { title: string; children: ReactNode; empty?: boolean }) {
   return (
     <section className="mt-8">
-      <h2 className="font-pixel glow-cyan text-accent mb-3 text-[11px] sm:text-sm">{title}</h2>
+      <h2 className="ui-label glow-cyan text-accent mb-3 text-[11px] sm:text-sm">{title}</h2>
       {empty ? (
         <p className="text-muted-foreground pixel-border bg-surface/50 p-4 text-xs">
           Nada por aqui ainda. Toque no coração de um jogo para favoritar.

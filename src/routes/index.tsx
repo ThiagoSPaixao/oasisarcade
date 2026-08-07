@@ -57,11 +57,11 @@ function LandingPage() {
           <Gamepad2 className="text-accent h-10 w-10" />
         </div>
 
-        <p className="font-pixel text-neon-yellow glow-yellow animate-pulse text-[9px] tracking-widest">
+        <p className="ui-label text-neon-yellow glow-yellow animate-pulse text-[9px] tracking-widest">
           INSIRA UMA FICHA
         </p>
 
-        <h1 className="font-pixel glow-magenta text-primary mt-4 text-[26px] leading-tight sm:text-4xl">
+        <h1 className="ui-label glow-magenta text-primary mt-4 text-[26px] leading-tight sm:text-4xl">
           RETRÔ
           <br />
           <span className="glow-cyan text-accent">ARCADE</span>
@@ -75,7 +75,7 @@ function LandingPage() {
           {HIGHLIGHTS.map((game) => (
             <li
               key={game}
-              className="font-pixel bg-surface/70 pixel-border text-foreground/80 px-2 py-1.5 text-[8px]"
+              className="ui-label bg-surface/70 pixel-border text-foreground/80 px-2 py-1.5 text-[8px]"
             >
               {game}
             </li>
@@ -86,7 +86,7 @@ function LandingPage() {
           type="button"
           onClick={enter}
           disabled={checking}
-          className="font-pixel bg-primary text-primary-foreground pixel-border-magenta mt-9 flex w-full items-center justify-center gap-2 px-6 py-4 text-xs transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-12"
+          className="ui-label bg-primary text-primary-foreground pixel-border-magenta mt-9 flex w-full items-center justify-center gap-2 px-6 py-4 text-xs transition-transform active:scale-95 disabled:opacity-60 sm:w-auto sm:px-12"
         >
           <Play className="h-4 w-4" />
           ENTRAR
@@ -106,7 +106,7 @@ function LandingPage() {
           </p>
         ) : null}
 
-        <footer className="font-pixel text-muted-foreground mt-10 text-[8px] leading-relaxed">
+        <footer className="ui-label text-muted-foreground mt-10 text-[8px] leading-relaxed">
           DESENVOLVIDO POR
           <br />
           <span className="text-neon-green glow-yellow mt-1 inline-block text-[10px]">ThiagoS.Paixão</span>

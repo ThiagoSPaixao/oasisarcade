@@ -282,7 +282,7 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
         className="bg-background pixel-border-cyan block w-full"
         style={{ imageRendering: "pixelated", aspectRatio: `${W} / ${H}` }}
       />
-      <p className="font-pixel text-muted-foreground mt-2 text-center text-[9px]">
+      <p className="ui-label text-muted-foreground mt-2 text-center text-[9px]">
         VIDAS {"❤".repeat(Math.max(0, lives))}
       </p>
       <GameOverlay

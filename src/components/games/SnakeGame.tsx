@@ -252,7 +252,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       />
       {status !== "running" && (
         <div className="bg-background/80 absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
-          <p className="font-pixel glow-cyan text-accent text-sm sm:text-base">
+          <p className="ui-label glow-cyan text-accent text-sm sm:text-base">
             {status === "over" ? "GAME OVER" : status === "paused" ? "PAUSADO" : "SNAKE"}
           </p>
           <p className="text-muted-foreground text-xs sm:text-sm">
@@ -263,7 +263,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
           <button
             type="button"
             onClick={() => (status === "paused" ? setStatus("running") : start())}
-            className="font-pixel bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
+            className="ui-label bg-primary text-primary-foreground pixel-border-magenta px-4 py-3 text-xs transition-transform active:scale-95"
           >
             {status === "over" ? "JOGAR DE NOVO" : status === "paused" ? "CONTINUAR" : "INSERIR FICHA"}
           </button>
