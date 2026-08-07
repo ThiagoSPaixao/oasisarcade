@@ -26,7 +26,7 @@ export function UpgradeDialog({
         <p className="text-muted-foreground text-xs">
           Esse fliperama é só para o Player 2. Assine para liberar todos os jogos premium.
         </p>
-        <PlanCards current={current} onSelect={onSelect} pending={pending} />
+        <PlanCards current={current} onSelect={onSelect} pending={pending ?? false} />
       </DialogContent>
     </Dialog>
   );
