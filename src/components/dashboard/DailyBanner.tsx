@@ -1,21 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import { Play } from "lucide-react";
 import type { Game } from "@/types/arcade";
 
 export function DailyBanner({ game }: { game: Game }) {
   return (
-    <section className="bg-surface panel-cyan relative mt-6 overflow-hidden p-5 sm:p-8">
+    <section className="bg-surface/60 border-accent/30 relative mt-6 overflow-hidden rounded-2xl border p-5 shadow-[0_0_50px_-22px_var(--neon-cyan)] backdrop-blur-md sm:p-8">
       <div className="arcade-grid absolute inset-0 opacity-40" aria-hidden="true" />
-      <div className="relative flex flex-col gap-4">
-        <span className="ui-label glow-yellow text-neon-yellow text-[11px]">JOGO DO DIA</span>
-        <h2 className="font-pixel glow-magenta text-primary neon-pulse text-lg sm:text-3xl">{game.name}</h2>
-        <p className="text-muted-foreground max-w-md text-sm">{game.description}</p>
+      <div className="relative flex flex-col gap-3">
+        <span className="text-accent/80 text-[11px] font-semibold tracking-[0.22em]">JOGO DO DIA</span>
+        <h2 className="glow-magenta text-primary text-2xl font-bold tracking-tight sm:text-4xl">{game.name}</h2>
+        <p className="text-muted-foreground max-w-md text-sm leading-relaxed">{game.description}</p>
         <Link
           to="/game/$slug"
           params={{ slug: game.slug }}
-          className="ui-label bg-primary text-primary-foreground inline-flex w-fit items-center gap-2 rounded-lg px-5 py-3 text-xs transition-transform active:scale-95"
+          className="bg-primary text-primary-foreground mt-1 inline-flex w-fit items-center rounded-full px-6 py-3 text-xs font-bold tracking-[0.14em] shadow-[0_0_28px_-8px_var(--neon-magenta)] transition-transform active:scale-95"
         >
-          <Play className="h-4 w-4" />
           JOGAR AGORA
         </Link>
       </div>
