@@ -176,7 +176,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_leaderboard: {
+        Args: { _game_slug: string; _limit?: number }
+        Returns: {
+          created_at: string
+          level: number
+          rank: number
+          score: number
+          user_id: string
+          username: string
+        }[]
+      }
     }
     Enums: {
       game_category: "mais_jogados" | "classicos_8bits"
