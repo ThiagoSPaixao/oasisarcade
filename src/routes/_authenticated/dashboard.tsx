@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
-import { SoundToggle } from "@/components/arcade/SoundToggle";
+import { SettingsMenu } from "@/components/arcade/SettingsMenu";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DailyBanner } from "@/components/dashboard/DailyBanner";
 import { GameCarousel } from "@/components/dashboard/GameCarousel";
@@ -69,7 +69,7 @@ function DashboardPage() {
     <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-3 flex justify-end">
-          <SoundToggle />
+          <SettingsMenu />
         </div>
 
         <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
