@@ -283,6 +283,18 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     }
   }, [collides, draw, play]);
 
+  /** Descida rápida (hard drop) — exclusiva do Tetris. */
+  const hardDrop = useCallback(() => {
+    let dropped = 0;
+    while (move(0, 1)) dropped += 1;
+    if (dropped > 0) {
+      scoreRef.current += dropped * 2;
+      setScore(scoreRef.current);
+    }
+    lockPiece();
+    draw();
+  }, [draw, lockPiece, move, setScore]);
+
   const tick = useCallback(() => {
     if (!move(0, 1)) lockPiece();
     draw();
@@ -370,9 +382,20 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       if (current === "running") rotatePiece();
       else if (current === "paused") setStatus("running");
       else start();
-    } else if (current === "running") setStatus("paused");
-    else if (current === "paused") setStatus("running");
-  }, [actionInput, rotatePiece, setStatus, start]);
+    } else if (actionInput.action === "b") {
+      // No Tetris o B faz a peça descer rápido (não pausa).
+      if (current === "running") hardDrop();
+      else if (current === "paused") setStatus("running");
+      else start();
+    }
+  }, [actionInput, hardDrop, rotatePiece, setStatus, start]);
+
+  // Trilha clássica do Tetris enquanto o jogo estiver aberto
+  useEffect(() => {
+    setMusicTheme("tetris");
+    if (musicOn) startMusic();
+    return () => setMusicTheme("arcade");
+  }, [musicOn]);
 
   return (
     <div
@@ -381,19 +404,37 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         {
           "--game-max": "340px",
           "--game-aspect": `${COLS / ROWS}`,
-          "--game-reserve": "300px",
+          "--game-reserve": "360px",
         } as React.CSSProperties
       }
     >
+      <div className="mb-2 flex items-center justify-center gap-2">
+        <span className="ui-label text-muted-foreground text-[9px] tracking-widest">PRÓXIMAS</span>
+        {nextPieces.map((def, index) => (
+          <PiecePreview key={`${def.color}-${index}`} def={def} />
+        ))}
+      </div>
       <canvas
         ref={canvasRef}
         className="bg-background pixel-border-cyan block w-full"
         style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
       />
-      <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">LINHAS {lines}</p>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <span className="ui-label text-muted-foreground text-[11px]">LINHAS {lines}</span>
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            if (useGameStore.getState().status === "running") hardDrop();
+          }}
+          className="border-accent/45 text-accent bg-surface/40 rounded-full border px-4 py-1.5 text-[11px] font-semibold tracking-wide backdrop-blur transition-transform active:scale-95"
+        >
+          DESCER ↓↓
+        </button>
+      </div>
       <GameOverlay
         title="TETRIS"
-        hint="Setas para mover · ↑ ou A gira · ↓ desce"
+        hint="Setas movem · ↑ ou A gira · B desce rápido"
         onStart={() => (status === "paused" ? setStatus("running") : start())}
       />
     </div>
