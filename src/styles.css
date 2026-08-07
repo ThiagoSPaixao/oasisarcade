@@ -62,45 +62,45 @@
 }
 
 :root {
-  --radius: 0.25rem;
-  --background: oklch(0.14 0.03 285);
-  --foreground: oklch(0.96 0.01 280);
-  --surface: oklch(0.19 0.04 285);
-  --surface-2: oklch(0.24 0.05 288);
-  --card: oklch(0.19 0.04 285);
-  --card-foreground: oklch(0.96 0.01 280);
-  --popover: oklch(0.19 0.04 285);
-  --popover-foreground: oklch(0.96 0.01 280);
-  --primary: oklch(0.68 0.27 340);
-  --primary-foreground: oklch(0.14 0.03 285);
-  --secondary: oklch(0.26 0.05 288);
-  --secondary-foreground: oklch(0.96 0.01 280);
-  --muted: oklch(0.24 0.04 288);
-  --muted-foreground: oklch(0.72 0.03 285);
-  --accent: oklch(0.82 0.17 195);
-  --accent-foreground: oklch(0.14 0.03 285);
-  --destructive: oklch(0.62 0.24 25);
+  --radius: 1rem;
+  --background: oklch(0.11 0.02 280);
+  --foreground: oklch(0.95 0.005 280);
+  --surface: oklch(0.16 0.025 283);
+  --surface-2: oklch(0.21 0.03 285);
+  --card: oklch(0.16 0.025 283);
+  --card-foreground: oklch(0.95 0.005 280);
+  --popover: oklch(0.15 0.025 283);
+  --popover-foreground: oklch(0.95 0.005 280);
+  --primary: oklch(0.71 0.28 342);
+  --primary-foreground: oklch(0.11 0.02 280);
+  --secondary: oklch(0.24 0.035 286);
+  --secondary-foreground: oklch(0.95 0.005 280);
+  --muted: oklch(0.21 0.028 285);
+  --muted-foreground: oklch(0.79 0.012 285);
+  --accent: oklch(0.85 0.16 197);
+  --accent-foreground: oklch(0.11 0.02 280);
+  --destructive: oklch(0.63 0.23 25);
   --destructive-foreground: oklch(0.98 0.01 280);
-  --border: oklch(0.34 0.07 292);
-  --input: oklch(0.3 0.06 290);
-  --ring: oklch(0.68 0.27 340);
-  --neon-magenta: oklch(0.68 0.27 340);
-  --neon-cyan: oklch(0.82 0.17 195);
-  --neon-yellow: oklch(0.88 0.18 95);
-  --neon-green: oklch(0.83 0.24 140);
-  --chart-1: oklch(0.68 0.27 340);
-  --chart-2: oklch(0.82 0.17 195);
-  --chart-3: oklch(0.88 0.18 95);
-  --chart-4: oklch(0.83 0.24 140);
-  --chart-5: oklch(0.7 0.2 300);
-  --sidebar: oklch(0.17 0.04 285);
-  --sidebar-foreground: oklch(0.96 0.01 280);
-  --sidebar-primary: oklch(0.68 0.27 340);
-  --sidebar-primary-foreground: oklch(0.14 0.03 285);
-  --sidebar-accent: oklch(0.24 0.05 288);
-  --sidebar-accent-foreground: oklch(0.96 0.01 280);
-  --sidebar-border: oklch(0.34 0.07 292);
-  --sidebar-ring: oklch(0.68 0.27 340);
+  --border: oklch(0.32 0.045 290);
+  --input: oklch(0.3 0.04 288);
+  --ring: oklch(0.71 0.28 342);
+  --neon-magenta: oklch(0.71 0.28 342);
+  --neon-cyan: oklch(0.85 0.16 197);
+  --neon-yellow: oklch(0.9 0.17 96);
+  --neon-green: oklch(0.85 0.23 145);
+  --chart-1: oklch(0.71 0.28 342);
+  --chart-2: oklch(0.85 0.16 197);
+  --chart-3: oklch(0.9 0.17 96);
+  --chart-4: oklch(0.85 0.23 145);
+  --chart-5: oklch(0.72 0.2 300);
+  --sidebar: oklch(0.14 0.022 282);
+  --sidebar-foreground: oklch(0.95 0.005 280);
+  --sidebar-primary: oklch(0.71 0.28 342);
+  --sidebar-primary-foreground: oklch(0.11 0.02 280);
+  --sidebar-accent: oklch(0.21 0.03 285);
+  --sidebar-accent-foreground: oklch(0.95 0.005 280);
+  --sidebar-border: oklch(0.32 0.045 290);
+  --sidebar-ring: oklch(0.71 0.28 342);
 }
 
 @layer base {
@@ -116,73 +116,113 @@
   }
 }
 
+/* Pixel font: reserved for the logo and main H1 titles only. */
 @utility font-pixel {
   font-family: var(--font-pixel);
-  letter-spacing: 0.02em;
-  line-height: 1.6;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 }
 
-/* Neon text glow */
+/* Modern UI label: replaces the pixel font on buttons, badges and small labels. */
+@utility ui-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+}
+
+/* Soft, diffuse neon glow */
 @utility glow-magenta {
   text-shadow:
-    0 0 6px color-mix(in oklab, var(--neon-magenta) 70%, transparent),
-    0 0 18px color-mix(in oklab, var(--neon-magenta) 40%, transparent);
+    0 0 4px color-mix(in oklab, var(--neon-magenta) 45%, transparent),
+    0 0 22px color-mix(in oklab, var(--neon-magenta) 28%, transparent);
 }
 
 @utility glow-cyan {
   text-shadow:
-    0 0 6px color-mix(in oklab, var(--neon-cyan) 70%, transparent),
-    0 0 18px color-mix(in oklab, var(--neon-cyan) 40%, transparent);
+    0 0 4px color-mix(in oklab, var(--neon-cyan) 45%, transparent),
+    0 0 22px color-mix(in oklab, var(--neon-cyan) 28%, transparent);
 }
 
 @utility glow-yellow {
   text-shadow:
-    0 0 6px color-mix(in oklab, var(--neon-yellow) 70%, transparent),
-    0 0 18px color-mix(in oklab, var(--neon-yellow) 40%, transparent);
+    0 0 4px color-mix(in oklab, var(--neon-yellow) 45%, transparent),
+    0 0 22px color-mix(in oklab, var(--neon-yellow) 28%, transparent);
 }
 
-/* Pixel-ish hard border + neon halo */
+/* 1px hairline borders with a soft halo — 8px radius (buttons, inputs, badges) */
 @utility pixel-border {
-  border: 2px solid var(--border);
-  border-radius: 0;
-  box-shadow:
-    0 0 0 2px color-mix(in oklab, var(--background) 90%, transparent),
-    0 0 14px -2px color-mix(in oklab, var(--neon-magenta) 35%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 20px -8px color-mix(in oklab, var(--neon-magenta) 30%, transparent);
 }
 
 @utility pixel-border-cyan {
-  border: 2px solid color-mix(in oklab, var(--neon-cyan) 60%, transparent);
-  border-radius: 0;
-  box-shadow: 0 0 16px -3px color-mix(in oklab, var(--neon-cyan) 45%, transparent);
+  border: 1px solid color-mix(in oklab, var(--neon-cyan) 45%, transparent);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 22px -8px color-mix(in oklab, var(--neon-cyan) 40%, transparent);
 }
 
 @utility pixel-border-magenta {
-  border: 2px solid color-mix(in oklab, var(--neon-magenta) 65%, transparent);
-  border-radius: 0;
-  box-shadow: 0 0 18px -3px color-mix(in oklab, var(--neon-magenta) 50%, transparent);
+  border: 1px solid color-mix(in oklab, var(--neon-magenta) 50%, transparent);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 24px -8px color-mix(in oklab, var(--neon-magenta) 42%, transparent);
+}
+
+/* Large containers / cards — 16px radius */
+@utility panel {
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 0 34px -14px color-mix(in oklab, var(--neon-magenta) 32%, transparent);
+}
+
+@utility panel-cyan {
+  border: 1px solid color-mix(in oklab, var(--neon-cyan) 40%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 0 40px -14px color-mix(in oklab, var(--neon-cyan) 38%, transparent);
+}
+
+@utility panel-magenta {
+  border: 1px solid color-mix(in oklab, var(--neon-magenta) 45%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 0 40px -14px color-mix(in oklab, var(--neon-magenta) 40%, transparent);
+}
+
+/* Glassmorphism for overlays, modals and floating panels */
+@utility glass {
+  background-color: color-mix(in oklab, var(--surface) 55%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  border-radius: 1rem;
 }
 
 @utility arcade-grid {
   background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--background) 92%, transparent),
-      var(--background) 70%
+    radial-gradient(
+      120% 90% at 50% -10%,
+      color-mix(in oklab, var(--neon-magenta) 10%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      100% 80% at 90% 110%,
+      color-mix(in oklab, var(--neon-cyan) 9%, transparent),
+      transparent 60%
     ),
     linear-gradient(
       to right,
-      color-mix(in oklab, var(--neon-cyan) 12%, transparent) 1px,
+      color-mix(in oklab, var(--neon-cyan) 5%, transparent) 1px,
       transparent 1px
     ),
     linear-gradient(
       to bottom,
-      color-mix(in oklab, var(--neon-magenta) 12%, transparent) 1px,
+      color-mix(in oklab, var(--neon-magenta) 5%, transparent) 1px,
       transparent 1px
     );
   background-size:
     100% 100%,
-    40px 40px,
-    40px 40px;
+    100% 100%,
+    56px 56px,
+    56px 56px;
 }
 
 @utility scanlines {
@@ -194,41 +234,17 @@
     pointer-events: none;
     background: repeating-linear-gradient(
       to bottom,
-      color-mix(in oklab, var(--background) 55%, transparent) 0px,
-      color-mix(in oklab, var(--background) 55%, transparent) 1px,
+      color-mix(in oklab, var(--background) 30%, transparent) 0px,
+      color-mix(in oklab, var(--background) 30%, transparent) 1px,
       transparent 1px,
-      transparent 3px
+      transparent 4px
     );
-    opacity: 0.5;
-    animation: scanline-drift 8s linear infinite;
+    opacity: 0.16;
   }
 }
 
 @utility crt-flicker {
-  animation: crt-flicker 4.5s steps(30) infinite;
-}
-
-@keyframes scanline-drift {
-  from {
-    background-position-y: 0;
-  }
-  to {
-    background-position-y: 24px;
-  }
-}
-
-@keyframes crt-flicker {
-  0%,
-  96%,
-  100% {
-    opacity: 1;
-  }
-  97% {
-    opacity: 0.86;
-  }
-  98% {
-    opacity: 0.97;
-  }
+  animation: none;
 }
 
 @keyframes neon-pulse {
@@ -237,10 +253,10 @@
     filter: brightness(1);
   }
   50% {
-    filter: brightness(1.25);
+    filter: brightness(1.18);
   }
 }
 
 @utility neon-pulse {
-  animation: neon-pulse 2.4s ease-in-out infinite;
+  animation: neon-pulse 3s ease-in-out infinite;
 }
