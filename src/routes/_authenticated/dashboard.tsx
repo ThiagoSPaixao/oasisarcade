@@ -68,12 +68,13 @@ function DashboardPage() {
   return (
     <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
       <div className="mx-auto w-full max-w-5xl">
-        <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
-
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <p className="text-muted-foreground text-xs">Arraste para o lado e escolha seu clássico.</p>
+        <div className="mb-3 flex justify-end">
           <SoundToggle />
         </div>
+
+        <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
+
+
 
         {daily ? <DailyBanner game={daily} /> : null}
 
