@@ -7,7 +7,7 @@ export function DailyBanner({ game }: { game: Game }) {
     <section className="bg-surface panel-cyan relative mt-6 overflow-hidden p-5 sm:p-8">
       <div className="arcade-grid absolute inset-0 opacity-40" aria-hidden="true" />
       <div className="relative flex flex-col gap-4">
-        <span className="ui-label glow-yellow text-neon-yellow text-[9px]">JOGO DO DIA</span>
+        <span className="ui-label glow-yellow text-neon-yellow text-[11px]">JOGO DO DIA</span>
         <h2 className="font-pixel glow-magenta text-primary neon-pulse text-lg sm:text-3xl">{game.name}</h2>
         <p className="text-muted-foreground max-w-md text-sm">{game.description}</p>
         <Link

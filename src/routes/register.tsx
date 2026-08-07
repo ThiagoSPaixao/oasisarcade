@@ -58,7 +58,7 @@ function RegisterPage() {
           RETRÔ ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
-          <h1 className="ui-label glow-cyan text-accent text-xs">NEW PLAYER</h1>
+          <h1 className="ui-label glow-cyan text-accent text-sm">NEW PLAYER</h1>
           <label className="flex flex-col gap-1 text-xs">
             <span className="text-muted-foreground">Nome de player</span>
             <input

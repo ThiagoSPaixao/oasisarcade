@@ -47,7 +47,7 @@ function LoginPage() {
           RETRÔ ARCADE
         </p>
         <form onSubmit={onSubmit} className="bg-surface/70 panel flex flex-col gap-4 p-5 backdrop-blur">
-          <h1 className="ui-label glow-cyan text-accent text-xs">INSERT COIN</h1>
+          <h1 className="ui-label glow-cyan text-accent text-sm">INSERT COIN</h1>
           <label className="flex flex-col gap-1 text-xs">
             <span className="text-muted-foreground">E-mail</span>
             <input

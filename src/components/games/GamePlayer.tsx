@@ -83,7 +83,7 @@ export function GamePlayer({
           <h1 className="font-pixel glow-magenta text-primary truncate text-[11px] sm:text-sm">{game.name}</h1>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          <div className="ui-label text-right text-[9px]">
+          <div className="ui-label text-right text-[11px]">
             <p className="text-accent">SCORE {score}</p>
             <p className="text-neon-yellow">HI {Math.max(storeBest, score)}</p>
           </div>

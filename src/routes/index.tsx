@@ -57,7 +57,7 @@ function LandingPage() {
           <Gamepad2 className="text-accent h-10 w-10" />
         </div>
 
-        <p className="ui-label text-neon-yellow glow-yellow animate-pulse text-[9px] tracking-widest">
+        <p className="ui-label text-neon-yellow glow-yellow animate-pulse text-[11px] tracking-widest">
           INSIRA UMA FICHA
         </p>
 
@@ -106,7 +106,7 @@ function LandingPage() {
           </p>
         ) : null}
 
-        <footer className="ui-label text-muted-foreground mt-10 text-[8px] leading-relaxed">
+        <footer className="ui-label text-muted-foreground mt-10 text-[10px] leading-relaxed">
           DESENVOLVIDO POR
           <br />
           <span className="text-neon-green glow-yellow mt-1 inline-block text-[10px]">ThiagoS.Paixão</span>

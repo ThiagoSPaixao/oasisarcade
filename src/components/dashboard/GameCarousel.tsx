@@ -53,7 +53,7 @@ export function GameCarousel({
   return (
     <section className="mt-6">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="ui-label glow-cyan text-accent text-[11px] sm:text-sm">ESCOLHA SEU JOGO</h2>
+        <h2 className="ui-label glow-cyan text-accent text-sm">ESCOLHA SEU JOGO</h2>
         <div className="flex gap-2">
           <button
             type="button"
@@ -129,7 +129,7 @@ export function GameCarousel({
                   </div>
 
                   <div className="flex flex-1 flex-col gap-2 p-4">
-                    <h3 className="ui-label text-foreground text-[11px] leading-relaxed">{game.name}</h3>
+                    <h3 className="ui-label text-foreground text-base leading-snug">{game.name}</h3>
                     <p className="text-muted-foreground text-xs">{game.description}</p>
                     <p className="text-accent text-[10px]">Seu recorde: {scores[game.slug] ?? 0}</p>
                     <Link

@@ -47,7 +47,7 @@ export function GameCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <h3 className="ui-label text-foreground text-[10px] leading-relaxed">{game.name}</h3>
+        <h3 className="ui-label text-foreground text-sm leading-snug">{game.name}</h3>
         <p className="text-muted-foreground line-clamp-2 text-xs">{game.description}</p>
         <p className="text-accent text-[10px]">Recorde: {best ?? 0}</p>
         <Link

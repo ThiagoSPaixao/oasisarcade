@@ -21,7 +21,7 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
           )}
         </div>
         <div className="min-w-0">
-          <p className="ui-label glow-cyan text-accent truncate text-[11px] sm:text-xs">{username}</p>
+          <p className="ui-label glow-cyan text-accent truncate text-sm">{username}</p>
           <div className="mt-1 flex items-center gap-2">
             <span className="text-muted-foreground text-[10px] uppercase">Nv {profile?.level ?? 1}</span>
             <div className="bg-surface-2 h-1.5 w-24 overflow-hidden rounded-full sm:w-36">
@@ -37,7 +37,7 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
       <div className="flex shrink-0 items-center gap-2">
         <Link
           to="/upgrade"
-          className={`ui-label flex items-center gap-1 px-2 py-2 text-[9px] ${
+          className={`ui-label flex items-center gap-1 rounded-lg px-3 py-2 text-[11px] ${
             premium
               ? "bg-neon-yellow text-primary-foreground pixel-border"
               : "text-accent pixel-border-cyan bg-transparent"
