@@ -89,7 +89,12 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-[380px]">
+    <div
+      className="game-fit relative"
+      style={
+        { "--game-max": "380px", "--game-aspect": "1", "--game-reserve": "190px" } as React.CSSProperties
+      }
+    >
       <div className="bg-surface panel-cyan grid grid-cols-4 gap-2 p-3">
         {cards.map((card, index) => {
           const open = card.flipped || card.matched;

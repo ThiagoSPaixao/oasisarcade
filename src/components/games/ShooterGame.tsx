@@ -276,7 +276,16 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
   }, [actionInput, setStatus, shoot, start]);
 
   return (
-    <div className="relative mx-auto w-full max-w-[360px]">
+    <div
+      className="game-fit relative"
+      style={
+        {
+          "--game-max": "360px",
+          "--game-aspect": `${W / H}`,
+          "--game-reserve": "300px",
+        } as React.CSSProperties
+      }
+    >
       <canvas
         ref={canvasRef}
         className="bg-background pixel-border-cyan block w-full"

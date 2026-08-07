@@ -328,7 +328,16 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   }, [actionInput, rotatePiece, setStatus, start]);
 
   return (
-    <div className="relative mx-auto w-full max-w-[340px]">
+    <div
+      className="game-fit relative"
+      style={
+        {
+          "--game-max": "340px",
+          "--game-aspect": `${COLS / ROWS}`,
+          "--game-reserve": "300px",
+        } as React.CSSProperties
+      }
+    >
       <canvas
         ref={canvasRef}
         className="bg-background pixel-border-cyan block w-full"

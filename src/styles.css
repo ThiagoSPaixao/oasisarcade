@@ -260,3 +260,19 @@
 @utility neon-pulse {
   animation: neon-pulse 3s ease-in-out infinite;
 }
+
+/* Encaixa a área de jogo na altura do dispositivo (mobile-first) */
+.game-fit {
+  width: 100%;
+  margin-inline: auto;
+  max-width: min(
+    var(--game-max, 520px),
+    calc((100dvh - var(--game-reserve, 320px)) * var(--game-aspect, 1))
+  );
+}
+
+@media (min-width: 1024px) {
+  .game-fit {
+    max-width: var(--game-max, 520px);
+  }
+}
