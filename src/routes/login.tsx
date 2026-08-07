@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { useAuthStore } from "@/stores/auth-store";
+
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -25,6 +27,8 @@ function LoginPage() {
   const loading = useAuthStore((s) => s.loading);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,8 +59,11 @@ function LoginPage() {
             <span className="text-muted-foreground font-medium">E-mail</span>
             <input
               type="email"
+              name="email"
+              id="email"
               required
-              autoComplete="email"
+              autoComplete="username email"
+              inputMode="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="bg-surface-2/70 text-foreground border-accent/30 placeholder:text-muted-foreground/60 focus:border-accent/70 rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors"
@@ -64,15 +71,38 @@ function LoginPage() {
           </label>
           <label className="flex flex-col gap-1.5 text-xs">
             <span className="text-muted-foreground font-medium">Senha</span>
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="bg-surface-2/70 text-foreground border-accent/30 placeholder:text-muted-foreground/60 focus:border-accent/70 rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="current-password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="bg-surface-2/70 text-foreground border-accent/30 placeholder:text-muted-foreground/60 focus:border-accent/70 w-full rounded-lg border px-3 py-2.5 pr-11 text-sm outline-none transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Ocultar senha" : "Exibir senha"}
+                aria-pressed={showPassword}
+                className="text-muted-foreground hover:text-accent absolute top-1/2 right-2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" strokeWidth={1.4} />
+                ) : (
+                  <Eye className="h-4 w-4" strokeWidth={1.4} />
+                )}
+              </button>
+            </div>
           </label>
+          <Link
+            to="/forgot-password"
+            className="text-muted-foreground hover:text-accent self-end text-xs no-underline transition-colors"
+          >
+            Esqueci a senha
+          </Link>
           <button
             type="submit"
             disabled={loading}
@@ -80,6 +110,7 @@ function LoginPage() {
           >
             {loading ? "CARREGANDO..." : "ENTRAR"}
           </button>
+
           <p className="text-muted-foreground text-center text-xs">
             Sem conta?{" "}
             <Link to="/register" className="text-accent font-medium no-underline hover:underline hover:decoration-1">
