@@ -50,7 +50,7 @@ function LandingPage() {
   };
 
   return (
-    <ArcadeShell className="grid min-h-screen grid-cols-[minmax(0,1fr)] place-items-center px-4 py-6 sm:px-5 sm:py-10">
+    <ArcadeShell className="grid min-h-dvh grid-cols-[minmax(0,1fr)] place-content-center place-items-center px-4 py-6 sm:px-5 sm:py-10">
       <main className="relative mx-auto flex w-full max-w-lg min-w-0 flex-col items-center text-center">
 
         <div
