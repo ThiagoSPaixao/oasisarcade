@@ -81,21 +81,25 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     ctx.globalAlpha = 1;
 
     const food = foodRef.current;
-    ctx.fillStyle = cssVar("--neon-yellow", "#f6d945");
+    ctx.fillStyle = cssVar("--neon-magenta", "#ff4fd8");
     ctx.shadowColor = ctx.fillStyle;
-    ctx.shadowBlur = 12;
-    ctx.fillRect(food.x * cell + 3, food.y * cell + 3, cell - 6, cell - 6);
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(food.x * cell + cell / 2, food.y * cell + cell / 2, cell / 2 - 3, 0, Math.PI * 2);
+    ctx.fill();
 
     const snake = snakeRef.current;
     snake.forEach((segment, index) => {
-      ctx.fillStyle =
-        index === 0 ? cssVar("--neon-magenta", "#ff4fd8") : cssVar("--neon-green", "#4dff9f");
+      ctx.fillStyle = cssVar("--neon-yellow", "#f6d945");
+      ctx.globalAlpha = index === 0 ? 1 : 0.78;
       ctx.shadowColor = ctx.fillStyle;
-      ctx.shadowBlur = index === 0 ? 14 : 6;
-      ctx.fillRect(segment.x * cell + 1, segment.y * cell + 1, cell - 2, cell - 2);
+      ctx.shadowBlur = index === 0 ? 10 : 4;
+      ctx.fillRect(segment.x * cell + 1.5, segment.y * cell + 1.5, cell - 3, cell - 3);
     });
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }, []);
+
 
   const reset = useCallback(() => {
     snakeRef.current = [{ x: 10, y: 10 }];
