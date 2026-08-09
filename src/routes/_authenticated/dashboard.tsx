@@ -129,20 +129,25 @@ function DashboardPage() {
           onToggleFavorite={(slug) => void onToggleFavorite(slug)}
         />
 
-        <GameRail title="MEUS FAVORITOS" empty={favorites.length === 0}>
-          {games
-            .filter((game) => favorites.includes(game.slug))
-            .map((game) => (
-              <GameCard
-                key={game.slug}
-                game={game}
-                best={scores[game.slug] ?? 0}
-                isFavorite
-                locked={game.is_premium && !isPremiumUser}
-                onToggleFavorite={() => void onToggleFavorite(game.slug)}
-              />
-            ))}
+        {newGames.length > 0 ? (
+          <GameRail title="🆕 NOVOS JOGOS">{newGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        {recentGames.length > 0 ? (
+          <GameRail title="▶️ JOGAR NOVAMENTE">{recentGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        {featuredGames.length > 0 ? (
+          <GameRail title="🔥 EM DESTAQUE">{featuredGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        <GameRail title="MEUS FAVORITOS" empty={favoriteGames.length === 0}>
+          {favoriteGames.map(renderCard)}
         </GameRail>
+
+        {comingSoonGames.length > 0 ? (
+          <GameRail title="EM BREVE">{comingSoonGames.map(renderCard)}</GameRail>
+        ) : null}
 
         <p className="ui-label text-muted-foreground mt-10 text-center text-[10px] leading-relaxed">
           OÁSIS ARCADE · DESENVOLVIDO POR{" "}
