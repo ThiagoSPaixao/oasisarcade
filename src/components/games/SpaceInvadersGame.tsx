@@ -180,12 +180,7 @@ export function SpaceInvadersGame({ onGameOver }: { onGameOver: (score: number) 
       if (shot.y < -10) return false;
       for (const inv of invadersRef.current) {
         if (!inv.alive) continue;
-        if (
-          shot.x > inv.x &&
-          shot.x < inv.x + INV_W &&
-          shot.y > inv.y &&
-          shot.y < inv.y + INV_H
-        ) {
+        if (shot.x > inv.x && shot.x < inv.x + INV_W && shot.y > inv.y && shot.y < inv.y + INV_H) {
           inv.alive = false;
           scoreRef.current += gain(10 + (ROWS - inv.row) * 5, optionsRef.current.difficulty);
           setScore(scoreRef.current);
@@ -279,7 +274,8 @@ export function SpaceInvadersGame({ onGameOver }: { onGameOver: (score: number) 
       }
     };
     const onKeyUp = (event: KeyboardEvent) => {
-      if (["arrowleft", "a", "arrowright", "d"].includes(event.key.toLowerCase())) moveRef.current = 0;
+      if (["arrowleft", "a", "arrowright", "d"].includes(event.key.toLowerCase()))
+        moveRef.current = 0;
     };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
