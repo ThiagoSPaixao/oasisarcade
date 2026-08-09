@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getLeaderboard } from "@/lib/leaderboard.functions";
 import { grantXpSecure, simulateSubscriptionSecure, submitScoreSecure } from "@/lib/player.functions";
 import type { Game, Profile } from "@/types/arcade";
 
