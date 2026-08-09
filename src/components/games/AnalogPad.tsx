@@ -93,7 +93,8 @@ export function AnalogPad({ className, compact, noActions }: { className?: strin
     <div
       onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center rounded-3xl border backdrop-blur-xl select-none",
+        noActions ? "justify-center" : "justify-between gap-3",
         compact ? "p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
