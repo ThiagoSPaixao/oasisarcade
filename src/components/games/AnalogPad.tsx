@@ -35,7 +35,11 @@ function ActBtn({
   );
 }
 
-const DEAD_ZONE = 0.32;
+const DEAD_ZONE = 0.42;
+/** Abaixo disso a direção atual é solta (histerese contra movimentos involuntários). */
+const RELEASE_ZONE = 0.3;
+/** Vantagem mínima de um eixo sobre o outro para trocar de direção. */
+const AXIS_BIAS = 1.3;
 const REPEAT_MS = 130;
 
 /** Alavanca analógica virtual: arraste o polegar para emitir direções continuamente. */
