@@ -18,7 +18,7 @@ import { DIFFICULTY_META } from "@/lib/game-options";
 import type { Game } from "@/types/arcade";
 
 const HINTS: Record<string, string> = {
-  snake: "Setas / WASD ou D-Pad · A reinicia · B pausa",
+  snake: "Setas / WASD ou D-Pad para mover",
   tetris: "Analógico move · centro (A) gira · botão ao lado desce rápido",
   "space-shooter": "← → move · A atira · B pausa",
   breakout: "← → move a raquete · A começa · B pausa",
@@ -84,6 +84,7 @@ export function GamePlayer({
   const needsDPad = game.state === "playable" && game.slug !== "memoria";
   // Tetris prioriza a área de jogo: controles compactos, como nos clássicos.
   const compactPad = game.slug === "tetris";
+  const isSnake = game.slug === "snake";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
@@ -129,6 +130,12 @@ export function GamePlayer({
           >
             {compactPad ? (
               <TetrisPad />
+            ) : isSnake ? (
+              controlMode === "analog" ? (
+                <AnalogPad noActions />
+              ) : (
+                <DPad noActions />
+              )
             ) : controlMode === "analog" ? (
               <AnalogPad compact={compactPad} />
             ) : (

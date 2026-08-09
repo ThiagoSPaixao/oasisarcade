@@ -39,7 +39,7 @@ const DEAD_ZONE = 0.32;
 const REPEAT_MS = 130;
 
 /** Alavanca analógica virtual: arraste o polegar para emitir direções continuamente. */
-export function AnalogPad({ className, compact }: { className?: string; compact?: boolean }) {
+export function AnalogPad({ className, compact, noActions }: { className?: string; compact?: boolean; noActions?: boolean }) {
   const pressDirection = useGameStore((s) => s.pressDirection);
   const baseRef = useRef<HTMLDivElement | null>(null);
   const dirRef = useRef<Direction | null>(null);
@@ -93,7 +93,8 @@ export function AnalogPad({ className, compact }: { className?: string; compact?
     <div
       onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center rounded-3xl border backdrop-blur-xl select-none",
+        noActions ? "justify-center" : "justify-between gap-3",
         compact ? "p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
@@ -132,10 +133,12 @@ export function AnalogPad({ className, compact }: { className?: string; compact?
           )}
         />
       </div>
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        <ActBtn action="b" label="B" compact={compact} />
-        <ActBtn action="a" label="A" compact={compact} />
-      </div>
+      {!noActions ? (
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <ActBtn action="b" label="B" compact={compact} />
+          <ActBtn action="a" label="A" compact={compact} />
+        </div>
+      ) : null}
     </div>
   );
 }

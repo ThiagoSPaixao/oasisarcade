@@ -66,13 +66,14 @@ function ActBtn({
 }
 
 /** Virtual D-Pad: emits directional + A/B events to the active game through the game store. */
-export function DPad({ className, compact }: { className?: string; compact?: boolean }) {
+export function DPad({ className, compact, noActions }: { className?: string; compact?: boolean; noActions?: boolean }) {
   const icon = compact ? "h-4 w-4" : "h-5 w-5";
   return (
     <div
       onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center rounded-3xl border backdrop-blur-xl select-none",
+        noActions ? "justify-center" : "justify-between gap-3",
         compact ? "gap-3 p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
@@ -101,10 +102,12 @@ export function DPad({ className, compact }: { className?: string; compact?: boo
         </DirButton>
         <span />
       </div>
-      <div className={cn("flex shrink-0 items-center", compact ? "gap-2" : "gap-2 sm:gap-3")}>
-        <ActBtn action="b" label="B" compact={compact} />
-        <ActBtn action="a" label="A" compact={compact} />
-      </div>
+      {!noActions ? (
+        <div className={cn("flex shrink-0 items-center", compact ? "gap-2" : "gap-2 sm:gap-3")}>
+          <ActBtn action="b" label="B" compact={compact} />
+          <ActBtn action="a" label="A" compact={compact} />
+        </div>
+      ) : null}
     </div>
   );
 }
