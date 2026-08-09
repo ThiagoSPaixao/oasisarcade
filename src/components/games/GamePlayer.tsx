@@ -7,6 +7,7 @@ import { DPad } from "./DPad";
 import { GameSettingsMenu } from "./GameSettingsMenu";
 import { AnalogPad } from "./AnalogPad";
 import { TetrisPad } from "./TetrisPad";
+import { TouchSurface } from "./TouchSurface";
 import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
 import { DIFFICULTY_META } from "@/lib/game-options";
@@ -41,6 +42,7 @@ export function GamePlayer({
   const setBest = useGameStore((s) => s.setBest);
   const score = useGameStore((s) => s.score);
   const storeBest = useGameStore((s) => s.best);
+  const status = useGameStore((s) => s.status);
 
   const controlMode = useSettingsStore((s) => s.controlMode);
   const options = useGameOptions(game.slug);
@@ -104,7 +106,12 @@ export function GamePlayer({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:gap-5 lg:flex-row lg:items-center lg:justify-center">
-        <GameScreen game={game} onGameOver={onGameOver} />
+        <div className="relative flex w-full max-w-[520px] justify-center">
+          <GameScreen game={game} onGameOver={onGameOver} />
+          {/* Toque/arraste na própria tela do jogo também controla a partida. */}
+          {available && controls !== "none" && status === "running" ? <TouchSurface /> : null}
+        </div>
+
 
         {showPad ? (
           <div

@@ -35,7 +35,11 @@ function ActBtn({
   );
 }
 
-const DEAD_ZONE = 0.32;
+const DEAD_ZONE = 0.42;
+/** Abaixo disso a direção atual é solta (histerese contra movimentos involuntários). */
+const RELEASE_ZONE = 0.3;
+/** Vantagem mínima de um eixo sobre o outro para trocar de direção. */
+const AXIS_BIAS = 1.3;
 const REPEAT_MS = 130;
 
 /** Alavanca analógica virtual: arraste o polegar para emitir direções continuamente. */
@@ -69,13 +73,27 @@ export function AnalogPad({ className, compact, noActions }: { className?: strin
       }
       setKnob({ x: dx * (radius - 22), y: dy * (radius - 22) });
 
-      if (Math.hypot(dx, dy) < DEAD_ZONE) {
+      const mag = Math.hypot(dx, dy);
+      const current = dirRef.current;
+      // Histerese: só solta abaixo da zona de liberação; só engata acima da zona morta.
+      if (mag < RELEASE_ZONE || (!current && mag < DEAD_ZONE)) {
         dirRef.current = null;
         return;
       }
-      const next: Direction =
-        Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
-      if (next !== dirRef.current) {
+      if (current && mag < DEAD_ZONE) return;
+
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      const horizontal = ax > ay;
+      const currentHorizontal = current === "left" || current === "right";
+      // Diagonais não trocam de eixo sem dominância clara: evita curvas involuntárias.
+      if (current && currentHorizontal !== horizontal) {
+        const dominant = horizontal ? ax : ay;
+        const other = horizontal ? ay : ax;
+        if (dominant < other * AXIS_BIAS) return;
+      }
+      const next: Direction = horizontal ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+      if (next !== current) {
         dirRef.current = next;
         pressDirection(next);
       }
