@@ -135,34 +135,38 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
                 type="button"
                 onClick={() => flip(index)}
                 aria-label={open ? `Carta ${card.icon.label}` : "Carta virada para baixo"}
-                className={cn(
-                  "relative grid aspect-square place-items-center overflow-hidden text-xl transition-transform active:scale-95",
-                  open
-                    ? card.matched
-                      ? "bg-neon-green/15 pixel-border-cyan"
-                      : "bg-surface-2 pixel-border-magenta"
-                    : "bg-surface-2 pixel-border text-muted-foreground",
-                )}
+                className="card-flip-scene relative aspect-square transition-transform active:scale-95"
               >
-                <img
-                  src={card.icon.url}
-                  alt={open ? card.icon.label : ""}
-                  fetchPriority="high"
-                  decoding="sync"
-                  draggable={false}
-                  className={cn(
-                    "absolute inset-0 h-full w-full object-cover",
-                    open ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                {open ? null : (
-                  <span aria-hidden="true" className="glow-cyan text-accent relative">
-                    ?
-                  </span>
-                )}
+                <div className={cn("card-flip-inner", open && "card-flip-open")}>
+                  <div
+                    className={cn(
+                      "card-face bg-surface-2 pixel-border text-muted-foreground text-xl",
+                      card.flipped && !card.matched && "card-neon-pulse",
+                    )}
+                  >
+                    <span aria-hidden="true" className="glow-cyan text-accent">
+                      ?
+                    </span>
+                  </div>
+                  <div
+                    className={cn(
+                      "card-face card-face-back",
+                      card.matched
+                        ? "bg-neon-green/15 pixel-border-cyan card-match-pulse"
+                        : cn("bg-surface-2 pixel-border-magenta", open && "card-neon-pulse"),
+                    )}
+                  >
+                    <img
+                      src={card.icon.url}
+                      alt={open ? card.icon.label : ""}
+                      fetchPriority="high"
+                      decoding="sync"
+                      draggable={false}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
               </button>
-
-
             );
           })}
         </div>
