@@ -100,9 +100,17 @@ export function GamePlayer({
             <span className="text-accent font-semibold">Score {score}</span>
             <span className="opacity-40"> · </span>
             <span className="text-neon-yellow font-semibold">High {Math.max(storeBest, score)}</span>
+            {game.state === "playable" ? (
+              <>
+                <span className="opacity-40"> · </span>
+                <span className="ui-label text-primary/80 text-[10px]">
+                  {difficulty.short} · {difficulty.multiplier}x
+                </span>
+              </>
+            ) : null}
           </p>
         </div>
-        <SettingsMenu />
+        {game.state === "playable" ? <GameSettingsMenu slug={game.slug} /> : <span />}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:gap-5 lg:flex-row lg:items-center lg:justify-center">
