@@ -1,21 +1,28 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { MEMORY_PAIRS, gain } from "@/lib/game-options";
 import { cn } from "@/lib/utils";
 
-const SYMBOLS = ["★", "♥", "♦", "☘", "♫", "☂", "☺", "⚡"];
+const SYMBOLS = ["★", "♥", "♦", "☘", "♫", "☂", "☺", "⚡", "♠", "☾"];
 
 type Card = { id: number; symbol: string; flipped: boolean; matched: boolean };
 
-function buildDeck(): Card[] {
-  return [...SYMBOLS, ...SYMBOLS]
+function buildDeck(pairs: number): Card[] {
+  const chosen = SYMBOLS.slice(0, pairs);
+  return [...chosen, ...chosen]
     .map((symbol, index) => ({ id: index, symbol, flipped: false, matched: false }))
     .sort(() => Math.random() - 0.5)
     .map((card, index) => ({ ...card, id: index }));
 }
 
 export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void }) {
-  const [cards, setCards] = useState<Card[]>(() => buildDeck());
+  const options = useGameOptions("memoria");
+  const pairs = MEMORY_PAIRS[options.difficulty];
+  const cols = pairs > 8 ? 5 : 4;
+
+  const [cards, setCards] = useState<Card[]>(() => buildDeck(pairs));
   const [picked, setPicked] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [locked, setLocked] = useState(false);
@@ -30,19 +37,29 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
   const matched = useMemo(() => cards.filter((c) => c.matched).length / 2, [cards]);
 
   const start = useCallback(() => {
-    setCards(buildDeck());
+    setCards(buildDeck(pairs));
     setPicked([]);
     setMoves(0);
     setLocked(false);
     setScore(0);
     setStatus("running");
-  }, [setScore, setStatus]);
+  }, [pairs, setScore, setStatus]);
 
   useEffect(() => {
     if (!actionInput) return;
     const current = useGameStore.getState().status;
     if (actionInput.action === "a" && current !== "running") start();
   }, [actionInput, start]);
+
+  // Mudar a dificuldade monta um tabuleiro novo
+  useEffect(() => {
+    setCards(buildDeck(pairs));
+    setPicked([]);
+    setMoves(0);
+    setLocked(false);
+    setScore(0);
+    setStatus("idle");
+  }, [pairs, setScore, setStatus]);
 
   const flip = (index: number) => {
     if (status !== "running" || locked) return;
@@ -65,11 +82,11 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
       const resolved = next.map((c, i) => (i === a || i === b ? { ...c, matched: true } : c));
       setCards(resolved);
       setPicked([]);
-      const pairs = resolved.filter((c) => c.matched).length / 2;
-      const score = pairs * 50;
+      const found = resolved.filter((c) => c.matched).length / 2;
+      const score = gain(found * 50, options.difficulty);
       setScore(score);
-      if (pairs === SYMBOLS.length) {
-        const bonus = Math.max(0, 400 - moves * 15);
+      if (found === pairs) {
+        const bonus = gain(Math.max(0, 400 - moves * 15), options.difficulty);
         const total = score + bonus;
         setScore(total);
         play("levelup");
@@ -95,7 +112,10 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
         { "--game-max": "380px", "--game-aspect": "1", "--game-reserve": "190px" } as React.CSSProperties
       }
     >
-      <div className="bg-surface panel-cyan grid grid-cols-4 gap-2 p-3">
+      <div
+        className="bg-surface panel-cyan grid gap-2 p-3"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      >
         {cards.map((card, index) => {
           const open = card.flipped || card.matched;
           return (
@@ -119,7 +139,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
         })}
       </div>
       <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">
-        PARES {matched}/{SYMBOLS.length} · JOGADAS {moves}
+        PARES {matched}/{pairs} · JOGADAS {moves}
       </p>
 
       {status !== "running" ? (
