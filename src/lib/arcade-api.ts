@@ -74,29 +74,46 @@ export async function saveScoreIfRecord(
   meta?: { durationMs?: number; difficulty?: string; gameVersion?: string },
 ): Promise<boolean> {
   if (!Number.isFinite(score) || score < 0) return false;
-  return (await submitScoreSecure({
-    data: {
-      slug,
-      score: Math.floor(score),
-      ...(meta?.durationMs !== undefined ? { durationMs: Math.floor(meta.durationMs) } : {}),
-      ...(meta?.difficulty !== undefined ? { difficulty: meta.difficulty } : {}),
-      ...(meta?.gameVersion !== undefined ? { gameVersion: meta.gameVersion } : {}),
-    },
-  })) as boolean;
+  const payload = {
+    slug,
+    score: Math.floor(score),
+    ...(meta?.durationMs !== undefined ? { durationMs: Math.floor(meta.durationMs) } : {}),
+    ...(meta?.difficulty !== undefined ? { difficulty: meta.difficulty } : {}),
+    ...(meta?.gameVersion !== undefined ? { gameVersion: meta.gameVersion } : {}),
+  };
+  // Public Data API first (works on any host); server function as fallback.
+  const { data, error } = await supabase.rpc("submit_score", {
+    _game_slug: slug,
+    _score: payload.score,
+    _duration_ms: payload.durationMs ?? null,
+    _difficulty: payload.difficulty ?? null,
+    _game_version: payload.gameVersion ?? null,
+  });
+  if (!error) return data === true;
+  console.warn("[score] RPC falhou, usando função de servidor", error);
+  return (await submitScoreSecure({ data: payload })) as boolean;
 }
 
 /** Requests XP; the server owns the accumulated XP and the level. */
 export async function grantXp(amount: number): Promise<Profile | null> {
   if (!Number.isFinite(amount) || amount <= 0) return null;
-  const row = await grantXpSecure({ data: { amount: Math.min(5000, Math.floor(amount)) } });
+  const safe = Math.min(5000, Math.floor(amount));
+  const { data, error } = await supabase.rpc("grant_xp", { _amount: safe });
+  if (!error) return (data as unknown as Profile) ?? null;
+  console.warn("[xp] RPC falhou, usando função de servidor", error);
+  const row = await grantXpSecure({ data: { amount: safe } });
   return (row as Profile) ?? null;
 }
 
 /** Development-only plan simulation, executed server-side. */
 export async function simulateSubscription(plan: "free" | "premium"): Promise<Profile | null> {
+  const { data, error } = await supabase.rpc("simulate_subscription", { _plan: plan });
+  if (!error) return (data as unknown as Profile) ?? null;
+  console.warn("[plan] RPC falhou, usando função de servidor", error);
   const row = await simulateSubscriptionSecure({ data: { plan } });
   return (row as Profile) ?? null;
 }
+
 
 /**
  * Global leaderboard read directly through the public Data API (publishable key),
