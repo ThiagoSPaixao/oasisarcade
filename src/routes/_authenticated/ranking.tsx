@@ -96,10 +96,10 @@ function RankingPage() {
             <ul className="divide-foreground/5 divide-y">
               {rows.map((row) => (
                 <li
-                  key={row.user_id}
+                  key={`${row.rank}-${row.username}`}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3",
-                    row.user_id === userId && "bg-primary/10",
+                    row.username === myUsername && "bg-primary/10",
                   )}
                 >
                   <span
@@ -115,10 +115,11 @@ function RankingPage() {
                   <div className="min-w-0 flex-1">
                     <p className="text-foreground truncate text-sm font-semibold">
                       {row.username}
-                      {row.user_id === userId ? (
+                      {row.username === myUsername ? (
                         <span className="text-primary ml-2 text-[10px] font-bold">VOCÊ</span>
                       ) : null}
                     </p>
+
                     <p className="text-muted-foreground text-[11px]">Level {row.level}</p>
                   </div>
                   <span className="text-accent text-sm font-bold tabular-nums">{row.score}</span>
