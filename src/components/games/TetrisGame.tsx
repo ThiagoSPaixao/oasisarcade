@@ -128,8 +128,12 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const lastFrameRef = useRef(0);
   const dirtyRef = useRef(true);
   const rafRef = useRef<number | null>(null);
+  /** Efeito visual das linhas completadas (flash neon). */
+  const clearFxRef = useRef<{ rows: number[]; start: number; count: number } | null>(null);
+  const [clearLabel, setClearLabel] = useState<{ text: string; id: number } | null>(null);
   const [lines, setLines] = useState(0);
   const [nextPieces, setNextPieces] = useState<PieceDef[]>(() => queueRef.current);
+
 
   const status = useGameStore((s) => s.status);
   const setStatus = useGameStore((s) => s.setStatus);
