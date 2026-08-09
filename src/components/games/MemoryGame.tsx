@@ -144,20 +144,24 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
                     : "bg-surface-2 pixel-border text-muted-foreground",
                 )}
               >
-                {open ? (
-                  <img
-                    src={card.icon.url}
-                    alt={card.icon.label}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span aria-hidden="true" className="glow-cyan text-accent">
+                <img
+                  src={card.icon.url}
+                  alt={open ? card.icon.label : ""}
+                  fetchPriority="high"
+                  decoding="sync"
+                  draggable={false}
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-cover",
+                    open ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                {open ? null : (
+                  <span aria-hidden="true" className="glow-cyan text-accent relative">
                     ?
                   </span>
                 )}
               </button>
+
 
             );
           })}
