@@ -567,6 +567,13 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     draw();
   }, [draw, options.tetrisGhost]);
 
+  // Remove o rótulo de linhas após a animação
+  useEffect(() => {
+    if (!clearLabel) return;
+    const timer = window.setTimeout(() => setClearLabel(null), 750);
+    return () => window.clearTimeout(timer);
+  }, [clearLabel]);
+
   const level = Math.floor(lines / 10) + 1;
 
   return (
@@ -586,12 +593,27 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
           className="bg-background pixel-border-cyan block w-full"
           style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
         />
+        {clearLabel ? (
+          <div
+            key={clearLabel.id}
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          >
+            <span
+              className={`animate-scale-in font-pixel text-lg tracking-widest drop-shadow-[0_0_12px_currentColor] sm:text-2xl ${
+                clearLabel.text === "TETRIS!" ? "text-neon-yellow" : "text-primary"
+              }`}
+            >
+              {clearLabel.text}
+            </span>
+          </div>
+        ) : null}
         <GameOverlay
           title="TETRIS"
           hint="Analógico move · centro gira · botão ao lado desce rápido"
           onStart={() => (status === "paused" ? setStatus("running") : start())}
         />
       </div>
+
 
       <aside className="flex w-14 shrink-0 flex-col items-center gap-2 sm:w-20">
         <span className="ui-label text-muted-foreground text-[8px] tracking-widest sm:text-[9px]">
