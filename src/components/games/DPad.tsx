@@ -102,10 +102,12 @@ export function DPad({ className, compact, noActions }: { className?: string; co
         </DirButton>
         <span />
       </div>
-      <div className={cn("flex shrink-0 items-center", compact ? "gap-2" : "gap-2 sm:gap-3")}>
-        <ActBtn action="b" label="B" compact={compact} />
-        <ActBtn action="a" label="A" compact={compact} />
-      </div>
+      {!noActions ? (
+        <div className={cn("flex shrink-0 items-center", compact ? "gap-2" : "gap-2 sm:gap-3")}>
+          <ActBtn action="b" label="B" compact={compact} />
+          <ActBtn action="a" label="A" compact={compact} />
+        </div>
+      ) : null}
     </div>
   );
 }
