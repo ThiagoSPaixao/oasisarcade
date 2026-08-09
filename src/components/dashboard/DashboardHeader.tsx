@@ -43,7 +43,7 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
           }`}
         >
           <Crown className="h-3 w-3" strokeWidth={1.4} />
-          {premium ? "PLAYER 2" : "PLAYER 1"}
+          {premium ? "Player PRO" : "Player 1"}
         </Link>
         <button
           type="button"
