@@ -81,16 +81,6 @@ export async function saveScoreIfRecord(
     ...(meta?.difficulty !== undefined ? { difficulty: meta.difficulty } : {}),
     ...(meta?.gameVersion !== undefined ? { gameVersion: meta.gameVersion } : {}),
   };
-  // Public Data API first (works on any host); server function as fallback.
-  const { data, error } = await supabase.rpc("submit_score", {
-    _game_slug: slug,
-    _score: payload.score,
-    ...(payload.durationMs === undefined ? {} : { _duration_ms: payload.durationMs }),
-    ...(payload.difficulty === undefined ? {} : { _difficulty: payload.difficulty }),
-    ...(payload.gameVersion === undefined ? {} : { _game_version: payload.gameVersion }),
-  });
-  if (!error) return data === true;
-  console.warn("[score] RPC falhou, usando função de servidor", error);
   return (await submitScoreSecure({ data: payload })) as boolean;
 }
 
@@ -98,29 +88,18 @@ export async function saveScoreIfRecord(
 export async function grantXp(amount: number): Promise<Profile | null> {
   if (!Number.isFinite(amount) || amount <= 0) return null;
   const safe = Math.min(5000, Math.floor(amount));
-  const { data, error } = await supabase.rpc("grant_xp", { _amount: safe });
-  if (!error) return (data as unknown as Profile) ?? null;
-  console.warn("[xp] RPC falhou, usando função de servidor", error);
   const row = await grantXpSecure({ data: { amount: safe } });
   return (row as Profile) ?? null;
 }
 
 /** Development-only plan simulation, executed server-side. */
 export async function simulateSubscription(plan: "free" | "premium"): Promise<Profile | null> {
-  const { data, error } = await supabase.rpc("simulate_subscription", { _plan: plan });
-  if (!error) return (data as unknown as Profile) ?? null;
-  console.warn("[plan] RPC falhou, usando função de servidor", error);
   const row = await simulateSubscriptionSecure({ data: { plan } });
   return (row as Profile) ?? null;
 }
 
-
-/**
- * Global leaderboard read directly through the public Data API (publishable key),
- * so it works on any host without server-only service keys.
- */
+/** Global leaderboard read through an authenticated server function. */
 export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {
-  const { data, error } = await supabase.rpc("get_leaderboard", { _game_slug: slug, _limit: limit });
-  if (error) throw error;
-  return (data ?? []) as LeaderboardRow[];
+  return (await getLeaderboard({ data: { slug, limit } })) as LeaderboardRow[];
 }
+
