@@ -4,6 +4,7 @@ import { Gamepad2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { useSoundStore } from "@/stores/sound-store";
+import { setMusicTheme, startMusic } from "@/lib/sound";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -36,6 +37,24 @@ function LandingPage() {
   const [checking, setChecking] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
 
+  // Tema da tela inicial: tenta iniciar já e, se o navegador exigir gesto,
+  // liga no primeiro toque/clique.
+  useEffect(() => {
+    setMusicTheme("title");
+    unlock();
+    startMusic();
+    const kick = () => {
+      unlock();
+      startMusic();
+    };
+    window.addEventListener("pointerdown", kick, { once: true });
+    window.addEventListener("keydown", kick, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+    };
+  }, [unlock]);
+
   useEffect(() => {
     void supabase.auth.getUser().then(({ data }) => {
       setLoggedIn(!!data.user);
@@ -45,6 +64,7 @@ function LandingPage() {
 
   const enter = () => {
     unlock();
+    setMusicTheme("arcade");
     play("coin");
     setTimeout(() => navigate({ to: loggedIn ? "/dashboard" : "/login" }), 260);
   };

@@ -15,7 +15,7 @@ export const useSoundStore = create<SoundState>()(
   persist(
     (set, get) => ({
       sfx: true,
-      music: false,
+      music: true,
       toggleSfx: () => {
         const next = !get().sfx;
         setSfxEnabled(next);
@@ -48,6 +48,9 @@ export const useSoundStore = create<SoundState>()(
     }),
     {
       name: "retro-arcade-sound",
+      version: 2,
+      // v2 passa a ligar a música por padrão (o motor novo é mais agradável).
+      migrate: (persisted) => ({ ...(persisted as object), music: true }) as never,
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         setSfxEnabled(state.sfx);
