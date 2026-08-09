@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { grantXpSecure, simulateSubscriptionSecure, submitScoreSecure } from "@/lib/player.functions";
 import type { Game, Profile } from "@/types/arcade";
 
 const GAME_FIELDS = "slug, name, description, category, is_premium, thumbnail, state, sort_order";
