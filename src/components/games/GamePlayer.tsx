@@ -62,6 +62,8 @@ export function GamePlayer({
   const storeBest = useGameStore((s) => s.best);
 
   const controlMode = useSettingsStore((s) => s.controlMode);
+  const options = useGameOptions(game.slug);
+  const difficulty = DIFFICULTY_META[options.difficulty];
 
   // Trava o scroll enquanto o jogo está aberto: tudo cabe na tela do aparelho.
   useEffect(() => {
