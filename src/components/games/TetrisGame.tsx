@@ -327,7 +327,10 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     lastFrameRef.current = 0;
     setLines(0);
     setScore(0);
+    clearFxRef.current = null;
+    setClearLabel(null);
     dirtyRef.current = true;
+
     draw();
   }, [draw, setScore]);
 
