@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/game/$slug")({
 });
 
 function GameRoute() {
-  const { slug } = Route.useParams();
+  const params = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const profile = useAuthStore((s) => s.profile);
@@ -23,12 +23,24 @@ function GameRoute() {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
+  // Slug canônico do Game Registry (resolve aliases antigos como "nave"/"arkanoid").
+  const slug = resolveSlug(params.slug);
+  const knownSlug = slug !== null;
+
   useEffect(() => {
     void loadProfile();
   }, [loadProfile]);
 
-  const gameQuery = useQuery({ queryKey: ["game", slug], queryFn: () => fetchGame(slug) });
-  const bestQuery = useQuery({ queryKey: ["best", slug], queryFn: () => fetchBestScore(slug) });
+  const gameQuery = useQuery({
+    queryKey: ["game", slug],
+    queryFn: () => fetchGame(slug as string),
+    enabled: knownSlug,
+  });
+  const bestQuery = useQuery({
+    queryKey: ["best", slug],
+    queryFn: () => fetchBestScore(slug as string),
+    enabled: knownSlug,
+  });
 
   const game = gameQuery.data;
   const locked = !!game?.is_premium && profile?.plano_status !== "premium";
@@ -36,6 +48,7 @@ function GameRoute() {
   useEffect(() => {
     if (locked) setUpgradeOpen(true);
   }, [locked]);
+
 
   const onGameOver = async (score: number) => {
     try {
