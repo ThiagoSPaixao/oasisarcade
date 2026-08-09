@@ -33,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/ranking")({
 function RankingPage() {
   const userId = useAuthStore((s) => s.user?.id);
   const [slug, setSlug] = useState<string | null>(null);
+  const loadLeaderboard = useServerFn(getLeaderboard);
 
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
   const games = gamesQuery.data ?? [];
@@ -40,11 +41,12 @@ function RankingPage() {
 
   const boardQuery = useQuery({
     queryKey: ["leaderboard", activeSlug],
-    queryFn: () => fetchLeaderboard(activeSlug as string),
+    queryFn: () => loadLeaderboard({ data: { slug: activeSlug as string } }) as Promise<LeaderboardRow[]>,
     enabled: !!activeSlug,
   });
 
-  const rows = boardQuery.data ?? [];
+  const rows: LeaderboardRow[] = boardQuery.data ?? [];
+
 
   return (
     <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
