@@ -182,6 +182,7 @@ export function GameCover({
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={priority ? "high" : "low"}
+        sizes={sizes}
         width={width}
         height={height}
         onLoad={() => {
