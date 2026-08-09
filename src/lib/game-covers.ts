@@ -1,4 +1,4 @@
-import coverTetris from "@/assets/cover-tetris.jpg";
+import coverTetrisNeon from "@/assets/cover-tetris-neon.png.asset.json";
 import coverSnake from "@/assets/cover-snake.jpg";
 import coverMemoria from "@/assets/cover-memoria.jpg";
 import coverShooter from "@/assets/cover-shooter.jpg";
@@ -7,7 +7,7 @@ import coverPong from "@/assets/cover-pong.jpg";
 
 /** Capas neon por jogo, usadas nos cards e no carrossel do dashboard. */
 export const GAME_COVERS: Record<string, string> = {
-  tetris: coverTetris,
+  tetris: coverTetrisNeon.url,
   snake: coverSnake,
   memoria: coverMemoria,
   "space-shooter": coverShooter,
