@@ -128,10 +128,10 @@ export async function fetchLeaderboard(slug: string, limit = 20): Promise<Leader
   if (error) throw error;
   return (data ?? []).map((row, index) => ({
     rank: index + 1,
-    username: row.username,
-    level: row.level,
-    score: row.score,
-    created_at: row.scored_at,
+    username: row.username ?? "Player",
+    level: row.level ?? 1,
+    score: row.score ?? 0,
+    created_at: row.scored_at ?? new Date(0).toISOString(),
   }));
 }
 
