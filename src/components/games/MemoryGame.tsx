@@ -52,6 +52,11 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
     if (actionInput.action === "a" && current !== "running") start();
   }, [actionInput, start]);
 
+  // Pré-carrega todas as faces uma única vez
+  useEffect(() => {
+    preloadMemoryIcons();
+  }, []);
+
   // Mudar a dificuldade monta um tabuleiro novo
   useEffect(() => {
     setCards(buildDeck(pairs));
