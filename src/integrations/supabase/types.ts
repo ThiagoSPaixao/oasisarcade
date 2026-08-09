@@ -142,22 +142,34 @@ export type Database = {
       user_scores: {
         Row: {
           created_at: string
+          difficulty: string | null
+          duration_ms: number | null
           game_slug: string
+          game_version: string | null
           id: string
+          played_at: string
           score: number
           user_id: string
         }
         Insert: {
           created_at?: string
+          difficulty?: string | null
+          duration_ms?: number | null
           game_slug: string
+          game_version?: string | null
           id?: string
+          played_at?: string
           score?: number
           user_id: string
         }
         Update: {
           created_at?: string
+          difficulty?: string | null
+          duration_ms?: number | null
           game_slug?: string
+          game_version?: string | null
           id?: string
+          played_at?: string
           score?: number
           user_id?: string
         }
@@ -186,6 +198,58 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      grant_xp_for: {
+        Args: { _amount: number; _user_id: string }
+        Returns: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          level: number
+          plano_status: Database["public"]["Enums"]["plan_status"]
+          updated_at: string
+          username: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      simulate_subscription_for: {
+        Args: {
+          _plan: Database["public"]["Enums"]["plan_status"]
+          _user_id: string
+        }
+        Returns: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          level: number
+          plano_status: Database["public"]["Enums"]["plan_status"]
+          updated_at: string
+          username: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      submit_score_for: {
+        Args: {
+          _difficulty?: string
+          _duration_ms?: number
+          _game_slug: string
+          _game_version?: string
+          _score: number
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

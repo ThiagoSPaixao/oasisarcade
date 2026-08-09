@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { grantXpSecure, simulateSubscriptionSecure, submitScoreSecure } from "@/lib/player.functions";
 import type { Game, Profile } from "@/types/arcade";
 
 const GAME_FIELDS = "slug, name, description, category, is_premium, thumbnail, state, sort_order";
@@ -66,60 +67,33 @@ export async function fetchBestScore(slug: string): Promise<number> {
   return data?.score ?? 0;
 }
 
-/** Saves the score only when it beats the stored record. Returns true when a new record was set. */
-export async function saveScoreIfRecord(slug: string, score: number): Promise<boolean> {
-  const { data: auth } = await supabase.auth.getUser();
-  const userId = auth.user?.id;
-  if (!userId) return false;
-  const best = await fetchBestScore(slug);
-  if (score <= best) return false;
-  const { error } = await supabase
-    .from("user_scores")
-    .upsert({ user_id: userId, game_slug: slug, score }, { onConflict: "user_id,game_slug" });
-  if (error) throw error;
-  return true;
+/** Saves the score only when it beats the stored record. The comparison happens in the database. */
+export async function saveScoreIfRecord(
+  slug: string,
+  score: number,
+  meta?: { durationMs?: number; difficulty?: string; gameVersion?: string },
+): Promise<boolean> {
+  if (!Number.isFinite(score) || score < 0) return false;
+  return (await submitScoreSecure({
+    data: {
+      slug,
+      score: Math.floor(score),
+      ...(meta?.durationMs !== undefined ? { durationMs: Math.floor(meta.durationMs) } : {}),
+      ...(meta?.difficulty !== undefined ? { difficulty: meta.difficulty } : {}),
+      ...(meta?.gameVersion !== undefined ? { gameVersion: meta.gameVersion } : {}),
+    },
+  })) as boolean;
 }
 
+/** Requests XP; the server owns the accumulated XP and the level. */
 export async function grantXp(amount: number): Promise<Profile | null> {
-  const { data: auth } = await supabase.auth.getUser();
-  const userId = auth.user?.id;
-  if (!userId || amount <= 0) return null;
-  const { data: current, error: readError } = await supabase
-    .from("profiles")
-    .select("xp")
-    .eq("id", userId)
-    .maybeSingle();
-  if (readError) throw readError;
-  const xp = (current?.xp ?? 0) + amount;
-  const level = Math.max(1, Math.floor(xp / 500) + 1);
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({ xp, level })
-    .eq("id", userId)
-    .select("id, username, avatar_url, level, xp, plano_status")
-    .maybeSingle();
-  if (error) throw error;
-  return (data as Profile) ?? null;
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  const row = await grantXpSecure({ data: { amount: Math.min(5000, Math.floor(amount)) } });
+  return (row as Profile) ?? null;
 }
 
+/** Development-only plan simulation, executed server-side. */
 export async function simulateSubscription(plan: "free" | "premium"): Promise<Profile | null> {
-  const { data: auth } = await supabase.auth.getUser();
-  const userId = auth.user?.id;
-  if (!userId) throw new Error("Não autenticado");
-
-  const periodEnd = plan === "premium" ? new Date(Date.now() + 30 * 864e5).toISOString() : null;
-  const { error: subError } = await supabase.from("subscriptions").upsert(
-    { user_id: userId, plan, status: "active", current_period_end: periodEnd },
-    { onConflict: "user_id" },
-  );
-  if (subError) throw subError;
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({ plano_status: plan })
-    .eq("id", userId)
-    .select("id, username, avatar_url, level, xp, plano_status")
-    .maybeSingle();
-  if (error) throw error;
-  return (data as Profile) ?? null;
+  const row = await simulateSubscriptionSecure({ data: { plan } });
+  return (row as Profile) ?? null;
 }
