@@ -16,12 +16,14 @@ function ActBtn({
   return (
     <button
       type="button"
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
         event.preventDefault();
         pressAction(action);
       }}
       className={cn(
-        "bg-surface/40 grid shrink-0 place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform active:scale-95",
+        "bg-surface/40 grid shrink-0 touch-none place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform select-none active:scale-95",
         compact ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12 sm:h-14 sm:w-14",
         action === "a"
           ? "border-primary/50 text-primary shadow-[0_0_24px_-10px_var(--neon-magenta)]"
@@ -89,8 +91,9 @@ export function AnalogPad({ className, compact }: { className?: string; compact?
 
   return (
     <div
+      onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
         compact ? "p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
@@ -99,6 +102,8 @@ export function AnalogPad({ className, compact }: { className?: string; compact?
         ref={baseRef}
         role="application"
         aria-label="Alavanca analógica"
+        draggable={false}
+        onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
           event.preventDefault();
           event.currentTarget.setPointerCapture(event.pointerId);
@@ -107,15 +112,17 @@ export function AnalogPad({ className, compact }: { className?: string; compact?
         }}
         onPointerMove={(event) => {
           if (!active) return;
+          event.preventDefault();
           track(event.clientX, event.clientY);
         }}
         onPointerUp={release}
         onPointerCancel={release}
         className={cn(
-          "border-accent/35 bg-surface/40 relative shrink-0 touch-none rounded-full border shadow-[0_0_36px_-14px_var(--neon-cyan)]",
+          "border-accent/35 bg-surface/40 relative shrink-0 touch-none rounded-full border shadow-[0_0_36px_-14px_var(--neon-cyan)] select-none",
           compact ? "h-24 w-24 sm:h-28 sm:w-28" : "h-32 w-32 sm:h-36 sm:w-36",
         )}
       >
+
         <span
           style={{ transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))` }}
           className={cn(

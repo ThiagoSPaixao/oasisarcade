@@ -17,12 +17,14 @@ function DirButton({
     <button
       type="button"
       aria-label={direction}
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
         event.preventDefault();
         pressDirection(direction);
       }}
       className={cn(
-        "border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid shrink-0 place-items-center rounded-full border backdrop-blur transition-all active:scale-95",
+        "border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid shrink-0 touch-none place-items-center rounded-full border backdrop-blur transition-all select-none active:scale-95",
         compact ? "h-9 w-9 sm:h-10 sm:w-10" : "h-11 w-11 sm:h-13 sm:w-13",
       )}
     >
@@ -44,12 +46,14 @@ function ActBtn({
   return (
     <button
       type="button"
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
         event.preventDefault();
         pressAction(action);
       }}
       className={cn(
-        "bg-surface/40 grid shrink-0 place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform active:scale-95",
+        "bg-surface/40 grid shrink-0 touch-none place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform select-none active:scale-95",
         compact ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12 sm:h-14 sm:w-14",
         action === "a"
           ? "border-primary/50 text-primary shadow-[0_0_24px_-10px_var(--neon-magenta)]"
@@ -66,8 +70,9 @@ export function DPad({ className, compact }: { className?: string; compact?: boo
   const icon = compact ? "h-4 w-4" : "h-5 w-5";
   return (
     <div
+      onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
         compact ? "gap-3 p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
