@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
+import { getRankedGames } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,7 @@ function RankingPage() {
   const [slug, setSlug] = useState<string | null>(null);
 
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
-  const games = gamesQuery.data ?? [];
+  const games = getRankedGames(gamesQuery.data ?? []);
   const activeSlug = slug ?? games[0]?.slug ?? null;
 
   const boardQuery = useQuery({

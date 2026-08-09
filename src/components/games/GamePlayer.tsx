@@ -1,13 +1,7 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { stopMusic } from "@/lib/sound";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { SnakeGame } from "./SnakeGame";
-import { TetrisGame } from "./TetrisGame";
-import { MemoryGame } from "./MemoryGame";
-import { ShooterGame } from "./ShooterGame";
-import { BreakoutGame } from "./BreakoutGame";
-import { PongGame } from "./PongGame";
 import { ComingSoon } from "./ComingSoon";
 import { DPad } from "./DPad";
 import { GameSettingsMenu } from "./GameSettingsMenu";
@@ -16,37 +10,22 @@ import { TetrisPad } from "./TetrisPad";
 import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
 import { DIFFICULTY_META } from "@/lib/game-options";
-import type { Game } from "@/types/arcade";
+import type { CatalogGame } from "@/lib/games/catalog";
 
-const HINTS: Record<string, string> = {
-  snake: "Setas / WASD ou D-Pad para mover",
-  tetris: "Analógico move · centro (A) gira · botão ao lado desce rápido",
-  "space-shooter": "← → move · A atira · B pausa",
-  breakout: "← → move a raquete · A começa · B pausa",
-  pong: "← → move a raquete · A começa · B pausa",
-  memoria: "Toque nas cartas para achar os pares",
-};
-
-function GameScreen({ game, onGameOver }: { game: Game; onGameOver: (score: number) => void }) {
-  if (game.state !== "playable") return <ComingSoon name={game.name} />;
-  switch (game.slug) {
-    case "snake":
-      return <SnakeGame onGameOver={onGameOver} />;
-    case "tetris":
-      return <TetrisGame onGameOver={onGameOver} />;
-    case "memoria":
-      return <MemoryGame onGameOver={onGameOver} />;
-    case "space-shooter":
-    case "nave":
-      return <ShooterGame onGameOver={onGameOver} />;
-    case "breakout":
-    case "arkanoid":
-      return <BreakoutGame onGameOver={onGameOver} />;
-    case "pong":
-      return <PongGame onGameOver={onGameOver} />;
-    default:
-      return <ComingSoon name={game.name} />;
-  }
+function GameScreen({ game, onGameOver }: { game: CatalogGame; onGameOver: (score: number) => void }) {
+  const Component = game.definition.component;
+  if (game.status !== "available" || !Component) return <ComingSoon name={game.name} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-surface panel grid aspect-square w-full max-w-[520px] place-items-center">
+          <p className="ui-label text-accent text-xs">CARREGANDO JOGO...</p>
+        </div>
+      }
+    >
+      <Component onGameOver={onGameOver} />
+    </Suspense>
+  );
 }
 
 export function GamePlayer({
@@ -54,7 +33,7 @@ export function GamePlayer({
   best,
   onGameOver,
 }: {
-  game: Game;
+  game: CatalogGame;
   best: number;
   onGameOver: (score: number) => void;
 }) {
@@ -66,6 +45,7 @@ export function GamePlayer({
   const controlMode = useSettingsStore((s) => s.controlMode);
   const options = useGameOptions(game.slug);
   const difficulty = DIFFICULTY_META[options.difficulty];
+  const { controls, controlHint, musicTheme } = game.definition;
 
   // Trava o scroll enquanto o jogo está aberto: tudo cabe na tela do aparelho.
   useEffect(() => {
@@ -78,19 +58,19 @@ export function GamePlayer({
     return () => setActiveGame(null);
   }, [game.slug, setActiveGame]);
 
-  // Snake, memória e demais jogos ficam em silêncio (só efeitos). Tetris cuida da sua própria música.
+  // Jogos sem tema próprio ficam em silêncio (só efeitos). Quem tem tema cuida da própria música.
   useEffect(() => {
-    if (game.slug !== "tetris") stopMusic();
-  }, [game.slug]);
+    if (!musicTheme) stopMusic();
+  }, [musicTheme]);
 
   useEffect(() => {
     setBest(best);
   }, [best, setBest]);
 
-  const needsDPad = game.state === "playable" && game.slug !== "memoria";
+  const available = game.status === "available";
+  const showPad = available && controls !== "none";
   // Tetris prioriza a área de jogo: controles compactos, como nos clássicos.
-  const compactPad = game.slug === "tetris";
-  const isSnake = game.slug === "snake";
+  const compactPad = controls === "tetris";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
@@ -110,7 +90,7 @@ export function GamePlayer({
             <span className="text-accent font-semibold">Score {score}</span>
             <span className="opacity-40"> · </span>
             <span className="text-neon-yellow font-semibold">High {Math.max(storeBest, score)}</span>
-            {game.state === "playable" ? (
+            {available ? (
               <>
                 <span className="opacity-40"> · </span>
                 <span className="ui-label text-primary/80 text-[10px]">
@@ -120,13 +100,13 @@ export function GamePlayer({
             ) : null}
           </p>
         </div>
-        {game.state === "playable" ? <GameSettingsMenu slug={game.slug} /> : <span />}
+        {available ? <GameSettingsMenu slug={game.slug} /> : <span />}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:gap-5 lg:flex-row lg:items-center lg:justify-center">
         <GameScreen game={game} onGameOver={onGameOver} />
 
-        {needsDPad ? (
+        {showPad ? (
           <div
             className={
               compactPad
@@ -134,21 +114,21 @@ export function GamePlayer({
                 : "mx-auto w-full max-w-sm shrink-0 lg:max-w-xs"
             }
           >
-            {compactPad ? (
+            {controls === "tetris" ? (
               <TetrisPad />
-            ) : isSnake ? (
+            ) : controls === "directional" ? (
               controlMode === "analog" ? (
                 <AnalogPad noActions />
               ) : (
                 <DPad noActions />
               )
             ) : controlMode === "analog" ? (
-              <AnalogPad compact={compactPad} />
+              <AnalogPad />
             ) : (
-              <DPad compact={compactPad} />
+              <DPad />
             )}
             <p className="text-muted-foreground/80 mt-1.5 text-center text-[10px] leading-relaxed sm:mt-3">
-              {HINTS[game.slug] ?? "A = jogar/reiniciar · B = pausar"}
+              {controlHint}
             </p>
           </div>
         ) : null}

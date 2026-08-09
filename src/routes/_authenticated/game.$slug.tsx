@@ -6,15 +6,17 @@ import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { GamePlayer } from "@/components/games/GamePlayer";
 import { UpgradeDialog } from "@/components/upgrade/UpgradeDialog";
 import { fetchBestScore, fetchGame, grantXp, saveScoreIfRecord, simulateSubscription } from "@/lib/arcade-api";
+import { resolveSlug } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
 import type { PlanStatus } from "@/types/arcade";
+
 
 export const Route = createFileRoute("/_authenticated/game/$slug")({
   component: GameRoute,
 });
 
 function GameRoute() {
-  const { slug } = Route.useParams();
+  const params = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const profile = useAuthStore((s) => s.profile);
@@ -23,12 +25,24 @@ function GameRoute() {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
+  // Slug canônico do Game Registry (resolve aliases antigos como "nave"/"arkanoid").
+  const slug = resolveSlug(params.slug);
+  const knownSlug = slug !== null;
+
   useEffect(() => {
     void loadProfile();
   }, [loadProfile]);
 
-  const gameQuery = useQuery({ queryKey: ["game", slug], queryFn: () => fetchGame(slug) });
-  const bestQuery = useQuery({ queryKey: ["best", slug], queryFn: () => fetchBestScore(slug) });
+  const gameQuery = useQuery({
+    queryKey: ["game", slug],
+    queryFn: () => fetchGame(slug as string),
+    enabled: knownSlug,
+  });
+  const bestQuery = useQuery({
+    queryKey: ["best", slug],
+    queryFn: () => fetchBestScore(slug as string),
+    enabled: knownSlug,
+  });
 
   const game = gameQuery.data;
   const locked = !!game?.is_premium && profile?.plano_status !== "premium";
@@ -37,9 +51,12 @@ function GameRoute() {
     if (locked) setUpgradeOpen(true);
   }, [locked]);
 
+
   const onGameOver = async (score: number) => {
+    if (!slug) return;
     try {
       const isRecord = await saveScoreIfRecord(slug, score);
+
       if (isRecord) {
         toast.success(`Novo recorde: ${score} pontos!`);
         await queryClient.invalidateQueries({ queryKey: ["best", slug] });
@@ -71,11 +88,14 @@ function GameRoute() {
   return (
     <ArcadeShell className="game-screen px-3 py-3 sm:px-6 sm:py-4">
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-        {gameQuery.isLoading ? (
+        {!knownSlug ? (
+          <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
+        ) : gameQuery.isLoading ? (
           <p className="ui-label text-accent text-xs">CARREGANDO...</p>
         ) : !game ? (
           <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
         ) : (
+
           <GamePlayer game={game} best={bestQuery.data ?? 0} onGameOver={(score) => void onGameOver(score)} />
         )}
       </div>

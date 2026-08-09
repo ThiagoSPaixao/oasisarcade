@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Lock, Play } from "lucide-react";
-import type { Game } from "@/types/arcade";
+import type { CatalogGame } from "@/lib/games/catalog";
 import { cn } from "@/lib/utils";
-import { gameCover } from "@/lib/game-covers";
 import { GameCover } from "@/components/dashboard/GameCover";
 
 export function GameCard({
@@ -12,14 +11,15 @@ export function GameCard({
   locked,
   onToggleFavorite,
 }: {
-  game: Game;
+  game: CatalogGame;
   best?: number;
   isFavorite: boolean;
   locked: boolean;
   onToggleFavorite: () => void;
 }) {
-  const cover = gameCover(game.slug, game.thumbnail);
-  const inDevelopment = game.state !== "playable";
+  const cover = game.cover;
+  const inDevelopment = game.status !== "available";
+
 
   const body = (
     <>
