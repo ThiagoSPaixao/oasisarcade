@@ -494,7 +494,11 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
         bonusRef.current = { ...spot, born: time };
       }
 
-      tickSpeedRef.current = Math.max(MIN_SPEED, BASE_SPEED - Math.floor(scoreRef.current / 30) * 8);
+      const factor = speedRef.current;
+      tickSpeedRef.current = Math.max(
+        MIN_SPEED / factor,
+        (BASE_SPEED - Math.floor(scoreRef.current / 30) * 8) / factor,
+      );
       accumulatorRef.current += frameDelta;
       let steps = 0;
       while (accumulatorRef.current >= tickSpeedRef.current && steps < 3) {
