@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { stopMusic } from "@/lib/sound";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { SnakeGame } from "./SnakeGame";
