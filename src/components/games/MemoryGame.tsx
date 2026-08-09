@@ -107,10 +107,8 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
 
   return (
     <div
-      className="game-fit relative"
-      style={
-        { "--game-max": "380px", "--game-aspect": "1", "--game-reserve": "190px" } as React.CSSProperties
-      }
+      className="game-fit relative flex h-full flex-col items-center justify-center"
+      style={{ "--game-max": "380px", "--game-aspect": "1", "--game-reserve": "160px" } as React.CSSProperties}
     >
       <div
         className="bg-surface panel-cyan grid gap-2 p-3"
