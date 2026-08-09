@@ -64,13 +64,13 @@ export function GameCarousel({
             const active = index === selected;
             const cover = gameCover(game.slug, game.thumbnail);
             return (
-              <div key={game.slug} className="min-w-0 shrink-0 grow-0 basis-[88%] pl-3 sm:basis-[62%] lg:basis-[44%]">
+              <div key={game.slug} className="min-w-0 shrink-0 grow-0 basis-[82%] pl-3 sm:basis-[58%] lg:basis-[40%]">
                 <div
                   className={cn(
                     "relative rounded-3xl transition-all duration-300",
                     active
                       ? "border-accent bg-surface/70 border shadow-[0_0_60px_-18px_var(--neon-cyan)]"
-                      : "border-foreground/10 bg-surface/40 scale-[0.96] border opacity-45",
+                      : "border-foreground/10 bg-surface/40 scale-[0.94] border opacity-55",
                   )}
                 >
                   <Link
