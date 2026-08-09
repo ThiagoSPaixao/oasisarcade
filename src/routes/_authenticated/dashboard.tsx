@@ -85,7 +85,6 @@ function DashboardPage() {
 
 
 
-        {daily ? <DailyBanner game={daily} /> : null}
 
         <GameCarousel
           games={games}
