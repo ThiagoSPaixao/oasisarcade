@@ -3,19 +3,19 @@ import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
 import { useGameOptions } from "@/stores/settings-store";
 import { MEMORY_PAIRS, gain } from "@/lib/game-options";
+import { pickMemoryIcons, type MemoryIcon } from "@/lib/memory-cards";
 import { cn } from "@/lib/utils";
 
-const SYMBOLS = ["★", "♥", "♦", "☘", "♫", "☂", "☺", "⚡", "♠", "☾"];
-
-type Card = { id: number; symbol: string; flipped: boolean; matched: boolean };
+type Card = { id: number; icon: MemoryIcon; flipped: boolean; matched: boolean };
 
 function buildDeck(pairs: number): Card[] {
-  const chosen = SYMBOLS.slice(0, pairs);
+  const chosen = pickMemoryIcons(pairs);
   return [...chosen, ...chosen]
-    .map((symbol, index) => ({ id: index, symbol, flipped: false, matched: false }))
+    .map((icon, index) => ({ id: index, icon, flipped: false, matched: false }))
     .sort(() => Math.random() - 0.5)
     .map((card, index) => ({ ...card, id: index }));
 }
+
 
 export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void }) {
   const options = useGameOptions("memoria");
