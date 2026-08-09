@@ -12,6 +12,7 @@ type AuthState = {
   setSession: (session: Session | null) => void;
   setProfile: (profile: Profile | null) => void;
   loadProfile: () => Promise<void>;
+  updateAvatar: (url: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
