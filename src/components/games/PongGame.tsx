@@ -72,11 +72,12 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
   }, []);
 
   const serve = useCallback((toPlayer: boolean) => {
+    const f = speedRef.current;
     ballRef.current = {
       x: W / 2,
       y: H / 2,
-      vx: (Math.random() > 0.5 ? 1 : -1) * 2.6,
-      vy: toPlayer ? 3.2 : -3.2,
+      vx: (Math.random() > 0.5 ? 1 : -1) * 2.6 * f,
+      vy: (toPlayer ? 3.2 : -3.2) * f,
     };
   }, []);
 
@@ -102,7 +103,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     );
 
     const ball = ballRef.current;
-    const cpuSpeed = 2 + Math.min(2.4, scoreRef.current / 60);
+    const cpuSpeed = (2 + Math.min(2.4, scoreRef.current / 60)) * speedRef.current;
     cpuRef.current += Math.sign(ball.x - cpuRef.current) * cpuSpeed;
     cpuRef.current = Math.max(PADDLE_W / 2, Math.min(W - PADDLE_W / 2, cpuRef.current));
 
