@@ -133,10 +133,12 @@ export function AnalogPad({ className, compact, noActions }: { className?: strin
           )}
         />
       </div>
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        <ActBtn action="b" label="B" compact={compact} />
-        <ActBtn action="a" label="A" compact={compact} />
-      </div>
+      {!noActions ? (
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <ActBtn action="b" label="B" compact={compact} />
+          <ActBtn action="a" label="A" compact={compact} />
+        </div>
+      ) : null}
     </div>
   );
 }
