@@ -618,6 +618,12 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     }
   }, [actionInput, setStatus, start]);
 
+  // Mudança de dificuldade/bordas reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, options.snakeWrap, reset, setStatus]);
+
   return (
     <div
       className="game-fit relative"
