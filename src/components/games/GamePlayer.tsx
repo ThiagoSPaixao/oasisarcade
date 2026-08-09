@@ -84,6 +84,7 @@ export function GamePlayer({
   const needsDPad = game.state === "playable" && game.slug !== "memoria";
   // Tetris prioriza a área de jogo: controles compactos, como nos clássicos.
   const compactPad = game.slug === "tetris";
+  const isSnake = game.slug === "snake";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
