@@ -90,7 +90,14 @@ export function GameCarousel({
                     </h2>
 
                     <div className="bg-surface-2 relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
-                      <GameCover src={cover} name={game.name} width={768} height={480} priority={active} />
+                      <GameCover
+                        src={cover}
+                        name={game.name}
+                        width={768}
+                        height={480}
+                        priority={active}
+                        sizes="(max-width: 640px) 82vw, (max-width: 1024px) 58vw, 40vw"
+                      />
                       {game.is_premium ? (
                         <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
                           PREMIUM
