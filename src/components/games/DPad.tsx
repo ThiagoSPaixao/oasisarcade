@@ -66,7 +66,7 @@ function ActBtn({
 }
 
 /** Virtual D-Pad: emits directional + A/B events to the active game through the game store. */
-export function DPad({ className, compact }: { className?: string; compact?: boolean }) {
+export function DPad({ className, compact, noActions }: { className?: string; compact?: boolean; noActions?: boolean }) {
   const icon = compact ? "h-4 w-4" : "h-5 w-5";
   return (
     <div
