@@ -76,6 +76,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_entries: {
+        Row: {
+          game_slug: string
+          level: number
+          score: number
+          scored_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          game_slug: string
+          level: number
+          score: number
+          scored_at: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          game_slug?: string
+          level?: number
+          score?: number
+          scored_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -106,6 +133,39 @@ export type Database = {
           updated_at?: string
           username?: string
           xp?: number
+        }
+        Relationships: []
+      }
+      score_submissions: {
+        Row: {
+          difficulty: string | null
+          duration_ms: number | null
+          game_slug: string
+          game_version: string | null
+          id: string
+          score: number
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          difficulty?: string | null
+          duration_ms?: number | null
+          game_slug: string
+          game_version?: string | null
+          id?: string
+          score: number
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          difficulty?: string | null
+          duration_ms?: number | null
+          game_slug?: string
+          game_version?: string | null
+          id?: string
+          score?: number
+          submitted_at?: string
+          user_id?: string
         }
         Relationships: []
       }

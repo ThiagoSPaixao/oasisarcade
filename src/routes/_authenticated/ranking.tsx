@@ -1,11 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
-import { fetchGames, type LeaderboardRow } from "@/lib/arcade-api";
-import { getLeaderboard } from "@/lib/leaderboard.functions";
+import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +31,6 @@ export const Route = createFileRoute("/_authenticated/ranking")({
 function RankingPage() {
   const userId = useAuthStore((s) => s.user?.id);
   const [slug, setSlug] = useState<string | null>(null);
-  const loadLeaderboard = useServerFn(getLeaderboard);
 
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
   const games = gamesQuery.data ?? [];
@@ -41,8 +38,7 @@ function RankingPage() {
 
   const boardQuery = useQuery({
     queryKey: ["leaderboard", activeSlug],
-    queryFn: async () =>
-      (await loadLeaderboard({ data: { slug: activeSlug as string } })) as LeaderboardRow[],
+    queryFn: () => fetchLeaderboard(activeSlug as string),
     enabled: !!activeSlug,
   });
 
