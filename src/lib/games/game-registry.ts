@@ -9,7 +9,9 @@ import type { GameDefinition, GameSlug } from "./game-types";
 export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   tetris: {
     slug: "tetris",
-    component: lazy(() => import("@/components/games/TetrisGame").then((m) => ({ default: m.TetrisGame }))),
+    component: lazy(() =>
+      import("@/components/games/TetrisGame").then((m) => ({ default: m.TetrisGame })),
+    ),
     cover: "/assets/cover-tetris-neon.jpg",
     controls: "tetris",
     controlHint: "Analógico move · centro (A) gira · botão ao lado desce rápido",
@@ -21,7 +23,9 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   },
   snake: {
     slug: "snake",
-    component: lazy(() => import("@/components/games/SnakeGame").then((m) => ({ default: m.SnakeGame }))),
+    component: lazy(() =>
+      import("@/components/games/SnakeGame").then((m) => ({ default: m.SnakeGame })),
+    ),
     cover: "/assets/cover-snake-neon.jpg",
     controls: "directional",
     controlHint: "Setas / WASD ou D-Pad para mover",
@@ -33,7 +37,9 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   },
   memoria: {
     slug: "memoria",
-    component: lazy(() => import("@/components/games/MemoryGame").then((m) => ({ default: m.MemoryGame }))),
+    component: lazy(() =>
+      import("@/components/games/MemoryGame").then((m) => ({ default: m.MemoryGame })),
+    ),
     cover: "/assets/cover-memoria-brain.jpg",
     controls: "none",
     controlHint: "Toque nas cartas para achar os pares",
@@ -45,7 +51,9 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   },
   "space-shooter": {
     slug: "space-shooter",
-    component: lazy(() => import("@/components/games/ShooterGame").then((m) => ({ default: m.ShooterGame }))),
+    component: lazy(() =>
+      import("@/components/games/ShooterGame").then((m) => ({ default: m.ShooterGame })),
+    ),
     cover: "/assets/cover-shooter.jpg",
     controls: "full",
     controlHint: "← → move · A atira · B pausa",
@@ -58,7 +66,9 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   },
   breakout: {
     slug: "breakout",
-    component: lazy(() => import("@/components/games/BreakoutGame").then((m) => ({ default: m.BreakoutGame }))),
+    component: lazy(() =>
+      import("@/components/games/BreakoutGame").then((m) => ({ default: m.BreakoutGame })),
+    ),
     cover: "/assets/cover-breakout.jpg",
     controls: "full",
     controlHint: "← → move a raquete · A começa · B pausa",
@@ -71,7 +81,9 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
   },
   pong: {
     slug: "pong",
-    component: lazy(() => import("@/components/games/PongGame").then((m) => ({ default: m.PongGame }))),
+    component: lazy(() =>
+      import("@/components/games/PongGame").then((m) => ({ default: m.PongGame })),
+    ),
     cover: "/assets/cover-pong.jpg",
     controls: "full",
     controlHint: "← → move a raquete · A começa · B pausa",
