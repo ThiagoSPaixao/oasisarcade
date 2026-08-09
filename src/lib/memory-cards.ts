@@ -41,3 +41,18 @@ export const MEMORY_ICONS: MemoryIcon[] = [
 export function pickMemoryIcons(count: number): MemoryIcon[] {
   return [...MEMORY_ICONS].sort(() => Math.random() - 0.5).slice(0, count);
 }
+
+const preloaded = new Set<string>();
+
+/** Baixa e decodifica as imagens antes do primeiro toque, evitando atraso ao virar a carta. */
+export function preloadMemoryIcons(icons: MemoryIcon[] = MEMORY_ICONS): void {
+  if (typeof window === "undefined") return;
+  for (const icon of icons) {
+    if (preloaded.has(icon.url)) continue;
+    preloaded.add(icon.url);
+    const img = new Image();
+    img.decoding = "async";
+    img.src = icon.url;
+    void img.decode?.().catch(() => {});
+  }
+}
