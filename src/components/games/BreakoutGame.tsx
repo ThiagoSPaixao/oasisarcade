@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { DIFFICULTY_META, gain } from "@/lib/game-options";
 import { GameOverlay } from "./GameOverlay";
 
 const W = 320;
@@ -46,6 +48,13 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
 
+  // Configurações isoladas do Breakout
+  const options = useGameOptions("breakout");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedRef = useRef(DIFFICULTY_META[options.difficulty].speed);
+  speedRef.current = DIFFICULTY_META[options.difficulty].speed;
+
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -72,8 +81,9 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
   }, []);
 
   const reset = useCallback(() => {
+    const f = speedRef.current;
     paddleRef.current = W / 2;
-    ballRef.current = { x: W / 2, y: H - 60, vx: 2.4, vy: -3.2 };
+    ballRef.current = { x: W / 2, y: H - 60, vx: 2.4 * f, vy: -3.2 * f };
     bricksRef.current = buildBricks();
     livesRef.current = 3;
     scoreRef.current = 0;
@@ -121,7 +131,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
       if (ball.x > brick.x && ball.x < brick.x + BRICK_W && ball.y > brick.y && ball.y < brick.y + BRICK_H) {
         brick.alive = false;
         ball.vy *= -1;
-        scoreRef.current += 15;
+        scoreRef.current += gain(15, optionsRef.current.difficulty);
         setScore(scoreRef.current);
         play("match");
         break;
@@ -129,7 +139,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
     }
 
     if (!bricksRef.current.some((b) => b.alive)) {
-      scoreRef.current += 200;
+      scoreRef.current += gain(200, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       bricksRef.current = buildBricks();
       ballRef.current = { x: W / 2, y: H - 60, vx: ball.vx * 1.08, vy: -Math.abs(ball.vy) * 1.08 };
@@ -145,7 +155,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
         onGameOver(scoreRef.current);
         return;
       }
-      ballRef.current = { x: W / 2, y: H - 60, vx: 2.4, vy: -3.2 };
+      ballRef.current = { x: W / 2, y: H - 60, vx: 2.4 * speedRef.current, vy: -3.2 * speedRef.current };
     }
 
     draw();
@@ -220,6 +230,12 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
     } else if (current === "running") setStatus("paused");
     else if (current === "paused") setStatus("running");
   }, [actionInput, setStatus, start]);
+
+  // Mudar a dificuldade reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
 
   return (
     <div

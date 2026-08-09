@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { DIFFICULTY_META, gain } from "@/lib/game-options";
 import { GameOverlay } from "./GameOverlay";
 
 const W = 320;
@@ -30,6 +32,13 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
+
+  // Configurações isoladas do Pong
+  const options = useGameOptions("pong");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedRef = useRef(DIFFICULTY_META[options.difficulty].speed);
+  speedRef.current = DIFFICULTY_META[options.difficulty].speed;
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -63,11 +72,12 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
   }, []);
 
   const serve = useCallback((toPlayer: boolean) => {
+    const f = speedRef.current;
     ballRef.current = {
       x: W / 2,
       y: H / 2,
-      vx: (Math.random() > 0.5 ? 1 : -1) * 2.6,
-      vy: toPlayer ? 3.2 : -3.2,
+      vx: (Math.random() > 0.5 ? 1 : -1) * 2.6 * f,
+      vy: (toPlayer ? 3.2 : -3.2) * f,
     };
   }, []);
 
@@ -93,7 +103,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     );
 
     const ball = ballRef.current;
-    const cpuSpeed = 2 + Math.min(2.4, scoreRef.current / 60);
+    const cpuSpeed = (2 + Math.min(2.4, scoreRef.current / 60)) * speedRef.current;
     cpuRef.current += Math.sign(ball.x - cpuRef.current) * cpuSpeed;
     cpuRef.current = Math.max(PADDLE_W / 2, Math.min(W - PADDLE_W / 2, cpuRef.current));
 
@@ -109,7 +119,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     if (ball.vy > 0 && ball.y > H - 24 - BALL / 2 && ball.y < H - 24 + PADDLE_H && Math.abs(ball.x - playerRef.current) < PADDLE_W / 2 + 2) {
       ball.vy = -Math.abs(ball.vy) * 1.03;
       ball.vx += (ball.x - playerRef.current) * 0.06;
-      scoreRef.current += 10;
+      scoreRef.current += gain(10, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       play("eat");
     }
@@ -132,7 +142,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
       }
       serve(true);
     } else if (ball.y < -20) {
-      scoreRef.current += 50;
+      scoreRef.current += gain(50, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       play("coin");
       serve(false);
@@ -210,6 +220,12 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     } else if (current === "running") setStatus("paused");
     else if (current === "paused") setStatus("running");
   }, [actionInput, setStatus, start]);
+
+  // Mudar a dificuldade reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
 
   return (
     <div

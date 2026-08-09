@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { DIFFICULTY_META, gain } from "@/lib/game-options";
 import { setMusicTheme, startMusic } from "@/lib/sound";
 import { GameOverlay } from "./GameOverlay";
 
@@ -137,6 +139,15 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const play = useSoundStore((s) => s.play);
   const musicOn = useSoundStore((s) => s.music);
 
+  // Configurações isoladas do Tetris
+  const options = useGameOptions("tetris");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedFactor = DIFFICULTY_META[options.difficulty].speed;
+  const speedRef = useRef(speedFactor);
+  speedRef.current = speedFactor;
+
+
   /** Cor do tema lida uma única vez por nome (evita getComputedStyle por frame). */
   const color = useCallback((name: string, fallback: string) => {
     const cache = colorCacheRef.current;
@@ -213,36 +224,38 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     const piece = pieceRef.current;
 
     // Sombra (ghost) da peça na posição de queda
-    let ghostY = piece.y;
-    const hits = (y: number) =>
-      piece.shape.some((row, dy) =>
-        row.some((value, dx) => {
-          if (!value) return false;
-          const gx = piece.x + dx;
-          const gy = y + dy;
-          return gy >= ROWS || (gy >= 0 && boardRef.current[gy]![gx] !== null);
-        }),
-      );
-    while (!hits(ghostY + 1)) ghostY += 1;
-    if (ghostY > piece.y) {
-      const value = color(piece.color, "#ff4fd8");
-      ctx.save();
-      ctx.globalAlpha = 0.22;
-      ctx.fillStyle = value;
-      ctx.strokeStyle = value;
-      ctx.lineWidth = 1;
-      piece.shape.forEach((row, dy) =>
-        row.forEach((v, dx) => {
-          if (!v) return;
-          const px = (piece.x + dx) * cell + 1;
-          const py = (ghostY + dy) * cell + 1;
-          ctx.fillRect(px, py, cell - 2, cell - 2);
-          ctx.globalAlpha = 0.6;
-          ctx.strokeRect(px + 0.5, py + 0.5, cell - 3, cell - 3);
-          ctx.globalAlpha = 0.22;
-        }),
-      );
-      ctx.restore();
+    if (optionsRef.current.tetrisGhost) {
+      let ghostY = piece.y;
+      const hits = (y: number) =>
+        piece.shape.some((row, dy) =>
+          row.some((value, dx) => {
+            if (!value) return false;
+            const gx = piece.x + dx;
+            const gy = y + dy;
+            return gy >= ROWS || (gy >= 0 && boardRef.current[gy]![gx] !== null);
+          }),
+        );
+      while (!hits(ghostY + 1)) ghostY += 1;
+      if (ghostY > piece.y) {
+        const value = color(piece.color, "#ff4fd8");
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = value;
+        ctx.strokeStyle = value;
+        ctx.lineWidth = 1;
+        piece.shape.forEach((row, dy) =>
+          row.forEach((v, dx) => {
+            if (!v) return;
+            const px = (piece.x + dx) * cell + 1;
+            const py = (ghostY + dy) * cell + 1;
+            ctx.fillRect(px, py, cell - 2, cell - 2);
+            ctx.globalAlpha = 0.6;
+            ctx.strokeRect(px + 0.5, py + 0.5, cell - 3, cell - 3);
+            ctx.globalAlpha = 0.22;
+          }),
+        );
+        ctx.restore();
+      }
     }
 
     piece.shape.forEach((row, dy) =>
@@ -309,7 +322,10 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       ];
       linesRef.current += cleared;
       setLines(linesRef.current);
-      scoreRef.current += [0, 100, 300, 500, 800][cleared] ?? 100 * cleared;
+      scoreRef.current += gain(
+        [0, 100, 300, 500, 800][cleared] ?? 100 * cleared,
+        optionsRef.current.difficulty,
+      );
       setScore(scoreRef.current);
       play("line");
     }
@@ -358,7 +374,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     let dropped = 0;
     while (move(0, 1)) dropped += 1;
     if (dropped > 0) {
-      scoreRef.current += dropped * 2;
+      scoreRef.current += gain(dropped * 2, optionsRef.current.difficulty);
       setScore(scoreRef.current);
     }
     lockPiece();
@@ -380,7 +396,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       if (!lastFrameRef.current) lastFrameRef.current = time;
       const delta = Math.min(time - lastFrameRef.current, 120);
       lastFrameRef.current = time;
-      const step = Math.max(120, BASE_SPEED - linesRef.current * 25);
+      const step = Math.max(90, (BASE_SPEED - linesRef.current * 25) / speedRef.current);
       accumulatorRef.current += delta;
       let guard = 4;
       while (accumulatorRef.current >= step && guard > 0) {
@@ -497,6 +513,17 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     if (musicOn) startMusic();
     return () => setMusicTheme("arcade");
   }, [musicOn]);
+
+  // Mudar a dificuldade reinicia; ligar/desligar a sombra só redesenha
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
+
+  useEffect(() => {
+    dirtyRef.current = true;
+    draw();
+  }, [draw, options.tetrisGhost]);
 
   const level = Math.floor(lines / 10) + 1;
 

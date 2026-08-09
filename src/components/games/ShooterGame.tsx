@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { DIFFICULTY_META, gain } from "@/lib/game-options";
 import { GameOverlay } from "./GameOverlay";
 
 const W = 300;
@@ -49,6 +51,13 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
   const directionInput = useGameStore((s) => s.directionInput);
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
+
+  // Configurações isoladas do Space Shooter
+  const options = useGameOptions("space-shooter");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedRef = useRef(DIFFICULTY_META[options.difficulty].speed);
+  speedRef.current = DIFFICULTY_META[options.difficulty].speed;
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -135,7 +144,7 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
 
     // movimento da frota
     const alive = enemiesRef.current.filter((e) => e.alive);
-    const speed = 0.5 + levelRef.current * 0.22;
+    const speed = (0.5 + levelRef.current * 0.22) * speedRef.current;
     const maxX = Math.max(...alive.map((e) => e.x), 0);
     const minX = Math.min(...alive.map((e) => e.x), W);
     if ((dirRef.current > 0 && maxX > W - 18) || (dirRef.current < 0 && minX < 18)) {
@@ -144,7 +153,7 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
     }
     enemiesRef.current.forEach((e) => (e.x += dirRef.current * speed));
 
-    if (alive.length && Math.random() < 0.02 + levelRef.current * 0.005) {
+    if (alive.length && Math.random() < (0.02 + levelRef.current * 0.005) * speedRef.current) {
       const shooter = alive[Math.floor(Math.random() * alive.length)]!;
       enemyBulletsRef.current.push({ x: shooter.x, y: shooter.y + 10 });
     }
@@ -157,7 +166,7 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
       if (!hit) return true;
       hit.alive = false;
       boomsRef.current.push({ x: hit.x, y: hit.y, life: 12 });
-      scoreRef.current += 20;
+      scoreRef.current += gain(20, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       play("explosion");
       return false;
@@ -185,7 +194,7 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
 
     if (!enemiesRef.current.some((e) => e.alive)) {
       levelRef.current += 1;
-      scoreRef.current += 100;
+      scoreRef.current += gain(100, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       enemiesRef.current = buildWave(levelRef.current);
       play("levelup");
@@ -274,6 +283,12 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
     } else if (current === "running") setStatus("paused");
     else if (current === "paused") setStatus("running");
   }, [actionInput, setStatus, shoot, start]);
+
+  // Mudar a dificuldade reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
 
   return (
     <div
