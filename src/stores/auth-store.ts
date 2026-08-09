@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { readStoredAvatar, storeAvatar } from "@/lib/avatars";
 import type { Profile } from "@/types/arcade";
 
 type AuthState = {
