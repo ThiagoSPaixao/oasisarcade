@@ -47,6 +47,15 @@ export async function fetchScores(): Promise<Record<string, number>> {
   return map;
 }
 
+/** Última partida registrada por jogo (base da vitrine "Jogar novamente"). */
+export async function fetchLastPlayed(): Promise<Record<string, string>> {
+  const { data, error } = await supabase.from("user_scores").select("game_slug, played_at");
+  if (error) throw error;
+  const map: Record<string, string> = {};
+  for (const row of data ?? []) if (row.played_at) map[row.game_slug] = row.played_at;
+  return map;
+}
+
 export type LeaderboardRow = {
   rank: number;
   username: string;
