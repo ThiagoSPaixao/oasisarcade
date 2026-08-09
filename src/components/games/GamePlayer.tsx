@@ -42,6 +42,7 @@ export function GamePlayer({
   const setBest = useGameStore((s) => s.setBest);
   const score = useGameStore((s) => s.score);
   const storeBest = useGameStore((s) => s.best);
+  const status = useGameStore((s) => s.status);
 
   const controlMode = useSettingsStore((s) => s.controlMode);
   const options = useGameOptions(game.slug);
@@ -108,7 +109,7 @@ export function GamePlayer({
         <div className="relative flex w-full max-w-[520px] justify-center">
           <GameScreen game={game} onGameOver={onGameOver} />
           {/* Toque/arraste na própria tela do jogo também controla a partida. */}
-          {available && controls !== "none" ? <TouchSurface /> : null}
+          {available && controls !== "none" && status === "running" ? <TouchSurface /> : null}
         </div>
 
 
