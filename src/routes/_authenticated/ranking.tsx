@@ -41,17 +41,11 @@ function RankingPage() {
 
   const boardQuery = useQuery({
     queryKey: ["leaderboard", activeSlug],
-    queryFn: async () => {
-      const slugValue = activeSlug as string;
-      try {
-        return await fetchLeaderboard(slugValue);
-      } catch (err) {
-        console.warn("[ranking] leitura pública falhou, usando função de servidor", err);
-        return (await loadLeaderboard({ data: { slug: slugValue } })) as LeaderboardRow[];
-      }
-    },
+    queryFn: async () =>
+      (await loadLeaderboard({ data: { slug: activeSlug as string } })) as LeaderboardRow[],
     enabled: !!activeSlug,
   });
+
 
 
   const rows: LeaderboardRow[] = boardQuery.data ?? [];
