@@ -13,6 +13,7 @@ import { GameCard } from "@/components/dashboard/GameCard";
 import { fetchFavorites, fetchGames, fetchScores, toggleFavorite } from "@/lib/arcade-api";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { setMusicTheme, startMusic } from "@/lib/sound";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
