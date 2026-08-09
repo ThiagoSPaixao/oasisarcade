@@ -322,7 +322,10 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       ];
       linesRef.current += cleared;
       setLines(linesRef.current);
-      scoreRef.current += [0, 100, 300, 500, 800][cleared] ?? 100 * cleared;
+      scoreRef.current += gain(
+        [0, 100, 300, 500, 800][cleared] ?? 100 * cleared,
+        optionsRef.current.difficulty,
+      );
       setScore(scoreRef.current);
       play("line");
     }
