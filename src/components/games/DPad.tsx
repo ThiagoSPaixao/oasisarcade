@@ -17,12 +17,14 @@ function DirButton({
     <button
       type="button"
       aria-label={direction}
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
         event.preventDefault();
         pressDirection(direction);
       }}
       className={cn(
-        "border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid shrink-0 place-items-center rounded-full border backdrop-blur transition-all active:scale-95",
+        "border-accent/35 text-accent bg-surface/40 hover:border-accent/60 grid shrink-0 touch-none place-items-center rounded-full border backdrop-blur transition-all select-none active:scale-95",
         compact ? "h-9 w-9 sm:h-10 sm:w-10" : "h-11 w-11 sm:h-13 sm:w-13",
       )}
     >
@@ -44,12 +46,14 @@ function ActBtn({
   return (
     <button
       type="button"
+      draggable={false}
+      onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
         event.preventDefault();
         pressAction(action);
       }}
       className={cn(
-        "bg-surface/40 grid shrink-0 place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform active:scale-95",
+        "bg-surface/40 grid shrink-0 touch-none place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform select-none active:scale-95",
         compact ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12 sm:h-14 sm:w-14",
         action === "a"
           ? "border-primary/50 text-primary shadow-[0_0_24px_-10px_var(--neon-magenta)]"
