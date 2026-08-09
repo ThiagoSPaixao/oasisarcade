@@ -1,6 +1,6 @@
 import coverTetrisNeon from "@/assets/cover-tetris-neon.jpg.asset.json";
 import coverSnakeNeon from "@/assets/cover-snake-neon.jpg.asset.json";
-import coverMemoria from "@/assets/cover-memoria.jpg";
+import coverMemoriaBrain from "@/assets/cover-memoria-brain.jpg.asset.json";
 import coverShooter from "@/assets/cover-shooter.jpg";
 import coverBreakout from "@/assets/cover-breakout.jpg";
 import coverPong from "@/assets/cover-pong.jpg";
@@ -9,7 +9,8 @@ import coverPong from "@/assets/cover-pong.jpg";
 export const GAME_COVERS: Record<string, string> = {
   tetris: coverTetrisNeon.url,
   snake: coverSnakeNeon.url,
-  memoria: coverMemoria,
+  memoria: coverMemoriaBrain.url,
+
 
   "space-shooter": coverShooter,
   breakout: coverBreakout,

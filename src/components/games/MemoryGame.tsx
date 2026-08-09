@@ -3,19 +3,19 @@ import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
 import { useGameOptions } from "@/stores/settings-store";
 import { MEMORY_PAIRS, gain } from "@/lib/game-options";
+import { pickMemoryIcons, type MemoryIcon } from "@/lib/memory-cards";
 import { cn } from "@/lib/utils";
 
-const SYMBOLS = ["★", "♥", "♦", "☘", "♫", "☂", "☺", "⚡", "♠", "☾"];
-
-type Card = { id: number; symbol: string; flipped: boolean; matched: boolean };
+type Card = { id: number; icon: MemoryIcon; flipped: boolean; matched: boolean };
 
 function buildDeck(pairs: number): Card[] {
-  const chosen = SYMBOLS.slice(0, pairs);
+  const chosen = pickMemoryIcons(pairs);
   return [...chosen, ...chosen]
-    .map((symbol, index) => ({ id: index, symbol, flipped: false, matched: false }))
+    .map((icon, index) => ({ id: index, icon, flipped: false, matched: false }))
     .sort(() => Math.random() - 0.5)
     .map((card, index) => ({ ...card, id: index }));
 }
+
 
 export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void }) {
   const options = useGameOptions("memoria");
@@ -78,7 +78,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
 
     setMoves((m) => m + 1);
     const [a, b] = chosen as [number, number];
-    if (next[a]!.symbol === next[b]!.symbol) {
+    if (next[a]!.icon.id === next[b]!.icon.id) {
       play("match");
       const resolved = next.map((c, i) => (i === a || i === b ? { ...c, matched: true } : c));
       setCards(resolved);
@@ -129,18 +129,31 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
                 key={card.id}
                 type="button"
                 onClick={() => flip(index)}
-                aria-label={open ? `Carta ${card.symbol}` : "Carta virada para baixo"}
+                aria-label={open ? `Carta ${card.icon.label}` : "Carta virada para baixo"}
                 className={cn(
-                  "grid aspect-square place-items-center text-xl transition-transform active:scale-95",
+                  "relative grid aspect-square place-items-center overflow-hidden text-xl transition-transform active:scale-95",
                   open
                     ? card.matched
-                      ? "bg-neon-green/20 pixel-border-cyan text-neon-green"
-                      : "bg-surface-2 pixel-border-magenta text-primary"
+                      ? "bg-neon-green/15 pixel-border-cyan"
+                      : "bg-surface-2 pixel-border-magenta"
                     : "bg-surface-2 pixel-border text-muted-foreground",
                 )}
               >
-                {open ? card.symbol : "?"}
+                {open ? (
+                  <img
+                    src={card.icon.url}
+                    alt={card.icon.label}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span aria-hidden="true" className="glow-cyan text-accent">
+                    ?
+                  </span>
+                )}
               </button>
+
             );
           })}
         </div>
