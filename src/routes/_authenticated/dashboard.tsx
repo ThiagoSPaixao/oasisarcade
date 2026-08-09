@@ -81,6 +81,17 @@ function DashboardPage() {
   const comingSoonGames = getComingSoonGames(games);
   const favoriteGames = games.filter((game) => favorites.includes(game.slug));
 
+  const renderCard = (game: (typeof games)[number]) => (
+    <GameCard
+      key={game.slug}
+      game={game}
+      best={scores[game.slug] ?? 0}
+      isFavorite={favorites.includes(game.slug)}
+      locked={game.is_premium && !isPremiumUser}
+      onToggleFavorite={() => void onToggleFavorite(game.slug)}
+    />
+  );
+
   const onToggleFavorite = async (slug: string) => {
     const isFavorite = favorites.includes(slug);
     try {
