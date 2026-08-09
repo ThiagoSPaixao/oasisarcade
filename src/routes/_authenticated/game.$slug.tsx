@@ -88,11 +88,14 @@ function GameRoute() {
   return (
     <ArcadeShell className="game-screen px-3 py-3 sm:px-6 sm:py-4">
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-        {gameQuery.isLoading ? (
+        {!knownSlug ? (
+          <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
+        ) : gameQuery.isLoading ? (
           <p className="ui-label text-accent text-xs">CARREGANDO...</p>
         ) : !game ? (
           <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
         ) : (
+
           <GamePlayer game={game} best={bestQuery.data ?? 0} onGameOver={(score) => void onGameOver(score)} />
         )}
       </div>
