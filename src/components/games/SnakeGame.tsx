@@ -104,6 +104,15 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
 
+  // Configurações isoladas do Snake
+  const options = useGameOptions("snake");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedFactor = DIFFICULTY_META[options.difficulty].speed;
+  const speedRef = useRef(speedFactor);
+  speedRef.current = speedFactor;
+
+
   const buildGridLayer = useCallback((size: number) => {
     const layer = gridLayerRef.current ?? document.createElement("canvas");
     gridLayerRef.current = layer;
