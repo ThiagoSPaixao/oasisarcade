@@ -1,20 +1,24 @@
 import { supabase } from "@/integrations/supabase/client";
 import { grantXpSecure, simulateSubscriptionSecure, submitScoreSecure } from "@/lib/player.functions";
+import { mergeCatalog, toCatalogGame, type CatalogGame } from "@/lib/games/catalog";
 import type { Game, Profile } from "@/types/arcade";
 
 const GAME_FIELDS = "slug, name, description, category, is_premium, thumbnail, state, sort_order";
 
-export async function fetchGames(): Promise<Game[]> {
+/** Catálogo = metadados do banco + definição técnica do Game Registry. */
+export async function fetchGames(): Promise<CatalogGame[]> {
   const { data, error } = await supabase.from("games").select(GAME_FIELDS).order("sort_order");
   if (error) throw error;
-  return (data ?? []) as Game[];
+  return mergeCatalog((data ?? []) as Game[]);
 }
 
-export async function fetchGame(slug: string): Promise<Game | null> {
+export async function fetchGame(slug: string): Promise<CatalogGame | null> {
   const { data, error } = await supabase.from("games").select(GAME_FIELDS).eq("slug", slug).maybeSingle();
   if (error) throw error;
-  return (data as Game) ?? null;
+  if (!data) return null;
+  return toCatalogGame(data as Game);
 }
+
 
 export async function fetchFavorites(): Promise<string[]> {
   const { data, error } = await supabase.from("favorites").select("game_slug");
