@@ -248,7 +248,6 @@ export type Database = {
       leaderboard_public: {
         Row: {
           game_slug: string | null
-          is_me: boolean | null
           level: number | null
           score: number | null
           scored_at: string | null
@@ -256,7 +255,6 @@ export type Database = {
         }
         Insert: {
           game_slug?: string | null
-          is_me?: never
           level?: number | null
           score?: number | null
           scored_at?: string | null
@@ -264,7 +262,6 @@ export type Database = {
         }
         Update: {
           game_slug?: string | null
-          is_me?: never
           level?: number | null
           score?: number | null
           scored_at?: string | null
