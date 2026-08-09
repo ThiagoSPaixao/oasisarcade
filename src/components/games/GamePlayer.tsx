@@ -77,6 +77,11 @@ export function GamePlayer({
     return () => setActiveGame(null);
   }, [game.slug, setActiveGame]);
 
+  // Snake, memória e demais jogos ficam em silêncio (só efeitos). Tetris cuida da sua própria música.
+  useEffect(() => {
+    if (game.slug !== "tetris") stopMusic();
+  }, [game.slug]);
+
   useEffect(() => {
     setBest(best);
   }, [best, setBest]);
