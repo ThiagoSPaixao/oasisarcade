@@ -211,6 +211,40 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     }
 
     const piece = pieceRef.current;
+
+    // Sombra (ghost) da peça na posição de queda
+    let ghostY = piece.y;
+    const hits = (y: number) =>
+      piece.shape.some((row, dy) =>
+        row.some((value, dx) => {
+          if (!value) return false;
+          const gx = piece.x + dx;
+          const gy = y + dy;
+          return gy >= ROWS || (gy >= 0 && boardRef.current[gy]![gx] !== null);
+        }),
+      );
+    while (!hits(ghostY + 1)) ghostY += 1;
+    if (ghostY > piece.y) {
+      const value = color(piece.color, "#ff4fd8");
+      ctx.save();
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = value;
+      ctx.strokeStyle = value;
+      ctx.lineWidth = 1;
+      piece.shape.forEach((row, dy) =>
+        row.forEach((v, dx) => {
+          if (!v) return;
+          const px = (piece.x + dx) * cell + 1;
+          const py = (ghostY + dy) * cell + 1;
+          ctx.fillRect(px, py, cell - 2, cell - 2);
+          ctx.globalAlpha = 0.6;
+          ctx.strokeRect(px + 0.5, py + 0.5, cell - 3, cell - 3);
+          ctx.globalAlpha = 0.22;
+        }),
+      );
+      ctx.restore();
+    }
+
     piece.shape.forEach((row, dy) =>
       row.forEach((value, dx) => {
         if (value) block(piece.x + dx, piece.y + dy, piece.color, 12);
@@ -413,8 +447,6 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         softDrop();
       } else if (["arrowup", "w"].includes(key) && running) {
         event.preventDefault();
-        if (!held.has(key)) rotatePiece();
-        held.add(key);
       } else if (key === " " || key === "p") {
         event.preventDefault();
         const current = useGameStore.getState().status;
@@ -433,7 +465,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [move, rotatePiece, setStatus, softDrop, start]);
+  }, [move, setStatus, softDrop, start]);
 
   useEffect(() => {
     if (!directionInput) return;
@@ -442,8 +474,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     if (direction === "left") move(-1, 0);
     else if (direction === "right") move(1, 0);
     else if (direction === "down") softDrop();
-    else rotatePiece();
-  }, [directionInput, move, rotatePiece, softDrop]);
+  }, [directionInput, move, softDrop]);
 
   useEffect(() => {
     if (!actionInput) return;
@@ -488,7 +519,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         />
         <GameOverlay
           title="TETRIS"
-          hint="Setas movem · ↑ ou A gira · B desce rápido"
+          hint="Setas movem · A gira · B desce rápido"
           onStart={() => (status === "paused" ? setStatus("running") : start())}
         />
       </div>
