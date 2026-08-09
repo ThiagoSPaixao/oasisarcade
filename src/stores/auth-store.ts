@@ -35,8 +35,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .select("id, username, avatar_url, level, xp, plano_status")
       .eq("id", user.id)
       .maybeSingle();
-    if (data) set({ profile: data as Profile });
+    if (data) {
+      const profile = data as Profile;
+      const stored = readStoredAvatar();
+      set({ profile: { ...profile, avatar_url: profile.avatar_url ?? stored } });
+    }
   },
+  updateAvatar: async (url) => {
+    const state = get();
+    const user = state.user;
+    if (!user) return;
+    storeAvatar(url);
+    if (state.profile) set({ profile: { ...state.profile, avatar_url: url } });
+    const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+    if (error) throw error;
+  },
+
   signIn: async (email, password) => {
     set({ loading: true });
     try {
