@@ -345,13 +345,20 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     );
     play("drop");
 
+    const fullRows = boardRef.current.reduce<number[]>((acc, row, index) => {
+      if (row.every((cell) => cell !== null)) acc.push(index);
+      return acc;
+    }, []);
     const kept = boardRef.current.filter((row) => row.some((cell) => cell === null));
     const cleared = ROWS - kept.length;
     if (cleared > 0) {
+      clearFxRef.current = { rows: fullRows, start: performance.now(), count: cleared };
+      setClearLabel({ text: CLEAR_LABELS[cleared] ?? "COMBO!", id: Date.now() });
       boardRef.current = [
         ...Array.from({ length: cleared }, () => Array.from({ length: COLS }, () => null as Cell)),
         ...kept,
       ];
+
       linesRef.current += cleared;
       setLines(linesRef.current);
       scoreRef.current += gain(
