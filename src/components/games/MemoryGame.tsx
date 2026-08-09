@@ -129,18 +129,31 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
                 key={card.id}
                 type="button"
                 onClick={() => flip(index)}
-                aria-label={open ? `Carta ${card.symbol}` : "Carta virada para baixo"}
+                aria-label={open ? `Carta ${card.icon.label}` : "Carta virada para baixo"}
                 className={cn(
-                  "grid aspect-square place-items-center text-xl transition-transform active:scale-95",
+                  "relative grid aspect-square place-items-center overflow-hidden text-xl transition-transform active:scale-95",
                   open
                     ? card.matched
-                      ? "bg-neon-green/20 pixel-border-cyan text-neon-green"
-                      : "bg-surface-2 pixel-border-magenta text-primary"
+                      ? "bg-neon-green/15 pixel-border-cyan"
+                      : "bg-surface-2 pixel-border-magenta"
                     : "bg-surface-2 pixel-border text-muted-foreground",
                 )}
               >
-                {open ? card.symbol : "?"}
+                {open ? (
+                  <img
+                    src={card.icon.url}
+                    alt={card.icon.label}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span aria-hidden="true" className="glow-cyan text-accent">
+                    ?
+                  </span>
+                )}
               </button>
+
             );
           })}
         </div>
