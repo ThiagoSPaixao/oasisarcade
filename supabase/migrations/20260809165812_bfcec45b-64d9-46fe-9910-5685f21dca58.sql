@@ -1,0 +1,1 @@
+UPDATE public.games SET state = 'soon' WHERE slug IN ('space-shooter', 'breakout', 'pong');
