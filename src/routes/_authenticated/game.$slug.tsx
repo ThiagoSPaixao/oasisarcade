@@ -6,8 +6,10 @@ import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { GamePlayer } from "@/components/games/GamePlayer";
 import { UpgradeDialog } from "@/components/upgrade/UpgradeDialog";
 import { fetchBestScore, fetchGame, grantXp, saveScoreIfRecord, simulateSubscription } from "@/lib/arcade-api";
+import { resolveSlug } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
 import type { PlanStatus } from "@/types/arcade";
+
 
 export const Route = createFileRoute("/_authenticated/game/$slug")({
   component: GameRoute,
