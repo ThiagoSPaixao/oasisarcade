@@ -53,8 +53,10 @@ function GameRoute() {
 
 
   const onGameOver = async (score: number) => {
+    if (!slug) return;
     try {
       const isRecord = await saveScoreIfRecord(slug, score);
+
       if (isRecord) {
         toast.success(`Novo recorde: ${score} pontos!`);
         await queryClient.invalidateQueries({ queryKey: ["best", slug] });
