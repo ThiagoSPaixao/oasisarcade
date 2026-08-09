@@ -85,9 +85,9 @@ export async function saveScoreIfRecord(
   const { data, error } = await supabase.rpc("submit_score", {
     _game_slug: slug,
     _score: payload.score,
-    _duration_ms: payload.durationMs ?? null,
-    _difficulty: payload.difficulty ?? null,
-    _game_version: payload.gameVersion ?? null,
+    ...(payload.durationMs === undefined ? {} : { _duration_ms: payload.durationMs }),
+    ...(payload.difficulty === undefined ? {} : { _difficulty: payload.difficulty }),
+    ...(payload.gameVersion === undefined ? {} : { _game_version: payload.gameVersion }),
   });
   if (!error) return data === true;
   console.warn("[score] RPC falhou, usando função de servidor", error);
