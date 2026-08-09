@@ -20,7 +20,7 @@ export function AvatarPickerDialog({
       <DialogContent className="glass max-h-[85vh] overflow-y-auto rounded-2xl sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="glow-magenta text-primary text-sm font-semibold tracking-wide">
-            Escolha seu Avatar Cyberpunk 👑
+            Escolha seu Avatar
           </DialogTitle>
         </DialogHeader>
         <p className="text-muted-foreground text-xs">
