@@ -267,8 +267,32 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         if (value) block(piece.x + dx, piece.y + dy, piece.color, 12);
       }),
     );
-    dirtyRef.current = false;
+
+    // Flash neon nas linhas completadas
+    const fx = clearFxRef.current;
+    if (fx) {
+      const t = Math.min(1, (performance.now() - fx.start) / CLEAR_FX_MS);
+      const glow = color(fx.count >= 4 ? "--neon-yellow" : "--primary", "#ff4fd8");
+      ctx.save();
+      fx.rows.forEach((row) => {
+        const grow = cell * 0.5 * t;
+        const y = row * cell - grow / 2;
+        const h = cell + grow;
+        ctx.globalAlpha = (1 - t) * 0.95;
+        ctx.shadowColor = glow;
+        ctx.shadowBlur = 24 * (1 - t) + 8;
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, y, canvas.width, h);
+        ctx.globalAlpha = (1 - t) * 0.85;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, row * cell + cell * 0.35, canvas.width, cell * 0.3);
+      });
+      ctx.restore();
+      if (t >= 1) clearFxRef.current = null;
+    }
+    dirtyRef.current = clearFxRef.current !== null;
   }, [color]);
+
 
   const collides = useCallback((piece: Piece) => {
     return piece.shape.some((row, dy) =>
