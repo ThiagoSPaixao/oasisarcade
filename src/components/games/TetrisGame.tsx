@@ -465,7 +465,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [move, rotatePiece, setStatus, softDrop, start]);
+  }, [move, setStatus, softDrop, start]);
 
   useEffect(() => {
     if (!directionInput) return;
@@ -474,8 +474,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     if (direction === "left") move(-1, 0);
     else if (direction === "right") move(1, 0);
     else if (direction === "down") softDrop();
-    else rotatePiece();
-  }, [directionInput, move, rotatePiece, softDrop]);
+  }, [directionInput, move, softDrop]);
 
   useEffect(() => {
     if (!actionInput) return;
