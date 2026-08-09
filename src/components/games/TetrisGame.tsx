@@ -9,6 +9,10 @@ import { GameOverlay } from "./GameOverlay";
 const COLS = 10;
 const ROWS = 20;
 const BASE_SPEED = 620;
+/** Duração do flash das linhas completadas (ms). */
+const CLEAR_FX_MS = 380;
+const CLEAR_LABELS = ["", "LINHA!", "DUPLO!", "TRIPLO!", "TETRIS!"];
+
 
 type Shape = number[][];
 
