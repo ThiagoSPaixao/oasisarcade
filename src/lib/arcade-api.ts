@@ -97,3 +97,13 @@ export async function simulateSubscription(plan: "free" | "premium"): Promise<Pr
   const row = await simulateSubscriptionSecure({ data: { plan } });
   return (row as Profile) ?? null;
 }
+
+/**
+ * Global leaderboard read directly through the public Data API (publishable key),
+ * so it works on any host without server-only service keys.
+ */
+export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {
+  const { data, error } = await supabase.rpc("get_leaderboard", { _game_slug: slug, _limit: limit });
+  if (error) throw error;
+  return (data ?? []) as LeaderboardRow[];
+}
