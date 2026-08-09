@@ -70,7 +70,7 @@ function GameRoute() {
 
   return (
     <ArcadeShell className="game-screen px-3 py-3 sm:px-6 sm:py-4">
-      <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
         {gameQuery.isLoading ? (
           <p className="ui-label text-accent text-xs">CARREGANDO...</p>
         ) : !game ? (
