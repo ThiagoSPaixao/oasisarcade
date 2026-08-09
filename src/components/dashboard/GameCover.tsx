@@ -15,6 +15,25 @@ export function preloadCover(src: string | null | undefined) {
   img.src = src;
 }
 
+/** Skeleton animado neon exibido enquanto a capa carrega. */
+function GameCoverSkeleton({ label, className }: { label: string; className?: string }) {
+  return (
+    <div
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      className={cn(
+        "skeleton-shimmer absolute inset-0 z-10 grid place-items-center justify-items-center gap-2 overflow-hidden",
+        className,
+      )}
+    >
+      <span className="border-accent/30 text-accent/60 grid h-10 w-10 place-items-center rounded-full border">
+        <Gamepad2 className="h-5 w-5" strokeWidth={1.3} />
+      </span>
+    </div>
+  );
+}
+
 /** Placeholder neon consistente, usado quando o jogo não tem capa ou a imagem falha ao carregar. */
 export function GameCoverFallback({
   name,
@@ -46,6 +65,7 @@ export function GameCoverFallback({
     </div>
   );
 }
+
 
 /** Capa do jogo com lazy loading, cache de sessão e fallback automático para o placeholder neon. */
 export function GameCover({
