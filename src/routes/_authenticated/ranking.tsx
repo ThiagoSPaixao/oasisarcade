@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
-import { fetchGames, type LeaderboardRow } from "@/lib/arcade-api";
+import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
 import { getLeaderboard } from "@/lib/leaderboard.functions";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
@@ -41,9 +41,18 @@ function RankingPage() {
 
   const boardQuery = useQuery({
     queryKey: ["leaderboard", activeSlug],
-    queryFn: () => loadLeaderboard({ data: { slug: activeSlug as string } }) as Promise<LeaderboardRow[]>,
+    queryFn: async () => {
+      const slugValue = activeSlug as string;
+      try {
+        return await fetchLeaderboard(slugValue);
+      } catch (err) {
+        console.warn("[ranking] leitura pública falhou, usando função de servidor", err);
+        return (await loadLeaderboard({ data: { slug: slugValue } })) as LeaderboardRow[];
+      }
+    },
     enabled: !!activeSlug,
   });
+
 
   const rows: LeaderboardRow[] = boardQuery.data ?? [];
 
