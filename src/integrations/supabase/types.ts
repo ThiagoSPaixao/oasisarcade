@@ -109,6 +109,39 @@ export type Database = {
         }
         Relationships: []
       }
+      score_submissions: {
+        Row: {
+          difficulty: string | null
+          duration_ms: number | null
+          game_slug: string
+          game_version: string | null
+          id: string
+          score: number
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          difficulty?: string | null
+          duration_ms?: number | null
+          game_slug: string
+          game_version?: string | null
+          id?: string
+          score: number
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          difficulty?: string | null
+          duration_ms?: number | null
+          game_slug?: string
+          game_version?: string | null
+          id?: string
+          score?: number
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -185,7 +218,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_public: {
+        Row: {
+          created_at: string | null
+          game_slug: string | null
+          level: number | null
+          rank: number | null
+          score: number | null
+          user_id: string | null
+          username: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_scores_game_slug_fkey"
+            columns: ["game_slug"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
     }
     Functions: {
       get_leaderboard: {
