@@ -59,8 +59,8 @@ export function TetrisPad({ className }: { className?: string }) {
   );
 
   const release = () => {
-    // Toque curto no centro, sem arrastar: vale como botão A (girar a peça).
-    if (!movedRef.current) pressAction("a");
+    // Toque curto no centro, sem arrastar: descida rápida.
+    if (!movedRef.current) pressAction("b");
     dirRef.current = null;
     movedRef.current = false;
     setActive(false);
@@ -78,7 +78,7 @@ export function TetrisPad({ className }: { className?: string }) {
       <div
         ref={baseRef}
         role="application"
-        aria-label="Analógico do Tetris (centro gira a peça)"
+        aria-label="Analógico do Tetris (centro desce rápido)"
         draggable={false}
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
@@ -100,29 +100,30 @@ export function TetrisPad({ className }: { className?: string }) {
         <span
           style={{ transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))` }}
           className={cn(
-            "border-primary/60 bg-surface-2/85 text-primary absolute top-1/2 left-1/2 grid h-14 w-14 place-items-center rounded-full border text-xs font-bold tracking-wide backdrop-blur transition-transform",
+            "border-accent/60 bg-surface-2/85 text-accent absolute top-1/2 left-1/2 grid h-14 w-14 place-items-center rounded-full border backdrop-blur transition-transform",
             active
-              ? "shadow-[0_0_28px_-6px_var(--neon-magenta)] scale-95"
-              : "shadow-[0_0_24px_-10px_var(--neon-magenta)] duration-150",
+              ? "shadow-[0_0_28px_-6px_var(--neon-cyan)] scale-95"
+              : "shadow-[0_0_24px_-10px_var(--neon-cyan)] duration-150",
           )}
         >
-          A
+          <ChevronsDown className="h-6 w-6" strokeWidth={1.4} />
         </span>
       </div>
 
       <button
         type="button"
-        aria-label="Descer rápido"
+        aria-label="Girar peça"
         draggable={false}
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
           event.preventDefault();
-          pressAction("b");
+          pressAction("a");
         }}
-        className="border-accent/50 text-accent bg-surface/40 grid h-16 w-16 shrink-0 touch-none place-items-center rounded-full border backdrop-blur transition-transform select-none active:scale-95 sm:h-18 sm:w-18"
+        className="border-primary/50 text-primary bg-surface/40 grid h-16 w-16 shrink-0 touch-none place-items-center rounded-full border text-sm font-bold tracking-wide backdrop-blur transition-transform select-none active:scale-95 sm:h-18 sm:w-18"
       >
-        <ChevronsDown className="h-6 w-6" strokeWidth={1.4} />
+        A
       </button>
     </div>
   );
 }
+
