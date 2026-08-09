@@ -104,7 +104,12 @@ export function GamePlayer({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 sm:gap-5 lg:flex-row lg:items-center lg:justify-center">
-        <GameScreen game={game} onGameOver={onGameOver} />
+        <div className="relative flex w-full max-w-[520px] justify-center">
+          <GameScreen game={game} onGameOver={onGameOver} />
+          {/* Toque/arraste na própria tela do jogo também controla a partida. */}
+          {available && controls !== "none" ? <TouchSurface /> : null}
+        </div>
+
 
         {showPad ? (
           <div
