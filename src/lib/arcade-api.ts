@@ -51,11 +51,9 @@ export type LeaderboardRow = {
   created_at: string;
 };
 
-export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {
-  const { data, error } = await supabase.rpc("get_leaderboard", { _game_slug: slug, _limit: limit });
-  if (error) throw error;
-  return (data ?? []) as LeaderboardRow[];
-}
+// O ranking global é lido por uma função de servidor (src/lib/leaderboard.functions.ts),
+// pois a função do banco não é mais executável diretamente pelo cliente.
+
 
 
 export async function fetchBestScore(slug: string): Promise<number> {
