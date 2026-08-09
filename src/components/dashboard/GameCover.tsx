@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-
 /** Cache em memória do estado das capas já resolvidas nesta sessão (evita re-flash e recarga no mobile). */
 const coverStatus = new Map<string, "loaded" | "failed">();
 
@@ -67,8 +66,7 @@ export function GameCoverFallback({
   );
 }
 
-
-/** Capa do jogo com lazy loading, cache de sessão e fallback automático para o placeholder neon. */
+/** Capa do jogo com lazy loading, cache de sessão, skeleton animado e fallback automático para o placeholder neon. */
 export function GameCover({
   src,
   name,
@@ -90,12 +88,29 @@ export function GameCover({
   const cached = src ? coverStatus.get(src) : undefined;
   const [failed, setFailed] = useState(cached === "failed");
   const [loaded, setLoaded] = useState(cached === "loaded");
+  const imgRef = useRef<HTMLImageElement>(null);
   const description = alt ?? `Capa do jogo ${name} em arte neon 8-bit`;
+
+  const markLoaded = (url: string) => {
+    coverStatus.set(url, "loaded");
+    setLoaded(true);
+  };
+
+  const markFailed = (url: string) => {
+    coverStatus.set(url, "failed");
+    setFailed(true);
+  };
 
   useEffect(() => {
     const status = src ? coverStatus.get(src) : undefined;
     setFailed(status === "failed");
     setLoaded(status === "loaded");
+
+    // Imagens vindas do cache podem já estar completas antes do listener onLoad ser anexado.
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0 && src) {
+      markLoaded(src);
+    }
   }, [src]);
 
   if (!src || failed) {
@@ -114,6 +129,7 @@ export function GameCover({
         <GameCoverSkeleton label={`Carregando capa do jogo ${name}...`} />
       )}
       <img
+        ref={imgRef}
         src={src}
         alt={description}
         loading={priority ? "eager" : "lazy"}
@@ -122,12 +138,10 @@ export function GameCover({
         width={width}
         height={height}
         onLoad={() => {
-          coverStatus.set(src, "loaded");
-          setLoaded(true);
+          if (src) markLoaded(src);
         }}
         onError={() => {
-          coverStatus.set(src, "failed");
-          setFailed(true);
+          if (src) markFailed(src);
         }}
         className={cn(
           "h-full w-full object-cover transition-opacity duration-300",
@@ -137,4 +151,3 @@ export function GameCover({
     </div>
   );
 }
-
