@@ -108,27 +108,32 @@ export function GameCover({
   }
 
   return (
-    <img
-      src={src}
-      alt={description}
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      fetchPriority={priority ? "high" : "low"}
-      width={width}
-      height={height}
-      onLoad={() => {
-        coverStatus.set(src, "loaded");
-        setLoaded(true);
-      }}
-      onError={() => {
-        coverStatus.set(src, "failed");
-        setFailed(true);
-      }}
-      className={cn(
-        "h-full w-full object-cover transition-opacity duration-300",
-        loaded ? "opacity-100" : "opacity-0",
-        className,
+    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+      {!loaded && !failed && (
+        <GameCoverSkeleton label={`Carregando capa do jogo ${name}...`} />
       )}
-    />
+      <img
+        src={src}
+        alt={description}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "low"}
+        width={width}
+        height={height}
+        onLoad={() => {
+          coverStatus.set(src, "loaded");
+          setLoaded(true);
+        }}
+        onError={() => {
+          coverStatus.set(src, "failed");
+          setFailed(true);
+        }}
+        className={cn(
+          "h-full w-full object-cover transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+      />
+    </div>
   );
 }
+
