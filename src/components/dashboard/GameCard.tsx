@@ -3,6 +3,7 @@ import { Heart, Lock, Play } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
 import { gameCover } from "@/lib/game-covers";
+import { GameCover } from "@/components/dashboard/GameCover";
 
 export function GameCard({
   game,
