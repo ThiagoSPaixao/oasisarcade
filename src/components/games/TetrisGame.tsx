@@ -374,7 +374,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     let dropped = 0;
     while (move(0, 1)) dropped += 1;
     if (dropped > 0) {
-      scoreRef.current += dropped * 2;
+      scoreRef.current += gain(dropped * 2, optionsRef.current.difficulty);
       setScore(scoreRef.current);
     }
     lockPiece();
@@ -396,7 +396,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
       if (!lastFrameRef.current) lastFrameRef.current = time;
       const delta = Math.min(time - lastFrameRef.current, 120);
       lastFrameRef.current = time;
-      const step = Math.max(120, BASE_SPEED - linesRef.current * 25);
+      const step = Math.max(90, (BASE_SPEED - linesRef.current * 25) / speedRef.current);
       accumulatorRef.current += delta;
       let guard = 4;
       while (accumulatorRef.current >= step && guard > 0) {
