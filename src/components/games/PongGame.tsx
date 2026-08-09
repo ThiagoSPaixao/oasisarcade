@@ -119,7 +119,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     if (ball.vy > 0 && ball.y > H - 24 - BALL / 2 && ball.y < H - 24 + PADDLE_H && Math.abs(ball.x - playerRef.current) < PADDLE_W / 2 + 2) {
       ball.vy = -Math.abs(ball.vy) * 1.03;
       ball.vx += (ball.x - playerRef.current) * 0.06;
-      scoreRef.current += 10;
+      scoreRef.current += gain(10, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       play("eat");
     }
@@ -142,7 +142,7 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
       }
       serve(true);
     } else if (ball.y < -20) {
-      scoreRef.current += 50;
+      scoreRef.current += gain(50, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       play("coin");
       serve(false);
