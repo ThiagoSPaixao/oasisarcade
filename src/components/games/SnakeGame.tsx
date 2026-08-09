@@ -402,7 +402,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     lastTickRef.current = now;
     lastFrameRef.current = now;
     accumulatorRef.current = 0;
-    tickSpeedRef.current = BASE_SPEED;
+    tickSpeedRef.current = BASE_SPEED / speedRef.current;
     particlesRef.current = [];
     shakeRef.current = 0;
     setScore(0);
@@ -426,9 +426,14 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     }
     const delta = DELTA[dirRef.current];
     const snake = snakeRef.current;
-    const head = { x: snake[0]!.x + delta.x, y: snake[0]!.y + delta.y };
+    const { snakeWrap, difficulty } = optionsRef.current;
+    const raw = { x: snake[0]!.x + delta.x, y: snake[0]!.y + delta.y };
+    const outside = raw.x < 0 || raw.y < 0 || raw.x >= GRID || raw.y >= GRID;
+    const head = snakeWrap
+      ? { x: (raw.x + GRID) % GRID, y: (raw.y + GRID) % GRID }
+      : raw;
 
-    const hitWall = head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID;
+    const hitWall = !snakeWrap && outside;
     const hitSelf = snake.some((s) => s.x === head.x && s.y === head.y);
     if (hitWall || hitSelf) {
       setStatus("over");
@@ -443,7 +448,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
     const cell = canvas ? canvas.width / GRID : 20;
     const bonus = bonusRef.current;
     if (bonus && head.x === bonus.x && head.y === bonus.y) {
-      scoreRef.current += 20;
+      scoreRef.current += gain(20, difficulty);
       setScore(scoreRef.current);
       play("coin");
       spawnParticles(cell, (bonus.x + 0.5) * cell, (bonus.y + 0.5) * cell, paletteRef.current.yellow, 16);
@@ -451,7 +456,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       bonusRef.current = null;
       nextBonusRef.current = performance.now() + BONUS_INTERVAL;
     } else if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
-      scoreRef.current += 10;
+      scoreRef.current += gain(10, difficulty);
       setScore(scoreRef.current);
       play("eat");
       spawnParticles(
