@@ -30,7 +30,7 @@ export function GameCard({
       >
         <div className="relative aspect-[4/3] w-full">
           <GameCover src={cover} name={game.name} width={768} height={576} />
-          <div className="from-background via-background/25 absolute inset-0 bg-gradient-to-t to-transparent" />
+          <div aria-hidden="true" className="from-background via-background/25 absolute inset-0 bg-gradient-to-t to-transparent" />
           {game.is_premium ? (
             <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
               PREMIUM
