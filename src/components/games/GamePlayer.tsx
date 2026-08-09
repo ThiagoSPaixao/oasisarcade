@@ -9,10 +9,11 @@ import { BreakoutGame } from "./BreakoutGame";
 import { PongGame } from "./PongGame";
 import { ComingSoon } from "./ComingSoon";
 import { DPad } from "./DPad";
-import { SettingsMenu } from "@/components/arcade/SettingsMenu";
+import { GameSettingsMenu } from "./GameSettingsMenu";
 import { AnalogPad } from "./AnalogPad";
-import { useSettingsStore } from "@/stores/settings-store";
+import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
+import { DIFFICULTY_META } from "@/lib/game-options";
 import type { Game } from "@/types/arcade";
 
 const HINTS: Record<string, string> = {
