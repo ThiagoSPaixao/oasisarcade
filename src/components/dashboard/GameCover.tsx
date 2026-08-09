@@ -90,6 +90,7 @@ export function GameCover({
   className,
   priority = false,
   alt,
+  sizes,
 }: {
   src: string | null;
   name: string;
@@ -99,6 +100,8 @@ export function GameCover({
   priority?: boolean;
   /** Texto alternativo customizado; por padrão descreve a capa do jogo. */
   alt?: string;
+  /** Tamanho responsivo para o atributo `sizes` (evita carregar imagens maiores que o necessário). */
+  sizes?: string;
 }) {
   const cachedLoaded = src ? coverStatus.get(src) === "loaded" : false;
   const [loaded, setLoaded] = useState(cachedLoaded);
