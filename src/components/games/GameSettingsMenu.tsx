@@ -1,4 +1,4 @@
-import { Gauge, Ghost, Settings2, SquareDashed } from "lucide-react";
+import { Gamepad2, Gauge, Ghost, Settings2, SquareDashed } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -125,6 +125,16 @@ export function GameSettingsMenu({ slug, className }: { slug: string; className?
                 onCheckedChange={(checked) => setGameOption(slug, { snakeWrap: checked })}
                 aria-label="Atravessar bordas"
               />
+            </Row>
+          ) : null}
+
+          {slug === "tetris" ? (
+            <Row
+              icon={<Gamepad2 className="h-4 w-4" strokeWidth={1.4} />}
+              title="Controle exclusivo"
+              hint="Analógico central com o A no meio (gira) e a descida rápida ao lado — não usa o controle geral."
+            >
+              <span className="ui-label text-accent text-[10px]">FIXO</span>
             </Row>
           ) : null}
 
