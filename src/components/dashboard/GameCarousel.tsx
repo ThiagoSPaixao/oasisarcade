@@ -56,8 +56,8 @@ export function GameCarousel({
 
   return (
     <section className="mt-5 w-full min-w-0">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="-ml-3 flex touch-pan-y">
+      <div className="overflow-hidden overscroll-contain" ref={emblaRef}>
+        <div className="-ml-3 flex touch-pan-y will-change-transform">
           {games.map((game, index) => {
             const locked = game.is_premium && !isPremiumUser;
             const isFavorite = favorites.includes(game.slug);
