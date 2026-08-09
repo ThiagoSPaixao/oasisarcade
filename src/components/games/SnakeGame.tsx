@@ -191,28 +191,38 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
 
       const center = (px: number, py: number) => ({ cx: px * cell + cell / 2, cy: py * cell + cell / 2 });
 
-      // Maçã (respira suavemente)
+      // Fruta: cristal dourado facetado com halo
       const food = foodRef.current;
       const fc = center(food.x, food.y);
       const breathe = 1 + Math.sin(time / 260) * 0.08;
+      const fr = cell * 0.3 * breathe;
       ctx.save();
-      ctx.shadowColor = p.magenta;
-      ctx.shadowBlur = 16;
-      ctx.fillStyle = p.magenta;
+      ctx.shadowColor = p.yellow;
+      ctx.shadowBlur = 22;
+      ctx.fillStyle = p.yellow;
       ctx.beginPath();
-      ctx.arc(fc.cx, fc.cy + cell * 0.05, cell * 0.32 * breathe, 0, Math.PI * 2);
+      for (let i = 0; i < 6; i += 1) {
+        const a = (Math.PI / 3) * i - Math.PI / 2;
+        const px = fc.cx + Math.cos(a) * fr;
+        const py = fc.cy + Math.sin(a) * fr;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.strokeStyle = "rgba(255,255,255,0.55)";
+      ctx.lineWidth = Math.max(1, cell * 0.05);
       ctx.beginPath();
-      ctx.arc(fc.cx - cell * 0.1, fc.cy - cell * 0.06, cell * 0.07, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = p.green;
-      ctx.lineWidth = Math.max(1.2, cell * 0.08);
-      ctx.beginPath();
-      ctx.moveTo(fc.cx, fc.cy - cell * 0.24);
-      ctx.quadraticCurveTo(fc.cx + cell * 0.16, fc.cy - cell * 0.42, fc.cx + cell * 0.3, fc.cy - cell * 0.3);
+      ctx.moveTo(fc.cx, fc.cy - fr);
+      ctx.lineTo(fc.cx, fc.cy + fr);
+      ctx.moveTo(fc.cx - fr * 0.86, fc.cy - fr * 0.5);
+      ctx.lineTo(fc.cx + fr * 0.86, fc.cy + fr * 0.5);
       ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.beginPath();
+      ctx.arc(fc.cx - fr * 0.28, fc.cy - fr * 0.34, cell * 0.05, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
 
       // Fruta especial (pulsa e desaparece)
@@ -223,8 +233,8 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
         const bc = center(bonus.x, bonus.y);
         ctx.save();
         ctx.globalAlpha = age > 0.75 ? (Math.sin(time / 90) > 0 ? 1 : 0.25) : 1;
-        ctx.fillStyle = p.yellow;
-        ctx.shadowColor = p.yellow;
+        ctx.fillStyle = p.magenta;
+        ctx.shadowColor = p.magenta;
         ctx.shadowBlur = 20;
         const r = cell * 0.2 * pulse;
         ctx.beginPath();
@@ -260,104 +270,148 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
         });
       }
 
-      const strokeBody = (width: number, color: string, alpha: number) => {
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = alpha;
-        ctx.lineWidth = width;
-        ctx.beginPath();
-        ctx.moveTo(pts[0]!.cx, pts[0]!.cy);
-        for (let i = 1; i < pts.length; i += 1) {
-          const a = pts[i - 1]!;
-          const b = pts[i]!;
-          ctx.quadraticCurveTo(a.cx, a.cy, (a.cx + b.cx) / 2, (a.cy + b.cy) / 2);
-        }
-        ctx.lineTo(pts[pts.length - 1]!.cx, pts[pts.length - 1]!.cy);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      };
+      /** Cor neon arco-íris por placa do corpo (cabeça ciano → cauda magenta). */
+      const segColor = (index: number, light = 60, alpha = 1) =>
+        `hsla(${(186 + index * 13) % 360} 92% ${light}% / ${alpha})`;
 
       ctx.save();
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
-      if (pts.length > 1) {
-        // halo (uma passada, sem shadowBlur = mais rápido)
-        strokeBody(cell * 0.98, p.green, 0.16);
-        strokeBody(cell * 0.74, p.green, 0.95);
-        // brilho superior dá volume ao corpo
-        strokeBody(cell * 0.3, "rgba(255,255,255,0.28)", 0.6);
-      }
 
-      // Escamas
-      ctx.fillStyle = p.cyan;
-      ctx.globalAlpha = 0.2;
-      for (let i = 2; i < pts.length; i += 2) {
-        const c = pts[i]!;
+      // Reflexo suave no chão
+      ctx.globalAlpha = 0.12;
+      for (let i = pts.length - 1; i > 0; i -= 1) {
+        ctx.strokeStyle = segColor(i, 55);
+        ctx.lineWidth = cell * 0.7;
         ctx.beginPath();
-        ctx.arc(c.cx, c.cy, cell * 0.13, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(pts[i]!.cx, pts[i]!.cy + cell * 0.34);
+        ctx.lineTo(pts[i - 1]!.cx, pts[i - 1]!.cy + cell * 0.34);
+        ctx.stroke();
       }
       ctx.globalAlpha = 1;
 
-      // Cabeça
-      const head = pts[0]!;
-      const d = DELTA[dirRef.current];
-      const headGrad = ctx.createRadialGradient(
-        head.cx - d.x * cell * 0.1,
-        head.cy - d.y * cell * 0.1,
-        cell * 0.05,
-        head.cx,
-        head.cy,
-        cell * 0.46,
-      );
-      headGrad.addColorStop(0, "rgba(255,255,255,0.85)");
-      headGrad.addColorStop(0.45, p.green);
-      headGrad.addColorStop(1, p.green);
-      ctx.fillStyle = headGrad;
-      ctx.beginPath();
-      ctx.arc(head.cx, head.cy, cell * 0.44, 0, Math.PI * 2);
-      ctx.fill();
-
-      const perp = { x: -d.y, y: -d.x };
-      const blink = Math.sin(time / 900) > 0.985;
-      const eye = (sign: number) => {
-        const ex = head.cx + d.x * cell * 0.16 + perp.x * sign * cell * 0.16;
-        const ey = head.cy + d.y * cell * 0.16 + perp.y * sign * cell * 0.16;
-        ctx.fillStyle = "#0d0b16";
+      // Halo neon difuso por placa
+      ctx.globalAlpha = 0.18;
+      for (let i = pts.length - 1; i > 0; i -= 1) {
+        ctx.strokeStyle = segColor(i, 62);
+        ctx.lineWidth = cell * 1.02;
         ctx.beginPath();
-        if (blink) {
-          ctx.ellipse(ex, ey, cell * 0.1, cell * 0.02, 0, 0, Math.PI * 2);
-        } else {
-          ctx.arc(ex, ey, cell * 0.1, 0, Math.PI * 2);
-        }
-        ctx.fill();
-        if (blink) return;
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(ex - cell * 0.025, ey - cell * 0.025, cell * 0.04, 0, Math.PI * 2);
-        ctx.fill();
-      };
-      eye(1);
-      eye(-1);
-
-      // Língua bifurcada que vibra
-      const flick = Math.sin(time / 110) * 0.5 + 0.5;
-      if (flick > 0.35) {
-        const baseX = head.cx + d.x * cell * 0.42;
-        const baseY = head.cy + d.y * cell * 0.42;
-        const tipX = baseX + d.x * cell * 0.26 * flick;
-        const tipY = baseY + d.y * cell * 0.26 * flick;
-        ctx.strokeStyle = p.magenta;
-        ctx.lineWidth = Math.max(1, cell * 0.06);
-        ctx.beginPath();
-        ctx.moveTo(baseX, baseY);
-        ctx.lineTo(tipX, tipY);
-        ctx.moveTo(tipX, tipY);
-        ctx.lineTo(tipX + perp.x * cell * 0.1, tipY + perp.y * cell * 0.1);
-        ctx.moveTo(tipX, tipY);
-        ctx.lineTo(tipX - perp.x * cell * 0.1, tipY - perp.y * cell * 0.1);
+        ctx.moveTo(pts[i]!.cx, pts[i]!.cy);
+        ctx.lineTo(pts[i - 1]!.cx, pts[i - 1]!.cy);
         ctx.stroke();
       }
+      ctx.globalAlpha = 1;
+
+      // Corpo: placas de armadura coloridas com divisória escura
+      for (let i = pts.length - 1; i > 0; i -= 1) {
+        const a = pts[i]!;
+        const b = pts[i - 1]!;
+        ctx.strokeStyle = segColor(i, 56);
+        ctx.lineWidth = cell * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(a.cx, a.cy);
+        ctx.lineTo(b.cx, b.cy);
+        ctx.stroke();
+
+        // brilho especular no topo da placa
+        ctx.strokeStyle = segColor(i, 84, 0.55);
+        ctx.lineWidth = cell * 0.24;
+        ctx.beginPath();
+        ctx.moveTo(a.cx, a.cy - cell * 0.18);
+        ctx.lineTo(b.cx, b.cy - cell * 0.18);
+        ctx.stroke();
+
+        // divisória entre placas
+        const dx = b.cx - a.cx;
+        const dy = b.cy - a.cy;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        ctx.strokeStyle = "rgba(6,8,14,0.75)";
+        ctx.lineWidth = Math.max(1, cell * 0.07);
+        ctx.beginPath();
+        ctx.moveTo(a.cx + nx * cell * 0.38, a.cy + ny * cell * 0.38);
+        ctx.lineTo(a.cx - nx * cell * 0.38, a.cy - ny * cell * 0.38);
+        ctx.stroke();
+      }
+
+      // Cabeça robótica angular com visor luminoso
+      const head = pts[0]!;
+      const d = DELTA[dirRef.current];
+      const perp = { x: -d.y, y: d.x };
+      const fwd = (n: number) => ({ x: d.x * cell * n, y: d.y * cell * n });
+      const side = (n: number) => ({ x: perp.x * cell * n, y: perp.y * cell * n });
+      const at = (f: number, s: number) => {
+        const a = fwd(f);
+        const b = side(s);
+        return { x: head.cx + a.x + b.x, y: head.cy + a.y + b.y };
+      };
+
+      // gargantilha metálica
+      ctx.strokeStyle = "rgba(20,26,38,0.9)";
+      ctx.lineWidth = cell * 0.86;
+      ctx.beginPath();
+      ctx.moveTo(head.cx - d.x * cell * 0.42, head.cy - d.y * cell * 0.42);
+      ctx.lineTo(head.cx - d.x * cell * 0.12, head.cy - d.y * cell * 0.12);
+      ctx.stroke();
+
+      const jaw = Math.max(0, Math.sin(time / 220)) * 0.12;
+      ctx.shadowColor = p.cyan;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = "#1b3b45";
+      ctx.beginPath();
+      const shell = [at(-0.3, 0.4), at(0.24, 0.34), at(0.52, 0.12), at(0.52, -0.12), at(0.24, -0.34), at(-0.3, -0.4)];
+      shell.forEach((point, i) => (i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // placa superior brilhante
+      ctx.fillStyle = "rgba(120,240,255,0.35)";
+      ctx.beginPath();
+      const top = [at(-0.24, 0.3), at(0.2, 0.24), at(0.44, 0.06), at(0.44, -0.06), at(0.2, -0.24), at(-0.24, -0.3)];
+      top.forEach((point, i) => (i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y)));
+      ctx.closePath();
+      ctx.fill();
+
+      // mandíbula que abre ao ritmo do movimento
+      ctx.fillStyle = "#12262e";
+      ctx.beginPath();
+      const jawPts = [at(0.14, 0.26), at(0.56, 0.06 - jaw), at(0.56, -0.06 - jaw), at(0.14, -0.26)];
+      jawPts.forEach((point, i) => (i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y)));
+      ctx.closePath();
+      ctx.fill();
+
+      // presas
+      ctx.strokeStyle = "rgba(220,255,255,0.9)";
+      ctx.lineWidth = Math.max(1, cell * 0.05);
+      ctx.beginPath();
+      for (const s of [0.16, -0.16]) {
+        const from = at(0.4, s);
+        const to = at(0.56, s - Math.sign(s) * 0.03 - jaw * Math.sign(s || 1) * 0);
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y + cell * jaw);
+      }
+      ctx.stroke();
+
+      // visor magenta
+      const blink = Math.sin(time / 900) > 0.985;
+      ctx.shadowColor = p.magenta;
+      ctx.shadowBlur = blink ? 4 : 16;
+      ctx.fillStyle = p.magenta;
+      ctx.beginPath();
+      const visor = [at(0.02, 0.24), at(0.28, 0.16), at(0.28, 0.04), at(0.02, 0.08)];
+      visor.forEach((point, i) => (i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      const visor2 = [at(0.02, -0.24), at(0.28, -0.16), at(0.28, -0.04), at(0.02, -0.08)];
+      visor2.forEach((point, i) => (i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
       ctx.restore();
+
 
       // Partículas de comida
       const particles = particlesRef.current;
