@@ -284,6 +284,12 @@ export function ShooterGame({ onGameOver }: { onGameOver: (score: number) => voi
     else if (current === "paused") setStatus("running");
   }, [actionInput, setStatus, shoot, start]);
 
+  // Mudar a dificuldade reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
+
   return (
     <div
       className="game-fit relative"
