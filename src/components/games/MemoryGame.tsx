@@ -153,7 +153,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
                       "card-face card-face-back",
                       card.matched
                         ? "bg-neon-green/15 pixel-border-cyan card-match-pulse"
-                        : "bg-surface-2 pixel-border-magenta card-neon-pulse",
+                        : cn("bg-surface-2 pixel-border-magenta", open && "card-neon-pulse"),
                     )}
                   >
                     <img
