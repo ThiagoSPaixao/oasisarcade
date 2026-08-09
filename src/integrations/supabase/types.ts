@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          is_hidden: boolean
+          name: string
+          slug: string
+          sort_order: number
+          xp_reward: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          is_hidden?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          xp_reward?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          is_hidden?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      daily_challenges: {
+        Row: {
+          created_at: string
+          description: string
+          game_slug: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          target: number
+          title: string
+          type: string
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          game_slug?: string | null
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order: number
+          target: number
+          title: string
+          type: string
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          game_slug?: string | null
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          target?: number
+          title?: string
+          type?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_challenges_game_slug_fkey"
+            columns: ["game_slug"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -199,6 +288,92 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_challenge_rewards: {
+        Row: {
+          activity_date: string
+          challenge_slug: string
+          granted_at: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          activity_date: string
+          challenge_slug: string
+          granted_at?: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          activity_date?: string
+          challenge_slug?: string
+          granted_at?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      user_daily_activity: {
+        Row: {
+          activity_date: string
+          challenge_completed_at: string | null
+          challenge_progress: number
+          challenge_slug: string | null
+          created_at: string
+          played_slugs: string[]
+          plays: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          challenge_completed_at?: string | null
+          challenge_progress?: number
+          challenge_slug?: string | null
+          created_at?: string
+          played_slugs?: string[]
+          plays?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          challenge_completed_at?: string | null
+          challenge_progress?: number
+          challenge_slug?: string | null
+          created_at?: string
+          played_slugs?: string[]
+          plays?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_scores: {
         Row: {
           created_at: string
@@ -243,6 +418,45 @@ export type Database = {
           },
         ]
       }
+      user_stats: {
+        Row: {
+          best_score: number
+          created_at: string
+          current_streak: number
+          games_played: string[]
+          last_activity_date: string | null
+          longest_streak: number
+          plays_total: number
+          records_total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_score?: number
+          created_at?: string
+          current_streak?: number
+          games_played?: string[]
+          last_activity_date?: string | null
+          longest_streak?: number
+          plays_total?: number
+          records_total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_score?: number
+          created_at?: string
+          current_streak?: number
+          games_played?: string[]
+          last_activity_date?: string | null
+          longest_streak?: number
+          plays_total?: number
+          records_total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       leaderboard_public: {
@@ -271,6 +485,30 @@ export type Database = {
       }
     }
     Functions: {
+      daily_challenge_for: {
+        Args: { _date: string }
+        Returns: {
+          created_at: string
+          description: string
+          game_slug: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          target: number
+          title: string
+          type: string
+          xp_reward: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "daily_challenges"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      evaluate_achievements_for: { Args: { _user_id: string }; Returns: Json }
+      get_gamification_state_for: { Args: { _user_id: string }; Returns: Json }
       get_leaderboard: {
         Args: { _game_slug: string; _limit?: number }
         Returns: {
@@ -319,6 +557,16 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      level_for_xp: { Args: { _xp: number }; Returns: number }
+      process_game_result_for: {
+        Args: {
+          _game_slug: string
+          _is_record?: boolean
+          _score: number
+          _user_id: string
+        }
+        Returns: Json
       }
       simulate_subscription: {
         Args: { _plan: Database["public"]["Enums"]["plan_status"] }
@@ -382,6 +630,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      xp_for_level: { Args: { _level: number }; Returns: number }
     }
     Enums: {
       game_category: "mais_jogados" | "classicos_8bits"

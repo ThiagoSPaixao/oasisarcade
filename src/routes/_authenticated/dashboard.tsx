@@ -11,6 +11,8 @@ import { GameCarousel } from "@/components/dashboard/GameCarousel";
 import { GameRail } from "@/components/dashboard/GameRail";
 import { GameCard } from "@/components/dashboard/GameCard";
 import { fetchFavorites, fetchGames, fetchScores, toggleFavorite } from "@/lib/arcade-api";
+import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
+import { ProgressPanel } from "@/components/dashboard/ProgressPanel";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSoundStore } from "@/stores/sound-store";
 import { setMusicTheme, startMusic } from "@/lib/sound";
@@ -51,6 +53,7 @@ function DashboardPage() {
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
   const favoritesQuery = useQuery({ queryKey: ["favorites"], queryFn: fetchFavorites });
   const scoresQuery = useQuery({ queryKey: ["scores"], queryFn: fetchScores });
+  const gamificationQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
 
   const games = gamesQuery.data ?? [];
   const favorites = favoritesQuery.data ?? [];
@@ -91,6 +94,8 @@ function DashboardPage() {
 
 
         <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
+
+        <ProgressPanel state={gamificationQuery.data} />
 
 
 

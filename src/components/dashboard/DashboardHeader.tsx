@@ -4,7 +4,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth-store";
 import { AvatarPickerDialog } from "@/components/dashboard/AvatarPickerDialog";
-import { XP_PER_LEVEL, type Profile } from "@/types/arcade";
+import type { Profile } from "@/types/arcade";
+import { levelProgress } from "@/lib/gamification/levels";
 
 export function DashboardHeader({ profile, onSignOut }: { profile: Profile | null; onSignOut: () => void }) {
   const email = useAuthStore((s) => s.user?.email) ?? "";
@@ -12,8 +13,7 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const username = profile?.username ?? email.split("@")[0] ?? "Player";
-  const xpInLevel = (profile?.xp ?? 0) % XP_PER_LEVEL;
-  const pct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
+  const progress = levelProgress(profile?.xp ?? 0, profile?.level ?? 1);
   const premium = profile?.plano_status === "premium";
 
   const handleSelect = async (url: string) => {
@@ -59,12 +59,12 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate text-sm font-semibold tracking-wide">{username}</p>
         <div className="mt-1.5 flex items-center gap-2">
-          <span className="text-muted-foreground text-[11px]">Nv {profile?.level ?? 1}</span>
+          <span className="text-muted-foreground text-[11px]">Nv {progress.level}</span>
           <div className="bg-surface-2 h-1 w-20 overflow-hidden rounded-full sm:w-40">
-            <div className="bg-accent h-full rounded-full" style={{ width: `${pct}%` }} />
+            <div className="bg-accent h-full rounded-full" style={{ width: `${progress.percent}%` }} />
           </div>
           <span className="text-muted-foreground hidden text-[11px] sm:inline">
-            {xpInLevel}/{XP_PER_LEVEL} XP
+            {progress.xpInLevel}/{progress.xpNeeded} XP
           </span>
         </div>
       </div>
