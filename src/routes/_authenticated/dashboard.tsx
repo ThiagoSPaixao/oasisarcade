@@ -10,7 +10,19 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { GameCarousel } from "@/components/dashboard/GameCarousel";
 import { GameRail } from "@/components/dashboard/GameRail";
 import { GameCard } from "@/components/dashboard/GameCard";
-import { fetchFavorites, fetchGames, fetchScores, toggleFavorite } from "@/lib/arcade-api";
+import {
+  fetchFavorites,
+  fetchGames,
+  fetchLastPlayed,
+  fetchScores,
+  toggleFavorite,
+} from "@/lib/arcade-api";
+import {
+  getComingSoonGames,
+  getFeaturedGames,
+  getNewGames,
+  getRecentlyPlayed,
+} from "@/lib/games/catalog";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { ProgressPanel } from "@/components/dashboard/ProgressPanel";
 import { useAuthStore } from "@/stores/auth-store";
@@ -53,6 +65,7 @@ function DashboardPage() {
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
   const favoritesQuery = useQuery({ queryKey: ["favorites"], queryFn: fetchFavorites });
   const scoresQuery = useQuery({ queryKey: ["scores"], queryFn: fetchScores });
+  const lastPlayedQuery = useQuery({ queryKey: ["last-played"], queryFn: fetchLastPlayed });
   const gamificationQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
 
   const games = gamesQuery.data ?? [];
