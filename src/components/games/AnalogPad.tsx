@@ -39,7 +39,7 @@ const DEAD_ZONE = 0.32;
 const REPEAT_MS = 130;
 
 /** Alavanca analógica virtual: arraste o polegar para emitir direções continuamente. */
-export function AnalogPad({ className, compact }: { className?: string; compact?: boolean }) {
+export function AnalogPad({ className, compact, noActions }: { className?: string; compact?: boolean; noActions?: boolean }) {
   const pressDirection = useGameStore((s) => s.pressDirection);
   const baseRef = useRef<HTMLDivElement | null>(null);
   const dirRef = useRef<Direction | null>(null);
