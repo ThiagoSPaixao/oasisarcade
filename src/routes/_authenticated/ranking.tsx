@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/ranking")({
 });
 
 function RankingPage() {
-  const userId = useAuthStore((s) => s.user?.id);
+  const myUsername = useAuthStore((s) => s.profile?.username ?? null);
   const [slug, setSlug] = useState<string | null>(null);
 
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
