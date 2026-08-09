@@ -15,6 +15,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TestSkeletonRouteImport } from './routes/test-skeleton'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
 import { Route as AuthenticatedUpgradeRouteImport } from './routes/_authenticated/upgrade'
@@ -49,6 +50,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestSkeletonRoute = TestSkeletonRouteImport.update({
+  id: '/test-skeleton',
+  path: '/test-skeleton',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-skeleton': typeof TestSkeletonRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-skeleton': typeof TestSkeletonRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/upgrade': typeof AuthenticatedUpgradeRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/test-skeleton': typeof TestSkeletonRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
   '/_authenticated/upgrade': typeof AuthenticatedUpgradeRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/test-skeleton'
     | '/dashboard'
     | '/ranking'
     | '/upgrade'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/test-skeleton'
     | '/dashboard'
     | '/ranking'
     | '/upgrade'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/test-skeleton'
     | '/_authenticated/dashboard'
     | '/_authenticated/ranking'
     | '/_authenticated/upgrade'
@@ -149,6 +161,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TestSkeletonRoute: typeof TestSkeletonRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-skeleton': {
+      id: '/test-skeleton'
+      path: '/test-skeleton'
+      fullPath: '/test-skeleton'
+      preLoaderRoute: typeof TestSkeletonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TestSkeletonRoute: TestSkeletonRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
