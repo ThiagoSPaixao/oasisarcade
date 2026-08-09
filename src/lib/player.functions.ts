@@ -41,9 +41,9 @@ export const submitScoreSecure = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _game_slug: data.slug,
       _score: data.score,
-      _duration_ms: data.durationMs ?? null,
-      _difficulty: data.difficulty ?? null,
-      _game_version: data.gameVersion ?? null,
+      ...(data.durationMs === undefined ? {} : { _duration_ms: data.durationMs }),
+      ...(data.difficulty === undefined ? {} : { _difficulty: data.difficulty }),
+      ...(data.gameVersion === undefined ? {} : { _game_version: data.gameVersion }),
     });
     if (error) {
       console.error("[submit_score]", error);
