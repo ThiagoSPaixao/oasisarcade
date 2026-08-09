@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { SettingsMenu } from "@/components/arcade/SettingsMenu";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { DailyBanner } from "@/components/dashboard/DailyBanner";
 import { GameCarousel } from "@/components/dashboard/GameCarousel";
 import { GameRail } from "@/components/dashboard/GameRail";
 import { GameCard } from "@/components/dashboard/GameCard";
@@ -46,7 +45,6 @@ function DashboardPage() {
   const favorites = favoritesQuery.data ?? [];
   const scores = scoresQuery.data ?? {};
   const isPremiumUser = profile?.plano_status === "premium";
-  const daily = games[0];
 
   const onToggleFavorite = async (slug: string) => {
     const isFavorite = favorites.includes(slug);
