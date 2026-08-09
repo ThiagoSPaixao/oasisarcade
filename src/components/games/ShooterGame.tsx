@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { useGameOptions } from "@/stores/settings-store";
+import { DIFFICULTY_META, gain } from "@/lib/game-options";
 import { GameOverlay } from "./GameOverlay";
 
 const W = 300;
