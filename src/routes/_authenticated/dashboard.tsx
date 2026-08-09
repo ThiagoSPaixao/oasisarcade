@@ -31,8 +31,18 @@ function DashboardPage() {
     void loadProfile();
   }, [loadProfile]);
 
+  // Música do Dashboard: tema "arcade" apenas aqui.
   useEffect(() => {
-    const onFirstTouch = () => unlock();
+    setMusicTheme("arcade");
+    startMusic();
+  }, []);
+
+  useEffect(() => {
+    const onFirstTouch = () => {
+      unlock();
+      setMusicTheme("arcade");
+      startMusic();
+    };
     window.addEventListener("pointerdown", onFirstTouch, { once: true });
     return () => window.removeEventListener("pointerdown", onFirstTouch);
   }, [unlock]);
