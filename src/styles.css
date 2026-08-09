@@ -283,19 +283,33 @@
   animation: none;
 }
 
-@keyframes neon-pulse {
-  0%,
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
   100% {
-    filter: brightness(1);
+    background-position: -200% 0;
   }
-  50% {
-    filter: brightness(1.18);
-  }
+}
+
+@utility skeleton-shimmer {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--surface-2) 85%, transparent) 0%,
+      color-mix(in oklab, var(--surface-2) 95%, transparent) 40%,
+      color-mix(in oklab, var(--neon-cyan) 18%, transparent) 50%,
+      color-mix(in oklab, var(--surface-2) 95%, transparent) 60%,
+      color-mix(in oklab, var(--surface-2) 85%, transparent) 100%
+    );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s linear infinite;
 }
 
 @utility neon-pulse {
   animation: neon-pulse 3s ease-in-out infinite;
 }
+
 
 /* Encaixa a área de jogo na altura do dispositivo (mobile-first) */
 .game-fit {
