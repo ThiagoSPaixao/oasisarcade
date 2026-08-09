@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { GamePlayer } from "@/components/games/GamePlayer";
 import { UpgradeDialog } from "@/components/upgrade/UpgradeDialog";
-import { fetchBestScore, fetchGame, grantXp, saveScoreIfRecord, simulateSubscription } from "@/lib/arcade-api";
+import { fetchBestScore, fetchGame, saveScoreIfRecord, simulateSubscription } from "@/lib/arcade-api";
+import { dispatchGamificationEvent, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
+import { celebrateOutcome } from "@/lib/gamification/feedback";
 import { resolveSlug } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
 import type { PlanStatus } from "@/types/arcade";
@@ -62,9 +64,13 @@ function GameRoute() {
         await queryClient.invalidateQueries({ queryKey: ["best", slug] });
         await queryClient.invalidateQueries({ queryKey: ["scores"] });
       }
-      const xp = Math.max(1, Math.floor(score / 10)) * (profile?.plano_status === "premium" ? 2 : 1);
-      const updated = await grantXp(xp);
-      if (updated) setProfile(updated);
+      // Gamificação: XP da partida, streak, desafio diário e conquistas — tudo server-side.
+      const outcome = await dispatchGamificationEvent({ type: "game_over", slug, score, isRecord });
+      if (outcome) {
+        celebrateOutcome(outcome);
+        if (profile) setProfile({ ...profile, xp: outcome.xp, level: outcome.level });
+        await queryClient.invalidateQueries({ queryKey: GAMIFICATION_QUERY_KEY });
+      }
     } catch {
       toast.error("Não foi possível salvar sua pontuação.");
     }
