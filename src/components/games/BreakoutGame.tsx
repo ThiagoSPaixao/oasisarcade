@@ -81,8 +81,9 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
   }, []);
 
   const reset = useCallback(() => {
+    const f = speedRef.current;
     paddleRef.current = W / 2;
-    ballRef.current = { x: W / 2, y: H - 60, vx: 2.4, vy: -3.2 };
+    ballRef.current = { x: W / 2, y: H - 60, vx: 2.4 * f, vy: -3.2 * f };
     bricksRef.current = buildBricks();
     livesRef.current = 3;
     scoreRef.current = 0;
@@ -130,7 +131,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
       if (ball.x > brick.x && ball.x < brick.x + BRICK_W && ball.y > brick.y && ball.y < brick.y + BRICK_H) {
         brick.alive = false;
         ball.vy *= -1;
-        scoreRef.current += 15;
+        scoreRef.current += gain(15, optionsRef.current.difficulty);
         setScore(scoreRef.current);
         play("match");
         break;
@@ -138,7 +139,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
     }
 
     if (!bricksRef.current.some((b) => b.alive)) {
-      scoreRef.current += 200;
+      scoreRef.current += gain(200, optionsRef.current.difficulty);
       setScore(scoreRef.current);
       bricksRef.current = buildBricks();
       ballRef.current = { x: W / 2, y: H - 60, vx: ball.vx * 1.08, vy: -Math.abs(ball.vy) * 1.08 };
@@ -154,7 +155,7 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
         onGameOver(scoreRef.current);
         return;
       }
-      ballRef.current = { x: W / 2, y: H - 60, vx: 2.4, vy: -3.2 };
+      ballRef.current = { x: W / 2, y: H - 60, vx: 2.4 * speedRef.current, vy: -3.2 * speedRef.current };
     }
 
     draw();
