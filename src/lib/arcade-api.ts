@@ -45,12 +45,12 @@ export async function fetchScores(): Promise<Record<string, number>> {
 
 export type LeaderboardRow = {
   rank: number;
-  user_id: string;
   username: string;
   level: number;
   score: number;
   created_at: string;
 };
+
 
 // O ranking global é lido por uma função de servidor (src/lib/leaderboard.functions.ts),
 // pois a função do banco não é mais executável diretamente pelo cliente.
