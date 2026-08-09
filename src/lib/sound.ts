@@ -159,76 +159,204 @@ export function playSfx(name: Sfx) {
 }
 
 // --- Looping themes -------------------------------------------------------
-export type MusicTheme = "arcade" | "tetris";
+// Sequenciador com agendamento antecipado (lookahead) no relógio do WebAudio:
+// sem jitter de setTimeout, com envelopes ADSR, filtro e delay para dar corpo.
+
+export type MusicTheme = "title" | "arcade" | "tetris";
+
+type Track = {
+  /** duração de uma colcheia, em segundos (maior = mais lento) */
+  stepSeconds: number;
+  melody: number[];
+  bass: number[];
+  /** acorde arpejado opcional, tocado em volume baixo */
+  pad?: number[];
+  filterHz: number;
+  leadType: OscillatorType;
+};
+
+const R = 0; // silêncio
+
+/** Tema da tela inicial: lento, atmosférico, arpejo neon. */
+const TITLE_MELODY = [
+  659, R, R, 784, R, 880, R, R, 988, R, 880, R, 784, R, R, R,
+  659, R, R, 587, R, 659, R, R, 784, R, R, 659, R, R, R, R,
+];
+const TITLE_BASS = [
+  110, R, R, R, 110, R, R, R, 147, R, R, R, 147, R, R, R,
+  165, R, R, R, 165, R, R, R, 98, R, R, R, 98, R, R, R,
+];
+const TITLE_PAD = [
+  330, R, 415, R, 494, R, 415, R, 349, R, 440, R, 523, R, 440, R,
+  330, R, 415, R, 494, R, 587, R, 294, R, 392, R, 494, R, 392, R,
+];
 
 const ARCADE_MELODY = [
-  659, 0, 523, 0, 587, 0, 494, 0, 523, 0, 440, 0, 392, 0, 0, 0, 587, 0, 523, 0, 494, 0, 440, 0, 392,
-  0, 440, 0, 494, 0, 0, 0,
+  659, R, 523, R, 587, R, 494, R, 523, R, 440, R, 392, R, R, R,
+  587, R, 523, R, 494, R, 440, R, 392, R, 440, R, 494, R, R, R,
 ];
 const ARCADE_BASS = [
-  131, 0, 0, 0, 165, 0, 0, 0, 131, 0, 0, 0, 98, 0, 0, 0, 147, 0, 0, 0, 110, 0, 0, 0, 131, 0, 0, 0,
-  98, 0, 0, 0,
+  131, R, R, R, 165, R, R, R, 131, R, R, R, 98, R, R, R,
+  147, R, R, R, 110, R, R, R, 131, R, R, R, 98, R, R, R,
 ];
 
 /** Korobeiniki (tema clássico do Tetris), grade de colcheias. */
 const TETRIS_MELODY = [
-  659, 0, 494, 523, 587, 0, 523, 494,
-  440, 0, 440, 523, 659, 0, 587, 523,
-  494, 0, 0, 523, 587, 0, 659, 0,
-  523, 0, 440, 0, 440, 0, 0, 0,
-  587, 0, 0, 698, 880, 0, 784, 698,
-  659, 0, 0, 523, 659, 0, 587, 523,
-  494, 0, 494, 523, 587, 0, 659, 0,
-  523, 0, 440, 0, 440, 0, 0, 0,
+  659, R, 494, 523, 587, R, 523, 494,
+  440, R, 440, 523, 659, R, 587, 523,
+  494, R, R, 523, 587, R, 659, R,
+  523, R, 440, R, 440, R, R, R,
+  587, R, R, 698, 880, R, 784, 698,
+  659, R, R, 523, 659, R, 587, 523,
+  494, R, 494, 523, 587, R, 659, R,
+  523, R, 440, R, 440, R, R, R,
 ];
 const TETRIS_BASS = [
-  220, 0, 165, 0, 220, 0, 165, 0,
-  220, 0, 165, 0, 220, 0, 165, 0,
-  247, 0, 196, 0, 247, 0, 196, 0,
-  220, 0, 165, 0, 220, 0, 165, 0,
-  294, 0, 220, 0, 294, 0, 220, 0,
-  262, 0, 196, 0, 262, 0, 196, 0,
-  247, 0, 196, 0, 247, 0, 196, 0,
-  220, 0, 165, 0, 220, 0, 165, 0,
+  220, R, 165, R, 220, R, 165, R,
+  220, R, 165, R, 220, R, 165, R,
+  247, R, 196, R, 247, R, 196, R,
+  220, R, 165, R, 220, R, 165, R,
+  294, R, 220, R, 294, R, 220, R,
+  262, R, 196, R, 262, R, 196, R,
+  247, R, 196, R, 247, R, 196, R,
+  220, R, 165, R, 220, R, 165, R,
 ];
 
-const TRACKS: Record<MusicTheme, { melody: number[]; bass: number[]; step: number }> = {
-  arcade: { melody: ARCADE_MELODY, bass: ARCADE_BASS, step: 150 },
-  tetris: { melody: TETRIS_MELODY, bass: TETRIS_BASS, step: 148 },
+const TRACKS: Record<MusicTheme, Track> = {
+  title: {
+    stepSeconds: 0.3,
+    melody: TITLE_MELODY,
+    bass: TITLE_BASS,
+    pad: TITLE_PAD,
+    filterHz: 2200,
+    leadType: "triangle",
+  },
+  arcade: { stepSeconds: 0.19, melody: ARCADE_MELODY, bass: ARCADE_BASS, filterHz: 2800, leadType: "square" },
+  // Mais lento que o original para ficar agradável durante partidas longas.
+  tetris: { stepSeconds: 0.225, melody: TETRIS_MELODY, bass: TETRIS_BASS, filterHz: 2600, leadType: "square" },
 };
 
 let currentTheme: MusicTheme = "arcade";
+let musicBus: GainNode | null = null;
+let musicFilter: BiquadFilterNode | null = null;
+let scheduler: ReturnType<typeof setInterval> | null = null;
+let nextNoteTime = 0;
+
+function ensureMusicBus(audio: AudioContext): GainNode | null {
+  if (!master) return null;
+  if (musicBus && musicFilter) {
+    musicFilter.frequency.value = TRACKS[currentTheme].filterHz;
+    return musicBus;
+  }
+  musicBus = audio.createGain();
+  musicBus.gain.value = 0.75;
+  musicFilter = audio.createBiquadFilter();
+  musicFilter.type = "lowpass";
+  musicFilter.frequency.value = TRACKS[currentTheme].filterHz;
+  musicFilter.Q.value = 0.6;
+
+  // Delay curto em stereo dá profundidade sem sujar o chiptune.
+  const delay = audio.createDelay(0.6);
+  delay.delayTime.value = TRACKS[currentTheme].stepSeconds * 1.5;
+  const feedback = audio.createGain();
+  feedback.gain.value = 0.22;
+  const wet = audio.createGain();
+  wet.gain.value = 0.2;
+
+  musicBus.connect(musicFilter);
+  musicFilter.connect(master);
+  musicFilter.connect(delay);
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delay.connect(wet);
+  wet.connect(master);
+  return musicBus;
+}
+
+type VoiceOptions = {
+  freq: number;
+  start: number;
+  duration: number;
+  type: OscillatorType;
+  gain: number;
+  detune?: number;
+  attack?: number;
+  release?: number;
+};
+
+/** Voz com ADSR suave — evita os "cliques" do envelope antigo. */
+function voice({ freq, start, duration, type, gain, detune = 0, attack = 0.012, release = 0.09 }: VoiceOptions) {
+  const audio = ctx;
+  const bus = audio ? ensureMusicBus(audio) : null;
+  if (!audio || !bus) return;
+  const osc = audio.createOscillator();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  if (detune) osc.detune.setValueAtTime(detune, start);
+  const env = audio.createGain();
+  env.gain.setValueAtTime(0.0001, start);
+  env.gain.linearRampToValueAtTime(gain, start + attack);
+  env.gain.linearRampToValueAtTime(gain * 0.72, start + duration * 0.6);
+  env.gain.exponentialRampToValueAtTime(0.0001, start + duration + release);
+  osc.connect(env);
+  env.connect(bus);
+  osc.start(start);
+  osc.stop(start + duration + release + 0.02);
+}
+
+function scheduleStep(step: number, time: number) {
+  const track = TRACKS[currentTheme];
+  const dur = track.stepSeconds * 0.9;
+  const lead = track.melody[step % track.melody.length];
+  const bass = track.bass[step % track.bass.length];
+  const pad = track.pad?.[step % track.pad.length];
+
+  if (lead) {
+    voice({ freq: lead, start: time, duration: dur, type: track.leadType, gain: 0.1 });
+    // segunda voz levemente desafinada = timbre mais rico
+    voice({ freq: lead, start: time, duration: dur, type: "triangle", gain: 0.05, detune: 8 });
+  }
+  if (bass) {
+    voice({ freq: bass, start: time, duration: track.stepSeconds * 1.4, type: "triangle", gain: 0.13, release: 0.14 });
+    voice({ freq: bass / 2, start: time, duration: track.stepSeconds * 1.4, type: "sine", gain: 0.09, release: 0.16 });
+  }
+  if (pad) {
+    voice({ freq: pad, start: time, duration: track.stepSeconds * 1.2, type: "sine", gain: 0.05, attack: 0.05, release: 0.2 });
+  }
+}
+
+function runScheduler() {
+  const audio = ctx;
+  if (!audio) return;
+  if (!musicEnabled) return stopMusic();
+  while (nextNoteTime < audio.currentTime + 0.25) {
+    scheduleStep(musicStep, Math.max(nextNoteTime, audio.currentTime + 0.02));
+    musicStep += 1;
+    nextNoteTime += TRACKS[currentTheme].stepSeconds;
+  }
+}
 
 /** Troca a trilha em execução (ex.: tema do Tetris dentro do jogo). */
 export function setMusicTheme(theme: MusicTheme) {
   if (currentTheme === theme) return;
+  const wasPlaying = scheduler !== null;
+  if (wasPlaying) stopMusic();
   currentTheme = theme;
   musicStep = 0;
-  if (musicTimer) {
-    stopMusic();
-    startMusic();
-  }
+  if (musicFilter) musicFilter.frequency.value = TRACKS[theme].filterHz;
+  if (wasPlaying) startMusic();
 }
 
 export function startMusic() {
-  if (!musicEnabled || musicTimer) return;
+  if (!musicEnabled || scheduler) return;
   const audio = ensureContext();
-  if (!audio) return;
-  const tick = () => {
-    if (!musicEnabled) return stopMusic();
-    const track = TRACKS[currentTheme];
-    const lead = track.melody[musicStep % track.melody.length];
-    const bass = track.bass[musicStep % track.bass.length];
-    if (lead) tone({ freq: lead, duration: 0.13, type: "square", gain: 0.12 });
-    if (bass) tone({ freq: bass, duration: 0.2, type: "triangle", gain: 0.16 });
-    musicStep += 1;
-    musicTimer = setTimeout(tick, track.step);
-  };
-  tick();
+  if (!audio || !ensureMusicBus(audio)) return;
+  nextNoteTime = audio.currentTime + 0.1;
+  runScheduler();
+  scheduler = setInterval(runScheduler, 60);
 }
 
 export function stopMusic() {
-  if (musicTimer) clearTimeout(musicTimer);
-  musicTimer = null;
+  if (scheduler) clearInterval(scheduler);
+  scheduler = null;
 }
-
