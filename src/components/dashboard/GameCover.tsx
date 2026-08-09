@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 /** Cache em memória do estado das capas já resolvidas nesta sessão (evita re-flash e recarga no mobile). */
 const coverStatus = new Map<string, "loaded" | "failed">();
