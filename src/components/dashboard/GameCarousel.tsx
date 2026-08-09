@@ -60,56 +60,53 @@ export function GameCarousel({
         <div className="-ml-3 flex touch-pan-y will-change-transform">
           {games.map((game, index) => {
             const locked = game.is_premium && !isPremiumUser;
+            const inDevelopment = game.state !== "playable";
             const isFavorite = favorites.includes(game.slug);
             const active = index === selected;
             const cover = gameCover(game.slug, game.thumbnail);
-            return (
-              <div key={game.slug} className="min-w-0 shrink-0 grow-0 basis-[82%] pl-3 sm:basis-[58%] lg:basis-[40%]">
-                <div
-                  className={cn(
-                    "relative rounded-3xl transition-all duration-300",
-                    active
-                      ? "border-accent bg-surface/70 border shadow-[0_0_60px_-18px_var(--neon-cyan)]"
-                      : "border-foreground/10 bg-surface/40 scale-[0.94] border opacity-55",
-                  )}
-                >
-                  <Link
-                    to="/game/$slug"
-                    params={{ slug: game.slug }}
-                    onClick={() => play("coin")}
-                    aria-label={`Jogar ${game.name}`}
-                    className="block p-4 sm:p-5"
-                  >
-                    {active ? (
-                      <p className="text-foreground/90 mb-1 text-center text-xs font-bold tracking-[0.22em]">
-                        JOGO DO DIA
-                      </p>
-                    ) : null}
-                    <h2 className="glow-magenta text-primary mb-3 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">
-                      {game.name.toUpperCase()}
-                    </h2>
+            const inner = (
+              <>
+                {active && !inDevelopment ? (
+                  <p className="text-foreground/90 mb-1 text-center text-xs font-bold tracking-[0.22em]">
+                    JOGO DO DIA
+                  </p>
+                ) : null}
+                <h2 className="glow-magenta text-primary mb-3 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  {game.name.toUpperCase()}
+                </h2>
 
-                    <div className="bg-surface-2 relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
-                      <GameCover
-                        src={cover}
-                        name={game.name}
-                        width={768}
-                        height={480}
-                        priority={active}
-                        sizes="(max-width: 640px) 82vw, (max-width: 1024px) 58vw, 40vw"
-                      />
-                      {game.is_premium ? (
-                        <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
-                          PREMIUM
+                <div className="bg-surface-2 relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
+                  <GameCover
+                    src={cover}
+                    name={game.name}
+                    width={768}
+                    height={480}
+                    priority={active}
+                    sizes="(max-width: 640px) 82vw, (max-width: 1024px) 58vw, 40vw"
+                  />
+                  {inDevelopment ? (
+                    <>
+                      <div aria-hidden className="bg-background/70 absolute inset-0 backdrop-blur-[2px]" />
+                      <span className="absolute inset-0 grid place-items-center">
+                        <span className="border-foreground/20 text-muted-foreground bg-background/60 grid h-14 w-14 place-items-center rounded-full border backdrop-blur">
+                          <Lock className="h-6 w-6" strokeWidth={1.5} />
                         </span>
-                      ) : null}
-                      {game.state !== "playable" ? (
-                        <span className="bg-background/60 text-neon-yellow absolute bottom-2 left-2 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
-                          EM BREVE
-                        </span>
-                      ) : null}
-                    </div>
+                      </span>
+                    </>
+                  ) : null}
+                  {game.is_premium ? (
+                    <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
+                      PREMIUM
+                    </span>
+                  ) : null}
+                </div>
 
+                {inDevelopment ? (
+                  <p className="text-muted-foreground mt-4 text-center text-sm">
+                    Este Clássico está em desenvolvimento
+                  </p>
+                ) : (
+                  <>
                     <h3 className="text-foreground mt-4 text-lg font-bold tracking-tight">
                       {game.name.toUpperCase()}
                     </h3>
@@ -122,7 +119,38 @@ export function GameCarousel({
                       {locked ? <Lock className="h-4 w-4" strokeWidth={1.8} /> : null}
                       JOGAR AGORA
                     </span>
-                  </Link>
+                  </>
+                )}
+              </>
+            );
+            return (
+              <div key={game.slug} className="min-w-0 shrink-0 grow-0 basis-[82%] pl-3 sm:basis-[58%] lg:basis-[40%]">
+                <div
+                  className={cn(
+                    "relative rounded-3xl transition-all duration-300",
+                    active
+                      ? "border-accent bg-surface/70 border shadow-[0_0_60px_-18px_var(--neon-cyan)]"
+                      : "border-foreground/10 bg-surface/40 scale-[0.94] border opacity-55",
+                    inDevelopment && "grayscale",
+                  )}
+                >
+                  {inDevelopment ? (
+                    <div aria-disabled="true" className="block cursor-not-allowed p-4 select-none sm:p-5">
+                      {inner}
+                      <RushDevCard gameName={game.name} />
+                    </div>
+                  ) : (
+                    <Link
+                      to="/game/$slug"
+                      params={{ slug: game.slug }}
+                      onClick={() => play("coin")}
+                      aria-label={`Jogar ${game.name}`}
+                      className="block p-4 sm:p-5"
+                    >
+                      {inner}
+                    </Link>
+                  )}
+
 
                   <button
                     type="button"
