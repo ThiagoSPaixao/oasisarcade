@@ -2,9 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Heart, Lock } from "lucide-react";
-import type { Game } from "@/types/arcade";
+import type { CatalogGame } from "@/lib/games/catalog";
 import { cn } from "@/lib/utils";
-import { gameCover } from "@/lib/game-covers";
 import { GameCover, preloadCover } from "@/components/dashboard/GameCover";
 import { useSoundStore } from "@/stores/sound-store";
 import { RushDevCard } from "@/components/games/RushDevCard";
@@ -17,7 +16,7 @@ export function GameCarousel({
   isPremiumUser,
   onToggleFavorite,
 }: {
-  games: Game[];
+  games: CatalogGame[];
   scores: Record<string, number>;
   favorites: string[];
   isPremiumUser: boolean;
@@ -49,7 +48,7 @@ export function GameCarousel({
       (i) => games[(i + games.length) % games.length],
     );
     for (const game of neighbors) {
-      if (game) preloadCover(gameCover(game.slug, game.thumbnail));
+      if (game) preloadCover(game.cover);
     }
   }, [games, selected]);
 
@@ -61,10 +60,10 @@ export function GameCarousel({
         <div className="-ml-3 flex touch-pan-y will-change-transform">
           {games.map((game, index) => {
             const locked = game.is_premium && !isPremiumUser;
-            const inDevelopment = game.state !== "playable";
+            const inDevelopment = game.status !== "available";
             const isFavorite = favorites.includes(game.slug);
             const active = index === selected;
-            const cover = gameCover(game.slug, game.thumbnail);
+            const cover = game.cover;
             const inner = (
               <>
                 {active && !inDevelopment ? (
