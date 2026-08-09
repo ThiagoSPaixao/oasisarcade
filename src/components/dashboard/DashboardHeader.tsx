@@ -1,24 +1,60 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Crown, Gamepad2 } from "lucide-react";
+import { LogOut, Crown, Gamepad2, Pencil } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useAuthStore } from "@/stores/auth-store";
+import { AvatarPickerDialog } from "@/components/dashboard/AvatarPickerDialog";
 import { XP_PER_LEVEL, type Profile } from "@/types/arcade";
 
 export function DashboardHeader({ profile, onSignOut }: { profile: Profile | null; onSignOut: () => void }) {
   const email = useAuthStore((s) => s.user?.email) ?? "";
+  const updateAvatar = useAuthStore((s) => s.updateAvatar);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pending, setPending] = useState(false);
   const username = profile?.username ?? email.split("@")[0] ?? "Player";
   const xpInLevel = (profile?.xp ?? 0) % XP_PER_LEVEL;
   const pct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const premium = profile?.plano_status === "premium";
 
+  const handleSelect = async (url: string) => {
+    setPending(true);
+    try {
+      await updateAvatar(url);
+      setPickerOpen(false);
+      toast.success("Avatar atualizado!");
+    } catch {
+      toast.error("Não foi possível salvar seu avatar.");
+    } finally {
+      setPending(false);
+    }
+  };
+
   return (
     <header className="glass flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5">
-      <div className="border-accent/40 grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border shadow-[0_0_22px_-10px_var(--neon-cyan)]">
+      <button
+        type="button"
+        onClick={() => setPickerOpen(true)}
+        aria-label="Trocar foto de perfil"
+        className="border-accent/40 hover:border-primary/70 group relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border shadow-[0_0_22px_-10px_var(--neon-cyan)] transition-colors"
+      >
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt={`Avatar de ${username}`} className="h-full w-full object-cover" />
         ) : (
           <Gamepad2 className="text-accent h-5 w-5" strokeWidth={1.1} />
         )}
-      </div>
+        <span className="bg-background/70 absolute inset-0 grid place-items-center opacity-0 transition-opacity group-hover:opacity-100">
+          <Pencil className="text-primary h-3.5 w-3.5" strokeWidth={1.6} />
+        </span>
+      </button>
+
+      <AvatarPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        current={profile?.avatar_url ?? null}
+        onSelect={(url) => void handleSelect(url)}
+        pending={pending}
+      />
+
 
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate text-sm font-semibold tracking-wide">{username}</p>
