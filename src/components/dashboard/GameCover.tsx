@@ -2,6 +2,19 @@ import { useEffect, useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/** Cache em memória do estado das capas já resolvidas nesta sessão (evita re-flash e recarga no mobile). */
+const coverStatus = new Map<string, "loaded" | "failed">();
+
+/** Pré-carrega uma capa (usado para os slides vizinhos do carrossel). */
+export function preloadCover(src: string | null | undefined) {
+  if (!src || coverStatus.has(src) || typeof window === "undefined") return;
+  const img = new Image();
+  img.decoding = "async";
+  img.onload = () => coverStatus.set(src, "loaded");
+  img.onerror = () => coverStatus.set(src, "failed");
+  img.src = src;
+}
+
 /** Placeholder neon consistente, usado quando o jogo não tem capa ou a imagem falha ao carregar. */
 export function GameCoverFallback({ name, className }: { name: string; className?: string | undefined }) {
   return (
@@ -23,24 +36,30 @@ export function GameCoverFallback({ name, className }: { name: string; className
   );
 }
 
-/** Capa do jogo com fallback automático para o placeholder neon em caso de erro de carregamento. */
+/** Capa do jogo com lazy loading, cache de sessão e fallback automático para o placeholder neon. */
 export function GameCover({
   src,
   name,
   width,
   height,
   className,
+  priority = false,
 }: {
   src: string | null;
   name: string;
   width: number;
   height: number;
   className?: string;
+  priority?: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
+  const cached = src ? coverStatus.get(src) : undefined;
+  const [failed, setFailed] = useState(cached === "failed");
+  const [loaded, setLoaded] = useState(cached === "loaded");
 
   useEffect(() => {
-    setFailed(false);
+    const status = src ? coverStatus.get(src) : undefined;
+    setFailed(status === "failed");
+    setLoaded(status === "loaded");
   }, [src]);
 
   if (!src || failed) return <GameCoverFallback name={name} className={className} />;
@@ -49,11 +68,24 @@ export function GameCover({
     <img
       src={src}
       alt={`Capa do jogo ${name}`}
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      fetchPriority={priority ? "high" : "low"}
       width={width}
       height={height}
-      onError={() => setFailed(true)}
-      className={cn("h-full w-full object-cover", className)}
+      onLoad={() => {
+        coverStatus.set(src, "loaded");
+        setLoaded(true);
+      }}
+      onError={() => {
+        coverStatus.set(src, "failed");
+        setFailed(true);
+      }}
+      className={cn(
+        "h-full w-full object-cover transition-opacity duration-300",
+        loaded ? "opacity-100" : "opacity-0",
+        className,
+      )}
     />
   );
 }
