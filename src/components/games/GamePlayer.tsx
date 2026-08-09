@@ -86,7 +86,7 @@ export function GamePlayer({
   const compactPad = game.slug === "tetris";
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2 sm:gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
       <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3">
         <Link
           to="/dashboard"
