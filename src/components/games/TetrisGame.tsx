@@ -9,6 +9,10 @@ import { GameOverlay } from "./GameOverlay";
 const COLS = 10;
 const ROWS = 20;
 const BASE_SPEED = 620;
+/** Duração do flash das linhas completadas (ms). */
+const CLEAR_FX_MS = 380;
+const CLEAR_LABELS = ["", "LINHA!", "DUPLO!", "TRIPLO!", "TETRIS!"];
+
 
 type Shape = number[][];
 
@@ -128,8 +132,12 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const lastFrameRef = useRef(0);
   const dirtyRef = useRef(true);
   const rafRef = useRef<number | null>(null);
+  /** Efeito visual das linhas completadas (flash neon). */
+  const clearFxRef = useRef<{ rows: number[]; start: number; count: number } | null>(null);
+  const [clearLabel, setClearLabel] = useState<{ text: string; id: number } | null>(null);
   const [lines, setLines] = useState(0);
   const [nextPieces, setNextPieces] = useState<PieceDef[]>(() => queueRef.current);
+
 
   const status = useGameStore((s) => s.status);
   const setStatus = useGameStore((s) => s.setStatus);
@@ -263,8 +271,32 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         if (value) block(piece.x + dx, piece.y + dy, piece.color, 12);
       }),
     );
-    dirtyRef.current = false;
+
+    // Flash neon nas linhas completadas
+    const fx = clearFxRef.current;
+    if (fx) {
+      const t = Math.min(1, (performance.now() - fx.start) / CLEAR_FX_MS);
+      const glow = color(fx.count >= 4 ? "--neon-yellow" : "--primary", "#ff4fd8");
+      ctx.save();
+      fx.rows.forEach((row) => {
+        const grow = cell * 0.5 * t;
+        const y = row * cell - grow / 2;
+        const h = cell + grow;
+        ctx.globalAlpha = (1 - t) * 0.95;
+        ctx.shadowColor = glow;
+        ctx.shadowBlur = 24 * (1 - t) + 8;
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, y, canvas.width, h);
+        ctx.globalAlpha = (1 - t) * 0.85;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, row * cell + cell * 0.35, canvas.width, cell * 0.3);
+      });
+      ctx.restore();
+      if (t >= 1) clearFxRef.current = null;
+    }
+    dirtyRef.current = clearFxRef.current !== null;
   }, [color]);
+
 
   const collides = useCallback((piece: Piece) => {
     return piece.shape.some((row, dy) =>
@@ -295,7 +327,10 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     lastFrameRef.current = 0;
     setLines(0);
     setScore(0);
+    clearFxRef.current = null;
+    setClearLabel(null);
     dirtyRef.current = true;
+
     draw();
   }, [draw, setScore]);
 
@@ -313,13 +348,20 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     );
     play("drop");
 
+    const fullRows = boardRef.current.reduce<number[]>((acc, row, index) => {
+      if (row.every((cell) => cell !== null)) acc.push(index);
+      return acc;
+    }, []);
     const kept = boardRef.current.filter((row) => row.some((cell) => cell === null));
     const cleared = ROWS - kept.length;
     if (cleared > 0) {
+      clearFxRef.current = { rows: fullRows, start: performance.now(), count: cleared };
+      setClearLabel({ text: CLEAR_LABELS[cleared] ?? "COMBO!", id: Date.now() });
       boardRef.current = [
         ...Array.from({ length: cleared }, () => Array.from({ length: COLS }, () => null as Cell)),
         ...kept,
       ];
+
       linesRef.current += cleared;
       setLines(linesRef.current);
       scoreRef.current += gain(
@@ -525,6 +567,13 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     draw();
   }, [draw, options.tetrisGhost]);
 
+  // Remove o rótulo de linhas após a animação
+  useEffect(() => {
+    if (!clearLabel) return;
+    const timer = window.setTimeout(() => setClearLabel(null), 750);
+    return () => window.clearTimeout(timer);
+  }, [clearLabel]);
+
   const level = Math.floor(lines / 10) + 1;
 
   return (
@@ -544,12 +593,27 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
           className="bg-background pixel-border-cyan block w-full"
           style={{ imageRendering: "pixelated", aspectRatio: `${COLS} / ${ROWS}` }}
         />
+        {clearLabel ? (
+          <div
+            key={clearLabel.id}
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          >
+            <span
+              className={`animate-scale-in font-pixel text-lg tracking-widest drop-shadow-[0_0_12px_currentColor] sm:text-2xl ${
+                clearLabel.text === "TETRIS!" ? "text-neon-yellow" : "text-primary"
+              }`}
+            >
+              {clearLabel.text}
+            </span>
+          </div>
+        ) : null}
         <GameOverlay
           title="TETRIS"
           hint="Analógico move · centro gira · botão ao lado desce rápido"
           onStart={() => (status === "paused" ? setStatus("running") : start())}
         />
       </div>
+
 
       <aside className="flex w-14 shrink-0 flex-col items-center gap-2 sm:w-20">
         <span className="ui-label text-muted-foreground text-[8px] tracking-widest sm:text-[9px]">
