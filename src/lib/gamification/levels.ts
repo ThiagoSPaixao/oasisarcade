@@ -40,6 +40,7 @@ export function levelProgress(xp: number, level?: number): LevelProgress {
   const xpNeeded = Math.max(1, nextLevelXp - levelStartXp);
   const xpInLevel = Math.max(0, Math.min(xpNeeded, safeXp - levelStartXp));
   return {
+    isMax,
     level: current,
     xp: safeXp,
     levelStartXp,
