@@ -20,6 +20,7 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportsRanking: true,
     supportsXp: true,
     musicTheme: "tetris",
+    featured: true,
   },
   snake: {
     slug: "snake",
@@ -92,6 +93,39 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportsRanking: true,
     supportsXp: true,
     musicTheme: null,
+  },
+  "space-invaders": {
+    slug: "space-invaders",
+    component: lazy(() =>
+      import("@/components/games/SpaceInvadersGame").then((m) => ({
+        default: m.SpaceInvadersGame,
+      })),
+    ),
+    cover: "/assets/cover-space-invaders.jpg",
+    controls: "full",
+    controlHint: "← → movem a nave · A atira · B pausa",
+    difficultyHint: "Invasores mais rápidos e mais tiros vindo de cima.",
+    supportedOptions: ["difficulty"],
+    supportsRanking: true,
+    supportsXp: true,
+    musicTheme: null,
+    isNew: true,
+    featured: true,
+  },
+  "mini-racer": {
+    slug: "mini-racer",
+    component: lazy(() =>
+      import("@/components/games/MiniRacerGame").then((m) => ({ default: m.MiniRacerGame })),
+    ),
+    cover: "/assets/cover-mini-racer.jpg",
+    controls: "directional",
+    controlHint: "← → (ou D-Pad) trocam de faixa · desvie e pegue moedas",
+    difficultyHint: "Pista mais veloz e obstáculos mais frequentes.",
+    supportedOptions: ["difficulty"],
+    supportsRanking: true,
+    supportsXp: true,
+    musicTheme: null,
+    isNew: true,
   },
 };
 

@@ -4,7 +4,15 @@ import type { MusicTheme } from "@/lib/sound";
 import type { Game, GameCategory } from "@/types/arcade";
 
 /** Slugs técnicos estáveis: usados em rotas, favoritos, user_scores e ranking. */
-export type GameSlug = "tetris" | "snake" | "memoria" | "space-shooter" | "breakout" | "pong";
+export type GameSlug =
+  | "tetris"
+  | "snake"
+  | "memoria"
+  | "space-shooter"
+  | "breakout"
+  | "pong"
+  | "space-invaders"
+  | "mini-racer";
 
 export type GameDifficulty = Difficulty;
 export type { GameCategory };
@@ -45,6 +53,10 @@ export type GameDefinition = {
   musicTheme: MusicTheme | null;
   /** Slugs antigos que devem redirecionar para este jogo. */
   aliases?: string[];
+  /** Lançamento recente: aparece na vitrine "Novos jogos". */
+  isNew?: boolean;
+  /** Curadoria: aparece na vitrine "Em destaque". */
+  featured?: boolean;
 };
 
 /** Metadados do banco + definição técnica: o que a UI consome. */

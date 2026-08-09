@@ -43,6 +43,10 @@ export function GameCard({
           <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
             PREMIUM
           </span>
+        ) : game.definition.isNew && !inDevelopment ? (
+          <span className="border-neon-green/60 text-neon-green bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
+            NOVO
+          </span>
         ) : null}
       </div>
 

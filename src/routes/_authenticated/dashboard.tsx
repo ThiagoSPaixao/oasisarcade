@@ -10,7 +10,19 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { GameCarousel } from "@/components/dashboard/GameCarousel";
 import { GameRail } from "@/components/dashboard/GameRail";
 import { GameCard } from "@/components/dashboard/GameCard";
-import { fetchFavorites, fetchGames, fetchScores, toggleFavorite } from "@/lib/arcade-api";
+import {
+  fetchFavorites,
+  fetchGames,
+  fetchLastPlayed,
+  fetchScores,
+  toggleFavorite,
+} from "@/lib/arcade-api";
+import {
+  getComingSoonGames,
+  getFeaturedGames,
+  getNewGames,
+  getRecentlyPlayed,
+} from "@/lib/games/catalog";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { ProgressPanel } from "@/components/dashboard/ProgressPanel";
 import { useAuthStore } from "@/stores/auth-store";
@@ -53,12 +65,32 @@ function DashboardPage() {
   const gamesQuery = useQuery({ queryKey: ["games"], queryFn: fetchGames });
   const favoritesQuery = useQuery({ queryKey: ["favorites"], queryFn: fetchFavorites });
   const scoresQuery = useQuery({ queryKey: ["scores"], queryFn: fetchScores });
+  const lastPlayedQuery = useQuery({ queryKey: ["last-played"], queryFn: fetchLastPlayed });
   const gamificationQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
 
   const games = gamesQuery.data ?? [];
   const favorites = favoritesQuery.data ?? [];
   const scores = scoresQuery.data ?? {};
+  const lastPlayed = lastPlayedQuery.data ?? {};
   const isPremiumUser = profile?.plano_status === "premium";
+
+  // Vitrines derivadas do catálogo (Game Registry + banco), sem listas fixas na UI.
+  const newGames = getNewGames(games);
+  const recentGames = getRecentlyPlayed(games, lastPlayed);
+  const featuredGames = getFeaturedGames(games);
+  const comingSoonGames = getComingSoonGames(games);
+  const favoriteGames = games.filter((game) => favorites.includes(game.slug));
+
+  const renderCard = (game: (typeof games)[number]) => (
+    <GameCard
+      key={game.slug}
+      game={game}
+      best={scores[game.slug] ?? 0}
+      isFavorite={favorites.includes(game.slug)}
+      locked={game.is_premium && !isPremiumUser}
+      onToggleFavorite={() => void onToggleFavorite(game.slug)}
+    />
+  );
 
   const onToggleFavorite = async (slug: string) => {
     const isFavorite = favorites.includes(slug);
@@ -108,20 +140,25 @@ function DashboardPage() {
           onToggleFavorite={(slug) => void onToggleFavorite(slug)}
         />
 
-        <GameRail title="MEUS FAVORITOS" empty={favorites.length === 0}>
-          {games
-            .filter((game) => favorites.includes(game.slug))
-            .map((game) => (
-              <GameCard
-                key={game.slug}
-                game={game}
-                best={scores[game.slug] ?? 0}
-                isFavorite
-                locked={game.is_premium && !isPremiumUser}
-                onToggleFavorite={() => void onToggleFavorite(game.slug)}
-              />
-            ))}
+        {newGames.length > 0 ? (
+          <GameRail title="🆕 NOVOS JOGOS">{newGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        {recentGames.length > 0 ? (
+          <GameRail title="▶️ JOGAR NOVAMENTE">{recentGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        {featuredGames.length > 0 ? (
+          <GameRail title="🔥 EM DESTAQUE">{featuredGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        <GameRail title="MEUS FAVORITOS" empty={favoriteGames.length === 0}>
+          {favoriteGames.map(renderCard)}
         </GameRail>
+
+        {comingSoonGames.length > 0 ? (
+          <GameRail title="EM BREVE">{comingSoonGames.map(renderCard)}</GameRail>
+        ) : null}
 
         <p className="ui-label text-muted-foreground mt-10 text-center text-[10px] leading-relaxed">
           OÁSIS ARCADE · DESENVOLVIDO POR{" "}

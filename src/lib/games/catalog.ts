@@ -46,3 +46,29 @@ export function getGamesByCategory(games: CatalogGame[], category: GameCategory)
 export function getRankedGames(games: CatalogGame[]): CatalogGame[] {
   return games.filter((game) => game.definition.supportsRanking);
 }
+
+/** Vitrine "Novos jogos": marcada no Game Registry (isNew), nunca hardcoded na UI. */
+export function getNewGames(games: CatalogGame[]): CatalogGame[] {
+  return games.filter((game) => game.definition.isNew);
+}
+
+/** Vitrine "Em destaque": curadoria do registro + ordem do banco (sort_order). */
+export function getFeaturedGames(games: CatalogGame[]): CatalogGame[] {
+  return games.filter((game) => game.definition.featured && game.status === "available");
+}
+
+export function getComingSoonGames(games: CatalogGame[]): CatalogGame[] {
+  return games.filter((game) => game.status === "coming_soon");
+}
+
+/** Ordena os jogos disponíveis pela última partida do jogador ("Jogar novamente"). */
+export function getRecentlyPlayed(
+  games: CatalogGame[],
+  playedAt: Record<string, string>,
+  limit = 6,
+): CatalogGame[] {
+  return games
+    .filter((game) => game.status === "available" && playedAt[game.slug])
+    .sort((a, b) => (playedAt[b.slug] ?? "").localeCompare(playedAt[a.slug] ?? ""))
+    .slice(0, limit);
+}
