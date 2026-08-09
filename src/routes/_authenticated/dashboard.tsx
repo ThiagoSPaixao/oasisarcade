@@ -13,6 +13,7 @@ import { GameCard } from "@/components/dashboard/GameCard";
 import { fetchFavorites, fetchGames, fetchScores, toggleFavorite } from "@/lib/arcade-api";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSoundStore } from "@/stores/sound-store";
+import { setMusicTheme, startMusic } from "@/lib/sound";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -31,8 +32,18 @@ function DashboardPage() {
     void loadProfile();
   }, [loadProfile]);
 
+  // Música do Dashboard: tema "arcade" apenas aqui.
   useEffect(() => {
-    const onFirstTouch = () => unlock();
+    setMusicTheme("arcade");
+    startMusic();
+  }, []);
+
+  useEffect(() => {
+    const onFirstTouch = () => {
+      unlock();
+      setMusicTheme("arcade");
+      startMusic();
+    };
     window.addEventListener("pointerdown", onFirstTouch, { once: true });
     return () => window.removeEventListener("pointerdown", onFirstTouch);
   }, [unlock]);

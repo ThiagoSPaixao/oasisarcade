@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { stopMusic } from "@/lib/sound";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { SnakeGame } from "./SnakeGame";
@@ -76,6 +77,11 @@ export function GamePlayer({
     setActiveGame(game.slug);
     return () => setActiveGame(null);
   }, [game.slug, setActiveGame]);
+
+  // Snake, memória e demais jogos ficam em silêncio (só efeitos). Tetris cuida da sua própria música.
+  useEffect(() => {
+    if (game.slug !== "tetris") stopMusic();
+  }, [game.slug]);
 
   useEffect(() => {
     setBest(best);
