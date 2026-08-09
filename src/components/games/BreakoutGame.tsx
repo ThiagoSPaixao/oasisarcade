@@ -48,6 +48,13 @@ export function BreakoutGame({ onGameOver }: { onGameOver: (score: number) => vo
   const actionInput = useGameStore((s) => s.actionInput);
   const play = useSoundStore((s) => s.play);
 
+  // Configurações isoladas do Breakout
+  const options = useGameOptions("breakout");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedRef = useRef(DIFFICULTY_META[options.difficulty].speed);
+  speedRef.current = DIFFICULTY_META[options.difficulty].speed;
+
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
