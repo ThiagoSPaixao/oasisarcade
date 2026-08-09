@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,25 @@ export function preloadCover(src: string | null | undefined) {
   img.onload = () => coverStatus.set(src, "loaded");
   img.onerror = () => coverStatus.set(src, "failed");
   img.src = src;
+}
+
+/** Skeleton animado neon exibido enquanto a capa carrega. */
+function GameCoverSkeleton({ label, className }: { label: string; className?: string }) {
+  return (
+    <div
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      className={cn(
+        "skeleton-shimmer absolute inset-0 z-10 grid place-items-center justify-items-center gap-2 overflow-hidden",
+        className,
+      )}
+    >
+      <span className="border-accent/30 text-accent/60 grid h-10 w-10 place-items-center rounded-full border">
+        <Gamepad2 className="h-5 w-5" strokeWidth={1.3} />
+      </span>
+    </div>
+  );
 }
 
 /** Placeholder neon consistente, usado quando o jogo não tem capa ou a imagem falha ao carregar. */
@@ -47,7 +66,7 @@ export function GameCoverFallback({
   );
 }
 
-/** Capa do jogo com lazy loading, cache de sessão e fallback automático para o placeholder neon. */
+/** Capa do jogo com lazy loading, cache de sessão, skeleton animado e fallback automático para o placeholder neon. */
 export function GameCover({
   src,
   name,
@@ -69,12 +88,29 @@ export function GameCover({
   const cached = src ? coverStatus.get(src) : undefined;
   const [failed, setFailed] = useState(cached === "failed");
   const [loaded, setLoaded] = useState(cached === "loaded");
+  const imgRef = useRef<HTMLImageElement>(null);
   const description = alt ?? `Capa do jogo ${name} em arte neon 8-bit`;
+
+  const markLoaded = (url: string) => {
+    coverStatus.set(url, "loaded");
+    setLoaded(true);
+  };
+
+  const markFailed = (url: string) => {
+    coverStatus.set(url, "failed");
+    setFailed(true);
+  };
 
   useEffect(() => {
     const status = src ? coverStatus.get(src) : undefined;
     setFailed(status === "failed");
     setLoaded(status === "loaded");
+
+    // Imagens vindas do cache podem já estar completas antes do listener onLoad ser anexado.
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0 && src) {
+      markLoaded(src);
+    }
   }, [src]);
 
   if (!src || failed) {
@@ -88,27 +124,30 @@ export function GameCover({
   }
 
   return (
-    <img
-      src={src}
-      alt={description}
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      fetchPriority={priority ? "high" : "low"}
-      width={width}
-      height={height}
-      onLoad={() => {
-        coverStatus.set(src, "loaded");
-        setLoaded(true);
-      }}
-      onError={() => {
-        coverStatus.set(src, "failed");
-        setFailed(true);
-      }}
-      className={cn(
-        "h-full w-full object-cover transition-opacity duration-300",
-        loaded ? "opacity-100" : "opacity-0",
-        className,
+    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+      {!loaded && !failed && (
+        <GameCoverSkeleton label={`Carregando capa do jogo ${name}...`} />
       )}
-    />
+      <img
+        ref={imgRef}
+        src={src}
+        alt={description}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "low"}
+        width={width}
+        height={height}
+        onLoad={() => {
+          if (src) markLoaded(src);
+        }}
+        onError={() => {
+          if (src) markFailed(src);
+        }}
+        className={cn(
+          "h-full w-full object-cover transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+      />
+    </div>
   );
 }
