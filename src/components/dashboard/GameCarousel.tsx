@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { gameCover } from "@/lib/game-covers";
 import { GameCover, preloadCover } from "@/components/dashboard/GameCover";
 import { useSoundStore } from "@/stores/sound-store";
+import { RushDevCard } from "@/components/games/RushDevCard";
 
 /** Carrossel de jogos no formato "JOGO DO DIA": card alto com capa, descrição e CTA. */
 export function GameCarousel({
