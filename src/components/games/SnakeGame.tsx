@@ -274,6 +274,13 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       const segColor = (index: number, light = 60, alpha = 1) =>
         `hsla(${(186 + index * 13) % 360} 92% ${light}% / ${alpha})`;
 
+      /** true quando os dois pontos são vizinhos reais (evita rastro ao atravessar a borda). */
+      const linked = (i: number) => {
+        const a = pts[i]!;
+        const b = pts[i - 1]!;
+        return Math.hypot(b.cx - a.cx, b.cy - a.cy) <= cell * 1.6;
+      };
+
       ctx.save();
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
@@ -281,6 +288,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       // Reflexo suave no chão
       ctx.globalAlpha = 0.12;
       for (let i = pts.length - 1; i > 0; i -= 1) {
+        if (!linked(i)) continue;
         ctx.strokeStyle = segColor(i, 55);
         ctx.lineWidth = cell * 0.7;
         ctx.beginPath();
@@ -293,6 +301,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       // Halo neon difuso por placa
       ctx.globalAlpha = 0.18;
       for (let i = pts.length - 1; i > 0; i -= 1) {
+        if (!linked(i)) continue;
         ctx.strokeStyle = segColor(i, 62);
         ctx.lineWidth = cell * 1.02;
         ctx.beginPath();
@@ -305,7 +314,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
       // Corpo: placas de armadura coloridas com divisória escura
       for (let i = pts.length - 1; i > 0; i -= 1) {
         const a = pts[i]!;
-        const b = pts[i - 1]!;
+        const b = linked(i) ? pts[i - 1]! : pts[i]!;
         ctx.strokeStyle = segColor(i, 56);
         ctx.lineWidth = cell * 0.8;
         ctx.beginPath();
@@ -334,6 +343,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
         ctx.lineTo(a.cx - nx * cell * 0.38, a.cy - ny * cell * 0.38);
         ctx.stroke();
       }
+
 
       // Cabeça robótica angular com visor luminoso
       const head = pts[0]!;
