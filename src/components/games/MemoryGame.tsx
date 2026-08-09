@@ -3,7 +3,7 @@ import { useGameStore } from "@/stores/game-store";
 import { useSoundStore } from "@/stores/sound-store";
 import { useGameOptions } from "@/stores/settings-store";
 import { MEMORY_PAIRS, gain } from "@/lib/game-options";
-import { pickMemoryIcons, type MemoryIcon } from "@/lib/memory-cards";
+import { pickMemoryIcons, preloadMemoryIcons, type MemoryIcon } from "@/lib/memory-cards";
 import { cn } from "@/lib/utils";
 
 type Card = { id: number; icon: MemoryIcon; flipped: boolean; matched: boolean };
