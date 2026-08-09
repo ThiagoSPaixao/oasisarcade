@@ -10,18 +10,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { DIFFICULTIES, DIFFICULTY_META, type Difficulty } from "@/lib/game-options";
+import { getDefinition } from "@/lib/games/catalog";
 import { cn } from "@/lib/utils";
 
-const DIFFICULTY_HINT: Record<string, string> = {
-  snake: "Quanto mais rápida a cobra, mais pontos por fruta.",
-  tetris: "Peças caem mais rápido e cada linha vale mais.",
-  "space-shooter": "Frota mais veloz e mais tiros inimigos.",
-  nave: "Frota mais veloz e mais tiros inimigos.",
-  breakout: "Bola mais rápida e raquete menor.",
-  arkanoid: "Bola mais rápida e raquete menor.",
-  pong: "Bola mais rápida e CPU mais esperta.",
-  memoria: "Mais pares para encontrar no tabuleiro.",
-};
 
 function Row({
   icon,
@@ -52,6 +43,8 @@ function Row({
 export function GameSettingsMenu({ slug, className }: { slug: string; className?: string }) {
   const options = useGameOptions(slug);
   const setGameOption = useSettingsStore((s) => s.setGameOption);
+  const definition = getDefinition(slug);
+  const supports = (key: string) => definition?.supportedOptions.includes(key as never) ?? false;
 
   return (
     <Sheet>
@@ -83,7 +76,7 @@ export function GameSettingsMenu({ slug, className }: { slug: string; className?
               <span className="min-w-0">
                 <span className="block text-sm font-semibold">Dificuldade</span>
                 <span className="text-muted-foreground block text-[11px] leading-snug">
-                  {DIFFICULTY_HINT[slug] ?? "Mais desafio, mais pontos."}
+                  {definition?.difficultyHint ?? "Mais desafio, mais pontos."}
                 </span>
               </span>
             </div>
@@ -114,7 +107,7 @@ export function GameSettingsMenu({ slug, className }: { slug: string; className?
             </div>
           </div>
 
-          {slug === "snake" ? (
+          {supports("snakeWrap") ? (
             <Row
               icon={<SquareDashed className="h-4 w-4" strokeWidth={1.4} />}
               title="Atravessar bordas"
@@ -128,7 +121,7 @@ export function GameSettingsMenu({ slug, className }: { slug: string; className?
             </Row>
           ) : null}
 
-          {slug === "tetris" ? (
+          {supports("tetrisFixedPad") ? (
             <Row
               icon={<Gamepad2 className="h-4 w-4" strokeWidth={1.4} />}
               title="Controle exclusivo"
@@ -138,7 +131,7 @@ export function GameSettingsMenu({ slug, className }: { slug: string; className?
             </Row>
           ) : null}
 
-          {slug === "tetris" ? (
+          {supports("tetrisGhost") ? (
             <Row
               icon={<Ghost className="h-4 w-4" strokeWidth={1.4} />}
               title="Sombra da peça"
