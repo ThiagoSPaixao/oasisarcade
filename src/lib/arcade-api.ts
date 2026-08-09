@@ -45,12 +45,12 @@ export async function fetchScores(): Promise<Record<string, number>> {
 
 export type LeaderboardRow = {
   rank: number;
-  user_id: string;
   username: string;
   level: number;
   score: number;
   created_at: string;
 };
+
 
 // O ranking global é lido por uma função de servidor (src/lib/leaderboard.functions.ts),
 // pois a função do banco não é mais executável diretamente pelo cliente.
@@ -115,12 +115,12 @@ export async function simulateSubscription(plan: "free" | "premium"): Promise<Pr
   return (row as Profile) ?? null;
 }
 
-/** Public leaderboard backed by the hosted database, independent of server deployment secrets. */
+/** Public leaderboard backed by a privacy-safe view (no internal user ids exposed). */
 export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {
   const safeLimit = Math.min(100, Math.max(1, Math.floor(limit)));
   const { data, error } = await supabase
-    .from("leaderboard_entries")
-    .select("user_id, username, level, score, scored_at")
+    .from("leaderboard_public")
+    .select("username, level, score, scored_at")
     .eq("game_slug", slug)
     .order("score", { ascending: false })
     .order("scored_at", { ascending: true })
@@ -128,11 +128,10 @@ export async function fetchLeaderboard(slug: string, limit = 20): Promise<Leader
   if (error) throw error;
   return (data ?? []).map((row, index) => ({
     rank: index + 1,
-    user_id: row.user_id,
-    username: row.username,
-    level: row.level,
-    score: row.score,
-    created_at: row.scored_at,
+    username: row.username ?? "Player",
+    level: row.level ?? 1,
+    score: row.score ?? 0,
+    created_at: row.scored_at ?? new Date(0).toISOString(),
   }));
 }
 

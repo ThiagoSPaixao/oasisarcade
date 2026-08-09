@@ -245,7 +245,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_public: {
+        Row: {
+          game_slug: string | null
+          level: number | null
+          score: number | null
+          scored_at: string | null
+          username: string | null
+        }
+        Insert: {
+          game_slug?: string | null
+          level?: number | null
+          score?: number | null
+          scored_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          game_slug?: string | null
+          level?: number | null
+          score?: number | null
+          scored_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_leaderboard: {
