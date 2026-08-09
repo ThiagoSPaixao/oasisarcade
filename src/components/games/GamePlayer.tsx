@@ -7,6 +7,7 @@ import { DPad } from "./DPad";
 import { GameSettingsMenu } from "./GameSettingsMenu";
 import { AnalogPad } from "./AnalogPad";
 import { TetrisPad } from "./TetrisPad";
+import { TouchSurface } from "./TouchSurface";
 import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
 import { DIFFICULTY_META } from "@/lib/game-options";
