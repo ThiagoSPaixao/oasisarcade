@@ -18,7 +18,7 @@ import { DIFFICULTY_META } from "@/lib/game-options";
 import type { Game } from "@/types/arcade";
 
 const HINTS: Record<string, string> = {
-  snake: "Setas / WASD ou D-Pad · A reinicia · B pausa",
+  snake: "Setas / WASD ou D-Pad para mover"
   tetris: "Analógico move · centro (A) gira · botão ao lado desce rápido",
   "space-shooter": "← → move · A atira · B pausa",
   breakout: "← → move a raquete · A começa · B pausa",
