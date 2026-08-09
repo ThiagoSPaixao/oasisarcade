@@ -221,6 +221,12 @@ export function PongGame({ onGameOver }: { onGameOver: (score: number) => void }
     else if (current === "paused") setStatus("running");
   }, [actionInput, setStatus, start]);
 
+  // Mudar a dificuldade reinicia a partida
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
+
   return (
     <div
       className="game-fit relative"
