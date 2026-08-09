@@ -199,8 +199,8 @@ export type Database = {
           username: string
         }[]
       }
-      grant_xp: {
-        Args: { _amount: number }
+      grant_xp_for: {
+        Args: { _amount: number; _user_id: string }
         Returns: {
           avatar_url: string | null
           created_at: string
@@ -218,8 +218,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      simulate_subscription: {
-        Args: { _plan: Database["public"]["Enums"]["plan_status"] }
+      simulate_subscription_for: {
+        Args: {
+          _plan: Database["public"]["Enums"]["plan_status"]
+          _user_id: string
+        }
         Returns: {
           avatar_url: string | null
           created_at: string
@@ -237,13 +240,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      submit_score: {
+      submit_score_for: {
         Args: {
           _difficulty?: string
           _duration_ms?: number
           _game_slug: string
           _game_version?: string
           _score: number
+          _user_id: string
         }
         Returns: boolean
       }
