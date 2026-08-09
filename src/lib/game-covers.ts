@@ -1,4 +1,4 @@
-import coverTetrisNeon from "@/assets/cover-tetris-neon.png.asset.json";
+import coverTetrisNeon from "@/assets/cover-tetris-neon.jpg.asset.json";
 import coverSnake from "@/assets/cover-snake.jpg";
 import coverMemoria from "@/assets/cover-memoria.jpg";
 import coverShooter from "@/assets/cover-shooter.jpg";
