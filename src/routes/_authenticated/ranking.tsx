@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
-import { fetchGames, fetchLeaderboard } from "@/lib/arcade-api";
+import { fetchGames } from "@/lib/arcade-api";
+import { getLeaderboard } from "@/lib/leaderboard.functions";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/ranking")({
   component: RankingPage,
