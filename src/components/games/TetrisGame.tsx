@@ -139,6 +139,15 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
   const play = useSoundStore((s) => s.play);
   const musicOn = useSoundStore((s) => s.music);
 
+  // Configurações isoladas do Tetris
+  const options = useGameOptions("tetris");
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const speedFactor = DIFFICULTY_META[options.difficulty].speed;
+  const speedRef = useRef(speedFactor);
+  speedRef.current = speedFactor;
+
+
   /** Cor do tema lida uma única vez por nome (evita getComputedStyle por frame). */
   const color = useCallback((name: string, fallback: string) => {
     const cache = colorCacheRef.current;
@@ -215,36 +224,38 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     const piece = pieceRef.current;
 
     // Sombra (ghost) da peça na posição de queda
-    let ghostY = piece.y;
-    const hits = (y: number) =>
-      piece.shape.some((row, dy) =>
-        row.some((value, dx) => {
-          if (!value) return false;
-          const gx = piece.x + dx;
-          const gy = y + dy;
-          return gy >= ROWS || (gy >= 0 && boardRef.current[gy]![gx] !== null);
-        }),
-      );
-    while (!hits(ghostY + 1)) ghostY += 1;
-    if (ghostY > piece.y) {
-      const value = color(piece.color, "#ff4fd8");
-      ctx.save();
-      ctx.globalAlpha = 0.22;
-      ctx.fillStyle = value;
-      ctx.strokeStyle = value;
-      ctx.lineWidth = 1;
-      piece.shape.forEach((row, dy) =>
-        row.forEach((v, dx) => {
-          if (!v) return;
-          const px = (piece.x + dx) * cell + 1;
-          const py = (ghostY + dy) * cell + 1;
-          ctx.fillRect(px, py, cell - 2, cell - 2);
-          ctx.globalAlpha = 0.6;
-          ctx.strokeRect(px + 0.5, py + 0.5, cell - 3, cell - 3);
-          ctx.globalAlpha = 0.22;
-        }),
-      );
-      ctx.restore();
+    if (optionsRef.current.tetrisGhost) {
+      let ghostY = piece.y;
+      const hits = (y: number) =>
+        piece.shape.some((row, dy) =>
+          row.some((value, dx) => {
+            if (!value) return false;
+            const gx = piece.x + dx;
+            const gy = y + dy;
+            return gy >= ROWS || (gy >= 0 && boardRef.current[gy]![gx] !== null);
+          }),
+        );
+      while (!hits(ghostY + 1)) ghostY += 1;
+      if (ghostY > piece.y) {
+        const value = color(piece.color, "#ff4fd8");
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = value;
+        ctx.strokeStyle = value;
+        ctx.lineWidth = 1;
+        piece.shape.forEach((row, dy) =>
+          row.forEach((v, dx) => {
+            if (!v) return;
+            const px = (piece.x + dx) * cell + 1;
+            const py = (ghostY + dy) * cell + 1;
+            ctx.fillRect(px, py, cell - 2, cell - 2);
+            ctx.globalAlpha = 0.6;
+            ctx.strokeRect(px + 0.5, py + 0.5, cell - 3, cell - 3);
+            ctx.globalAlpha = 0.22;
+          }),
+        );
+        ctx.restore();
+      }
     }
 
     piece.shape.forEach((row, dy) =>
