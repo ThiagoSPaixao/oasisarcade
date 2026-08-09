@@ -345,19 +345,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card-flip-inner {
-    transition: opacity 120ms linear;
+    transition: none;
   }
   .card-flip-open {
     transform: none;
   }
   .card-face-back {
     transform: none;
-  }
-  .card-flip-inner .card-face:first-child {
-    opacity: 1;
-  }
-  .card-flip-open .card-face:first-child {
     opacity: 0;
+    transition: opacity 120ms linear;
+  }
+  .card-flip-open .card-face-back {
+    opacity: 1;
   }
   .card-neon-pulse,
   .card-match-pulse {
