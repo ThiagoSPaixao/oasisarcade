@@ -706,7 +706,7 @@ export function SnakeGame({ onGameOver }: { onGameOver: (score: number) => void 
           </p>
           <p className="text-muted-foreground text-xs sm:text-sm">
             {status === "paused"
-              ? "Aperte B ou espaço para continuar"
+              ? "Aperte espaço para continuar"
               : "Frutas douradas valem o dobro — pegue antes de sumirem"}
           </p>
           <button
