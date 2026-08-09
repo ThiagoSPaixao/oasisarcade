@@ -3,6 +3,7 @@ import { Heart, Lock, Play } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
 import { gameCover } from "@/lib/game-covers";
+import { GameCover } from "@/components/dashboard/GameCover";
 
 export function GameCard({
   game,
@@ -28,22 +29,7 @@ export function GameCard({
         className="border-foreground/10 bg-surface-2 block overflow-hidden rounded-2xl border transition-transform active:scale-[0.98]"
       >
         <div className="relative aspect-[4/3] w-full">
-          {cover ? (
-            <img
-              src={cover}
-              alt={`Capa do jogo ${game.name}`}
-              loading="lazy"
-              width={768}
-              height={576}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="arcade-grid grid h-full w-full place-items-center">
-              <span className="glow-magenta text-primary text-xs font-semibold tracking-wide">
-                {game.name.toUpperCase()}
-              </span>
-            </div>
-          )}
+          <GameCover src={cover} name={game.name} width={768} height={576} />
           <div className="from-background via-background/25 absolute inset-0 bg-gradient-to-t to-transparent" />
           {game.is_premium ? (
             <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">

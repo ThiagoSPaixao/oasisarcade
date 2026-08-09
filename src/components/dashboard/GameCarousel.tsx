@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Heart, Lock } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
 import { gameCover } from "@/lib/game-covers";
+import { GameCover } from "@/components/dashboard/GameCover";
 import { useSoundStore } from "@/stores/sound-store";
 
 /** Carrossel de jogos no formato "JOGO DO DIA": card alto com capa, descrição e CTA. */
@@ -78,22 +79,7 @@ export function GameCarousel({
                     </h2>
 
                     <div className="bg-surface-2 relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
-                      {cover ? (
-                        <img
-                          src={cover}
-                          alt={`Capa do jogo ${game.name}`}
-                          loading="lazy"
-                          width={768}
-                          height={480}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="arcade-grid grid h-full w-full place-items-center">
-                          <span className="glow-magenta text-primary text-xs font-semibold">
-                            {game.name.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
+                      <GameCover src={cover} name={game.name} width={768} height={480} />
                       {game.is_premium ? (
                         <span className="border-neon-yellow/60 text-neon-yellow bg-background/50 absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur">
                           PREMIUM
