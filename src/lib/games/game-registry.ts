@@ -19,7 +19,7 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportedOptions: ["difficulty", "tetrisFixedPad", "tetrisGhost"],
     supportsRanking: true,
     supportsXp: true,
-    musicTheme: "korobeiniki",
+    musicTheme: "tetris",
   },
   snake: {
     slug: "snake",

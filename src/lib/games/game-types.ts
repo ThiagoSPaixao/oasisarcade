@@ -1,5 +1,6 @@
 import type { ComponentType, LazyExoticComponent } from "react";
 import type { Difficulty } from "@/lib/game-options";
+import type { MusicTheme } from "@/lib/sound";
 import type { Game, GameCategory } from "@/types/arcade";
 
 /** Slugs técnicos estáveis: usados em rotas, favoritos, user_scores e ranking. */
@@ -41,7 +42,7 @@ export type GameDefinition = {
   supportsRanking: boolean;
   supportsXp: boolean;
   /** Tema de música tocado durante a partida (null = silêncio, só efeitos). */
-  musicTheme: "korobeiniki" | null;
+  musicTheme: MusicTheme | null;
   /** Slugs antigos que devem redirecionar para este jogo. */
   aliases?: string[];
 };
