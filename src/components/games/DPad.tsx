@@ -70,8 +70,9 @@ export function DPad({ className, compact }: { className?: string; compact?: boo
   const icon = compact ? "h-4 w-4" : "h-5 w-5";
   return (
     <div
+      onContextMenu={(event) => event.preventDefault()}
       className={cn(
-        "border-foreground/10 bg-surface/35 flex w-full items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl",
+        "border-foreground/10 bg-surface/35 flex w-full touch-none items-center justify-between gap-3 rounded-3xl border backdrop-blur-xl select-none",
         compact ? "gap-3 p-2.5 sm:p-3" : "p-4 sm:gap-6 sm:p-5",
         className,
       )}
