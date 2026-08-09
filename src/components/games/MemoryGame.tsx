@@ -78,7 +78,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
 
     setMoves((m) => m + 1);
     const [a, b] = chosen as [number, number];
-    if (next[a]!.symbol === next[b]!.symbol) {
+    if (next[a]!.icon.id === next[b]!.icon.id) {
       play("match");
       const resolved = next.map((c, i) => (i === a || i === b ? { ...c, matched: true } : c));
       setCards(resolved);
