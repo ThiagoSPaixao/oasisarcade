@@ -514,6 +514,17 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
     return () => setMusicTheme("arcade");
   }, [musicOn]);
 
+  // Mudar a dificuldade reinicia; ligar/desligar a sombra só redesenha
+  useEffect(() => {
+    reset();
+    setStatus("idle");
+  }, [options.difficulty, reset, setStatus]);
+
+  useEffect(() => {
+    dirtyRef.current = true;
+    draw();
+  }, [draw, options.tetrisGhost]);
+
   const level = Math.floor(lines / 10) + 1;
 
   return (
