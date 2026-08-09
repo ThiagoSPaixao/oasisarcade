@@ -546,7 +546,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         />
         <GameOverlay
           title="TETRIS"
-          hint="Setas movem · A gira · B desce rápido"
+          hint="Analógico move · centro gira · botão ao lado desce rápido"
           onStart={() => (status === "paused" ? setStatus("running") : start())}
         />
       </div>
@@ -564,16 +564,6 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
           <p className="ui-label text-muted-foreground mt-1 text-[8px] tracking-widest">NÍVEL</p>
           <p className="text-neon-yellow text-xs font-bold sm:text-sm">{level}</p>
         </div>
-        <button
-          type="button"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            if (useGameStore.getState().status === "running") hardDrop();
-          }}
-          className="border-accent/45 text-accent bg-surface/40 mt-auto w-full rounded-lg border py-1.5 text-[9px] font-semibold tracking-wide backdrop-blur transition-transform active:scale-95"
-        >
-          ↓↓
-        </button>
       </aside>
     </div>
   );

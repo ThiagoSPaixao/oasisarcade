@@ -11,6 +11,7 @@ import { ComingSoon } from "./ComingSoon";
 import { DPad } from "./DPad";
 import { GameSettingsMenu } from "./GameSettingsMenu";
 import { AnalogPad } from "./AnalogPad";
+import { TetrisPad } from "./TetrisPad";
 import { useGameOptions, useSettingsStore } from "@/stores/settings-store";
 import { useGameStore } from "@/stores/game-store";
 import { DIFFICULTY_META } from "@/lib/game-options";
@@ -18,7 +19,7 @@ import type { Game } from "@/types/arcade";
 
 const HINTS: Record<string, string> = {
   snake: "Setas / WASD ou D-Pad · A reinicia · B pausa",
-  tetris: "← → move · ↑ ou A gira · B desce rápido",
+  tetris: "Analógico move · centro (A) gira · botão ao lado desce rápido",
   "space-shooter": "← → move · A atira · B pausa",
   breakout: "← → move a raquete · A começa · B pausa",
   pong: "← → move a raquete · A começa · B pausa",
@@ -126,7 +127,9 @@ export function GamePlayer({
                 : "mx-auto w-full max-w-sm shrink-0 lg:max-w-xs"
             }
           >
-            {controlMode === "analog" ? (
+            {compactPad ? (
+              <TetrisPad />
+            ) : controlMode === "analog" ? (
               <AnalogPad compact={compactPad} />
             ) : (
               <DPad compact={compactPad} />
