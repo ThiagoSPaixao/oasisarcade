@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Heart, Lock } from "lucide-react";
 import type { Game } from "@/types/arcade";
 import { cn } from "@/lib/utils";
 import { gameCover } from "@/lib/game-covers";
+import { GameCover } from "@/components/dashboard/GameCover";
 import { useSoundStore } from "@/stores/sound-store";
 
 /** Carrossel de jogos no formato "JOGO DO DIA": card alto com capa, descrição e CTA. */
