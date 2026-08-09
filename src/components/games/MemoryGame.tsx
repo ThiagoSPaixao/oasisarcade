@@ -21,6 +21,7 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
   const options = useGameOptions("memoria");
   const pairs = MEMORY_PAIRS[options.difficulty];
   const cols = pairs > 8 ? 5 : 4;
+  const rows = Math.ceil((pairs * 2) / cols);
 
   const [cards, setCards] = useState<Card[]>(() => buildDeck(pairs));
   const [picked, setPicked] = useState<number[]>([]);
@@ -106,37 +107,45 @@ export function MemoryGame({ onGameOver }: { onGameOver: (score: number) => void
   };
 
   return (
-    <div
-      className="game-fit relative flex h-full flex-col items-center justify-center"
-      style={{ "--game-max": "380px", "--game-aspect": "1", "--game-reserve": "160px" } as React.CSSProperties}
-    >
+    <div className="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-2">
       <div
-        className="bg-surface panel-cyan grid gap-2 p-3"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        className="game-fit"
+        style={
+          {
+            "--game-max": "360px",
+            "--game-aspect": `${cols / rows}`,
+            "--game-reserve": "150px",
+          } as React.CSSProperties
+        }
       >
-        {cards.map((card, index) => {
-          const open = card.flipped || card.matched;
-          return (
-            <button
-              key={card.id}
-              type="button"
-              onClick={() => flip(index)}
-              aria-label={open ? `Carta ${card.symbol}` : "Carta virada para baixo"}
-              className={cn(
-                "grid aspect-square place-items-center text-xl transition-transform active:scale-95",
-                open
-                  ? card.matched
-                    ? "bg-neon-green/20 pixel-border-cyan text-neon-green"
-                    : "bg-surface-2 pixel-border-magenta text-primary"
-                  : "bg-surface-2 pixel-border text-muted-foreground",
-              )}
-            >
-              {open ? card.symbol : "?"}
-            </button>
-          );
-        })}
+        <div
+          className="bg-surface panel-cyan grid gap-2 p-3"
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        >
+          {cards.map((card, index) => {
+            const open = card.flipped || card.matched;
+            return (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => flip(index)}
+                aria-label={open ? `Carta ${card.symbol}` : "Carta virada para baixo"}
+                className={cn(
+                  "grid aspect-square place-items-center text-xl transition-transform active:scale-95",
+                  open
+                    ? card.matched
+                      ? "bg-neon-green/20 pixel-border-cyan text-neon-green"
+                      : "bg-surface-2 pixel-border-magenta text-primary"
+                    : "bg-surface-2 pixel-border text-muted-foreground",
+                )}
+              >
+                {open ? card.symbol : "?"}
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <p className="ui-label text-muted-foreground mt-2 text-center text-[11px]">
+      <p className="ui-label text-muted-foreground text-center text-[11px]">
         PARES {matched}/{pairs} · JOGADAS {moves}
       </p>
 
