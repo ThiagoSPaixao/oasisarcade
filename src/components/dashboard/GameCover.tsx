@@ -3,7 +3,7 @@ import { Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Placeholder neon consistente, usado quando o jogo não tem capa ou a imagem falha ao carregar. */
-export function GameCoverFallback({ name, className }: { name: string; className?: string }) {
+export function GameCoverFallback({ name, className }: { name: string; className?: string | undefined }) {
   return (
     <div
       role="img"
