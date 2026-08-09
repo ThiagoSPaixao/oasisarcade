@@ -71,7 +71,15 @@ function DashboardPage() {
   const games = gamesQuery.data ?? [];
   const favorites = favoritesQuery.data ?? [];
   const scores = scoresQuery.data ?? {};
+  const lastPlayed = lastPlayedQuery.data ?? {};
   const isPremiumUser = profile?.plano_status === "premium";
+
+  // Vitrines derivadas do catálogo (Game Registry + banco), sem listas fixas na UI.
+  const newGames = getNewGames(games);
+  const recentGames = getRecentlyPlayed(games, lastPlayed);
+  const featuredGames = getFeaturedGames(games);
+  const comingSoonGames = getComingSoonGames(games);
+  const favoriteGames = games.filter((game) => favorites.includes(game.slug));
 
   const onToggleFavorite = async (slug: string) => {
     const isFavorite = favorites.includes(slug);
