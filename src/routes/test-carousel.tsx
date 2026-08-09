@@ -8,7 +8,6 @@ export const Route = createFileRoute("/test-carousel")({
 
 const mockGames: Game[] = [
   {
-    id: "1",
     slug: "tetris",
     name: "Tetris",
     description: "Monte linhas com blocos que caem cada vez mais rápido no clássico eterno.",
@@ -18,7 +17,6 @@ const mockGames: Game[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "2",
     slug: "snake",
     name: "Snake",
     description: "Controle a cobra, coma as frutas e cresça sem bater nas paredes.",
@@ -28,7 +26,6 @@ const mockGames: Game[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "3",
     slug: "space-shooter",
     name: "Space Shooter",
     description: "Destrua naves alienígenas e escale sua pontuação no espaço sideral.",
@@ -38,7 +35,6 @@ const mockGames: Game[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "4",
     slug: "breakout",
     name: "Breakout",
     description: "Quebre todos os tijolos com a bola ricocheteando na sua raquete.",
