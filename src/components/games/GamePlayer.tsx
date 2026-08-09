@@ -130,6 +130,12 @@ export function GamePlayer({
           >
             {compactPad ? (
               <TetrisPad />
+            ) : isSnake ? (
+              controlMode === "analog" ? (
+                <AnalogPad noActions />
+              ) : (
+                <DPad noActions />
+              )
             ) : controlMode === "analog" ? (
               <AnalogPad compact={compactPad} />
             ) : (
