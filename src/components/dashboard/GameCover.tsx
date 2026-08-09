@@ -16,20 +16,31 @@ export function preloadCover(src: string | null | undefined) {
 }
 
 /** Placeholder neon consistente, usado quando o jogo não tem capa ou a imagem falha ao carregar. */
-export function GameCoverFallback({ name, className }: { name: string; className?: string | undefined }) {
+export function GameCoverFallback({
+  name,
+  label,
+  className,
+}: {
+  name: string;
+  label?: string | undefined;
+  className?: string | undefined;
+}) {
   return (
     <div
       role="img"
-      aria-label={`Capa indisponível do jogo ${name}`}
+      aria-label={label ?? `Capa indisponível do jogo ${name}. Placeholder do Oásis Arcade.`}
       className={cn(
         "arcade-grid from-surface-2 to-background grid h-full w-full place-content-center gap-2 justify-items-center bg-gradient-to-br px-3",
         className,
       )}
     >
-      <span className="border-accent/40 text-accent grid h-9 w-9 place-items-center rounded-full border">
+      <span aria-hidden="true" className="border-accent/40 text-accent grid h-9 w-9 place-items-center rounded-full border">
         <Gamepad2 className="h-4 w-4" strokeWidth={1.4} />
       </span>
-      <span className="glow-magenta text-primary text-center text-[11px] font-semibold tracking-[0.16em]">
+      <span
+        aria-hidden="true"
+        className="glow-magenta text-primary text-center text-[11px] font-semibold tracking-[0.16em]"
+      >
         {name.toUpperCase()}
       </span>
     </div>
@@ -44,6 +55,7 @@ export function GameCover({
   height,
   className,
   priority = false,
+  alt,
 }: {
   src: string | null;
   name: string;
@@ -51,10 +63,13 @@ export function GameCover({
   height: number;
   className?: string;
   priority?: boolean;
+  /** Texto alternativo customizado; por padrão descreve a capa do jogo. */
+  alt?: string;
 }) {
   const cached = src ? coverStatus.get(src) : undefined;
   const [failed, setFailed] = useState(cached === "failed");
   const [loaded, setLoaded] = useState(cached === "loaded");
+  const description = alt ?? `Capa do jogo ${name} em arte neon 8-bit`;
 
   useEffect(() => {
     const status = src ? coverStatus.get(src) : undefined;
@@ -62,12 +77,20 @@ export function GameCover({
     setLoaded(status === "loaded");
   }, [src]);
 
-  if (!src || failed) return <GameCoverFallback name={name} className={className} />;
+  if (!src || failed) {
+    return (
+      <GameCoverFallback
+        name={name}
+        label={`Capa indisponível do jogo ${name}. Placeholder do Oásis Arcade.`}
+        className={className}
+      />
+    );
+  }
 
   return (
     <img
       src={src}
-      alt={`Capa do jogo ${name}`}
+      alt={description}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
       fetchPriority={priority ? "high" : "low"}
