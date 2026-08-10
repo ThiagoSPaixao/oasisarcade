@@ -54,7 +54,11 @@ export function GameCard({
         <div className="min-w-0">
           <h3 className="text-foreground truncate text-sm font-semibold tracking-tight">{game.name}</h3>
           <p className="text-muted-foreground text-[11px]">
-            {inDevelopment ? "Este Clássico está em desenvolvimento" : `High Score · ${best ?? 0}`}
+            {inDevelopment
+              ? "Este Clássico está em desenvolvimento"
+              : locked
+                ? "Jogo Premium · toque para saber mais"
+                : `High Score · ${best ?? 0}`}
           </p>
         </div>
         {inDevelopment ? null : (
@@ -79,7 +83,7 @@ export function GameCard({
         <Link
           to="/game/$slug"
           params={{ slug: game.slug }}
-          aria-label={`Jogar ${game.name}`}
+          aria-label={locked ? `${game.name} · jogo Premium` : `Jogar ${game.name}`}
           className="border-foreground/10 bg-surface-2 block overflow-hidden rounded-2xl border transition-transform active:scale-[0.98]"
         >
           {body}

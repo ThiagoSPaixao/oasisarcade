@@ -12,6 +12,7 @@ import { StreakCard } from "@/components/dashboard/StreakCard";
 import { StatsPanel } from "@/components/dashboard/StatsPanel";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { useAuthStore } from "@/stores/auth-store";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -50,7 +51,7 @@ function ProfilePage() {
 
   const stateQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
   const state = stateQuery.data;
-  const premium = profile?.plano_status === "premium";
+  const { isPremium: premium } = useSubscription();
   const achievements = (state?.achievements ?? []).filter((a) => !a.hidden || a.unlockedAt);
   const unlocked = achievements.filter((a) => a.unlockedAt).length;
 
@@ -120,13 +121,14 @@ function ProfilePage() {
             <p className="text-foreground truncate text-base font-semibold">{profile?.username ?? "Player"}</p>
             <p className="text-muted-foreground truncate text-[11px]">{email}</p>
             <Link
-              to="/upgrade"
+              to="/premium"
+              aria-label={premium ? "Seu plano: Oásis Premium" : "Conhecer o Oásis Premium"}
               className={`mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold ${
                 premium ? "border-neon-yellow/60 text-neon-yellow" : "border-accent/40 text-accent"
               }`}
             >
               <Crown className="h-3 w-3" strokeWidth={1.4} />
-              {premium ? "Player PRO" : "Player 1"}
+              {premium ? "Oásis Premium · Ativo" : "Plano gratuito · Conhecer Premium"}
             </Link>
           </div>
         </section>

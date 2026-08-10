@@ -485,6 +485,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_play_game_for: {
+        Args: { _game_slug: string; _user_id: string }
+        Returns: boolean
+      }
       daily_challenge_for: {
         Args: { _date: string }
         Returns: {
@@ -630,6 +634,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      subscription_state_for: { Args: { _user_id: string }; Returns: Json }
       xp_for_level: { Args: { _level: number }; Returns: number }
     }
     Enums: {
