@@ -115,7 +115,7 @@ export const syncPremiumSubscriptionSecure = createServerFn({ method: "POST" })
 
       if (snapshot) {
         const { plan, status } = mapProviderStatus(snapshot.status);
-        const { error } = await (supabaseAdmin.rpc as (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }>)("apply_provider_subscription", {
+        const { error } = await (supabaseAdmin.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }>)("apply_provider_subscription", {
           _user_id: context.userId,
           _plan: plan,
           _status: status,
