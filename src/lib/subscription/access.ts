@@ -11,7 +11,8 @@
 export type PlanId = "free" | "premium";
 
 /** Estados normalizados da assinatura. Novos planos entram sem reescrita. */
-export type SubscriptionStatus = "free" | "active" | "expired" | "cancelled";
+export type SubscriptionStatus = "free" | "active" | "past_due" | "expired" | "cancelled";
+
 
 export type SubscriptionState = {
   plan: PlanId;
