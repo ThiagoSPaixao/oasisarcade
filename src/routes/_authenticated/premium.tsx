@@ -127,15 +127,24 @@ function PremiumPage() {
         <section className="glass mt-3 px-4 py-5 sm:px-5">
           <p className="ui-label text-neon-yellow text-[10px]">SEU PLANO ATUAL</p>
           <p className="text-foreground mt-1 text-base font-semibold">
-            {isPremium ? "👑 Oásis Premium" : "Plano gratuito"}
+            {isPremium
+              ? subscription.isComped
+                ? "👑 Oásis Premium · Cortesia"
+                : `👑 Oásis Premium${subscription.interval === "yearly" ? " · Anual" : subscription.interval === "monthly" ? " · Mensal" : ""}`
+              : "Plano gratuito"}
           </p>
           <p className="text-muted-foreground mt-0.5 text-[12px]">
             {isPremium
-              ? `Status: ${STATUS_LABEL[subscription.status]}${
-                  periodEndLabel ? `${cancelled ? " · acesso até " : " · renova em "}${periodEndLabel}` : ""
-                }`
+              ? subscription.isComped
+                ? "Acesso vitalício concedido pela equipe do Oásis Arcade — sem cobranças."
+                : `Status: ${STATUS_LABEL[subscription.status]}${
+                    periodEndLabel
+                      ? `${cancelled || subscription.cancelAtPeriodEnd ? " · acesso até " : " · renova em "}${periodEndLabel}`
+                      : ""
+                  }`
               : "Você tem acesso a todos os jogos gratuitos, recordes, ranking, XP e conquistas."}
           </p>
+
 
           {pastDue ? (
             <p
