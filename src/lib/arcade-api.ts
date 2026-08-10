@@ -62,7 +62,9 @@ export type LeaderboardRow = {
   level: number;
   score: number;
   created_at: string;
+  isPremium: boolean;
 };
+
 
 
 // O ranking global é lido por uma função de servidor (src/lib/leaderboard.functions.ts),
