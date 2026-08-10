@@ -65,6 +65,7 @@ function PremiumPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [interval, setInterval_] = useState<PremiumInterval>("monthly");
   const [portalPending, setPortalPending] = useState(false);
+  const [syncPending, setSyncPending] = useState(false);
   const configured = isPaymentsConfigured();
   const selected = PREMIUM_PRICE_LIST.find((p) => p.interval === interval) ?? PREMIUM_PRICE_LIST[0]!;
   const pastDue = subscription.status === "past_due";
@@ -92,6 +93,25 @@ function PremiumPage() {
     const timer = setInterval(() => void tick(), 2500);
     return () => clearInterval(timer);
   }, [checkout, refresh, loadProfile]);
+
+  const reconfirm = async () => {
+    setSyncPending(true);
+    try {
+      const result = await syncPremiumSubscriptionSecure({});
+      if ("error" in result) throw new Error(result.error);
+      await refresh();
+      void loadProfile();
+      toast[result.isPremium ? "success" : "info"](
+        result.isPremium
+          ? "Assinatura confirmada! Premium ativo."
+          : "Nenhuma assinatura ativa encontrada para esta conta neste ambiente.",
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível conferir sua assinatura.");
+    } finally {
+      setSyncPending(false);
+    }
+  };
 
   const openPortal = async () => {
     setPortalPending(true);
@@ -180,6 +200,15 @@ function PremiumPage() {
               {portalPending ? "ABRINDO..." : "GERENCIAR ASSINATURA"}
             </button>
           ) : null}
+
+          <button
+            type="button"
+            disabled={syncPending || subscription.isComped}
+            onClick={() => void reconfirm()}
+            className="border-foreground/15 text-muted-foreground hover:text-accent hover:border-accent/40 focus-visible:ring-accent/60 mt-3 ml-0 inline-flex min-h-10 items-center justify-center rounded-full border px-4 text-[11px] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 sm:ml-2"
+          >
+            {syncPending ? "CONFERINDO..." : "RECONFERIR PAGAMENTO"}
+          </button>
         </section>
 
         <h2 className="ui-label text-accent mt-8 text-xs">O QUE O PREMIUM LIBERA</h2>
