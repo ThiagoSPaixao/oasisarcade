@@ -19,8 +19,10 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => resultSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { serverPaymentEnv } = await import("@/lib/payment-env.server");
     const { data: row, error } = await supabaseAdmin.rpc("process_game_result_for", {
       _user_id: context.userId,
+      _environment: serverPaymentEnv(),
       _game_slug: data.slug,
       _score: data.score,
       _session_id: data.sessionId,

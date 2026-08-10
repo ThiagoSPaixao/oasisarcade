@@ -337,6 +337,7 @@ export type Database = {
           current_period_start: string | null
           environment: string
           id: string
+          is_comped: boolean
           plan: Database["public"]["Enums"]["plan_status"]
           price_id: string | null
           provider: string | null
@@ -353,6 +354,7 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
+          is_comped?: boolean
           plan?: Database["public"]["Enums"]["plan_status"]
           price_id?: string | null
           provider?: string | null
@@ -369,6 +371,7 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
+          is_comped?: boolean
           plan?: Database["public"]["Enums"]["plan_status"]
           price_id?: string | null
           provider?: string | null
@@ -571,7 +574,7 @@ export type Database = {
         Returns: undefined
       }
       can_play_game_for: {
-        Args: { _game_slug: string; _user_id: string }
+        Args: { _environment?: string; _game_slug: string; _user_id: string }
         Returns: boolean
       }
       daily_challenge_for: {
@@ -631,6 +634,7 @@ export type Database = {
       level_for_xp: { Args: { _xp: number }; Returns: number }
       process_game_result_for: {
         Args: {
+          _environment?: string
           _game_slug: string
           _is_record?: boolean
           _score: number
@@ -638,6 +642,11 @@ export type Database = {
           _user_id: string
         }
         Returns: Json
+      }
+      reconcile_plan_cache: { Args: never; Returns: number }
+      refresh_plan_cache_for: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["plan_status"]
       }
       register_payment_event: {
         Args: {
@@ -649,13 +658,14 @@ export type Database = {
         Returns: boolean
       }
       start_game_session_for: {
-        Args: { _game_slug: string; _user_id: string }
+        Args: { _environment?: string; _game_slug: string; _user_id: string }
         Returns: string
       }
       submit_score_for: {
         Args: {
           _difficulty?: string
           _duration_ms?: number
+          _environment?: string
           _game_slug: string
           _game_version?: string
           _score: number
@@ -664,7 +674,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      subscription_state_for: { Args: { _user_id: string }; Returns: Json }
+      subscription_state_for: {
+        Args: { _environment?: string; _user_id: string }
+        Returns: Json
+      }
       validate_game_session_for: {
         Args: {
           _game_slug: string

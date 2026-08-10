@@ -8,10 +8,10 @@ import { MobileNav } from "@/components/arcade/MobileNav";
 import { PaymentTestModeBanner } from "@/components/premium/PaymentTestModeBanner";
 import { PremiumCheckout } from "@/components/premium/PremiumCheckout";
 import { useRefreshSubscription, useSubscription } from "@/hooks/use-subscription";
-import { createPremiumPortalSecure } from "@/lib/payments.functions";
+import { createPremiumPortalSecure, syncPremiumSubscriptionSecure } from "@/lib/payments.functions";
 import { PREMIUM_PRICE_LIST, type PremiumInterval } from "@/lib/subscription/plan-catalog";
 import { STATUS_LABEL } from "@/lib/subscription/access";
-import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +65,7 @@ function PremiumPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [interval, setInterval_] = useState<PremiumInterval>("monthly");
   const [portalPending, setPortalPending] = useState(false);
+  const [syncPending, setSyncPending] = useState(false);
   const configured = isPaymentsConfigured();
   const selected = PREMIUM_PRICE_LIST.find((p) => p.interval === interval) ?? PREMIUM_PRICE_LIST[0]!;
   const pastDue = subscription.status === "past_due";
@@ -79,21 +80,44 @@ function PremiumPage() {
     if (checkout !== "success") return;
     setShowCheckout(false);
     toast.success("Pagamento recebido! Ativando seu Premium...");
+    // Não dependemos do webhook: conferimos a assinatura direto no provedor.
     let tries = 0;
-    const timer = setInterval(() => {
+    const tick = async () => {
       tries += 1;
-      void refresh();
+      await syncPremiumSubscriptionSecure({}).catch(() => undefined);
+      await refresh();
       void loadProfile();
       if (tries >= 6) clearInterval(timer);
-    }, 2500);
+    };
+    void tick();
+    const timer = setInterval(() => void tick(), 2500);
     return () => clearInterval(timer);
   }, [checkout, refresh, loadProfile]);
+
+  const reconfirm = async () => {
+    setSyncPending(true);
+    try {
+      const result = await syncPremiumSubscriptionSecure({});
+      if ("error" in result) throw new Error(result.error);
+      await refresh();
+      void loadProfile();
+      toast[result.isPremium ? "success" : "info"](
+        result.isPremium
+          ? "Assinatura confirmada! Premium ativo."
+          : "Nenhuma assinatura ativa encontrada para esta conta neste ambiente.",
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível conferir sua assinatura.");
+    } finally {
+      setSyncPending(false);
+    }
+  };
 
   const openPortal = async () => {
     setPortalPending(true);
     try {
       const result = await createPremiumPortalSecure({
-        data: { environment: getStripeEnvironment(), returnUrl: `${window.location.origin}/premium` },
+        data: { returnUrl: `${window.location.origin}/premium` },
       });
       if ("error" in result) throw new Error(result.error);
       window.open(result.url, "_blank", "noopener,noreferrer");
@@ -123,15 +147,24 @@ function PremiumPage() {
         <section className="glass mt-3 px-4 py-5 sm:px-5">
           <p className="ui-label text-neon-yellow text-[10px]">SEU PLANO ATUAL</p>
           <p className="text-foreground mt-1 text-base font-semibold">
-            {isPremium ? "👑 Oásis Premium" : "Plano gratuito"}
+            {isPremium
+              ? subscription.isComped
+                ? "👑 Oásis Premium · Cortesia"
+                : `👑 Oásis Premium${subscription.interval === "yearly" ? " · Anual" : subscription.interval === "monthly" ? " · Mensal" : ""}`
+              : "Plano gratuito"}
           </p>
           <p className="text-muted-foreground mt-0.5 text-[12px]">
             {isPremium
-              ? `Status: ${STATUS_LABEL[subscription.status]}${
-                  periodEndLabel ? `${cancelled ? " · acesso até " : " · renova em "}${periodEndLabel}` : ""
-                }`
+              ? subscription.isComped
+                ? "Acesso vitalício concedido pela equipe do Oásis Arcade — sem cobranças."
+                : `Status: ${STATUS_LABEL[subscription.status]}${
+                    periodEndLabel
+                      ? `${cancelled || subscription.cancelAtPeriodEnd ? " · acesso até " : " · renova em "}${periodEndLabel}`
+                      : ""
+                  }`
               : "Você tem acesso a todos os jogos gratuitos, recordes, ranking, XP e conquistas."}
           </p>
+
 
           {pastDue ? (
             <p
@@ -167,6 +200,15 @@ function PremiumPage() {
               {portalPending ? "ABRINDO..." : "GERENCIAR ASSINATURA"}
             </button>
           ) : null}
+
+          <button
+            type="button"
+            disabled={syncPending || subscription.isComped}
+            onClick={() => void reconfirm()}
+            className="border-foreground/15 text-muted-foreground hover:text-accent hover:border-accent/40 focus-visible:ring-accent/60 mt-3 ml-0 inline-flex min-h-10 items-center justify-center rounded-full border px-4 text-[11px] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 sm:ml-2"
+          >
+            {syncPending ? "CONFERINDO..." : "RECONFERIR PAGAMENTO"}
+          </button>
         </section>
 
         <h2 className="ui-label text-accent mt-8 text-xs">O QUE O PREMIUM LIBERA</h2>

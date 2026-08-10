@@ -19,6 +19,13 @@ export type SubscriptionState = {
   status: SubscriptionStatus;
   isPremium: boolean;
   currentPeriodEnd: string | null;
+  /** "monthly" | "yearly" quando conhecido. */
+  interval: "monthly" | "yearly" | null;
+  priceId: string | null;
+  /** Assinatura marcada para não renovar no fim do período. */
+  cancelAtPeriodEnd: boolean;
+  /** Premium de cortesia concedido pela equipe (sem cobrança). */
+  isComped: boolean;
 };
 
 export const FREE_SUBSCRIPTION: SubscriptionState = {
@@ -26,6 +33,10 @@ export const FREE_SUBSCRIPTION: SubscriptionState = {
   status: "free",
   isPremium: false,
   currentPeriodEnd: null,
+  interval: null,
+  priceId: null,
+  cancelAtPeriodEnd: false,
+  isComped: false,
 };
 
 const STATUSES: SubscriptionStatus[] = ["free", "active", "past_due", "expired", "cancelled"];
@@ -46,6 +57,13 @@ export function toSubscriptionState(raw: unknown): SubscriptionState {
       plan === "premium" &&
       (status === "active" || status === "past_due" || status === "cancelled"),
     currentPeriodEnd: typeof row["currentPeriodEnd"] === "string" ? row["currentPeriodEnd"] : null,
+    interval:
+      row["interval"] === "monthly" || row["interval"] === "yearly"
+        ? (row["interval"] as "monthly" | "yearly")
+        : null,
+    priceId: typeof row["priceId"] === "string" ? row["priceId"] : null,
+    cancelAtPeriodEnd: row["cancelAtPeriodEnd"] === true,
+    isComped: row["isComped"] === true,
   };
 }
 
