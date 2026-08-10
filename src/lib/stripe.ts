@@ -3,7 +3,7 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
 /** Espelho local do tipo do servidor — mantém este módulo livre de imports server-only. */
 type StripeEnv = "sandbox" | "live";
 
-const clientToken = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined;
+const clientToken = import.meta.env["VITE_PAYMENTS_CLIENT_TOKEN"] as string | undefined;
 
 /**
  * O ambiente vem do PREFIXO do token. Token ausente ou desconhecido é erro de
