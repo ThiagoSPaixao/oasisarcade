@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { AvatarPickerDialog } from "@/components/dashboard/AvatarPickerDialog";
 import type { Profile } from "@/types/arcade";
 import { levelProgress } from "@/lib/gamification/levels";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export function DashboardHeader({ profile, onSignOut }: { profile: Profile | null; onSignOut: () => void }) {
   const email = useAuthStore((s) => s.user?.email) ?? "";
@@ -14,7 +15,8 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
   const [pending, setPending] = useState(false);
   const username = profile?.username ?? email.split("@")[0] ?? "Player";
   const progress = levelProgress(profile?.xp ?? 0, profile?.level ?? 1);
-  const premium = profile?.plano_status === "premium";
+  // Plano vem do servidor (assinatura), não do cache local do perfil.
+  const { isPremium: premium } = useSubscription();
 
   const handleSelect = async (url: string) => {
     setPending(true);
