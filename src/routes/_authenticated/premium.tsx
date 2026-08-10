@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Crown, Gamepad2, Sparkles, Trophy, Wrench } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Crown, Gamepad2, Sparkles, Trophy, Wrench } from "lucide-react";
 
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { MobileNav } from "@/components/arcade/MobileNav";
@@ -10,10 +10,11 @@ import { PremiumCheckout } from "@/components/premium/PremiumCheckout";
 import { useRefreshSubscription, useSubscription } from "@/hooks/use-subscription";
 import { createPremiumPortalSecure } from "@/lib/payments.functions";
 import { devSetPlanSecure } from "@/lib/subscription.functions";
-import { PREMIUM_PLAN } from "@/lib/subscription/plan-catalog";
+import { PREMIUM_PRICE_LIST, type PremiumInterval } from "@/lib/subscription/plan-catalog";
 import { STATUS_LABEL } from "@/lib/subscription/access";
 import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
 import { useAuthStore } from "@/stores/auth-store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   component: PremiumPage,
@@ -112,8 +113,15 @@ function PremiumPage() {
   const refresh = useRefreshSubscription();
   const loadProfile = useAuthStore((s) => s.loadProfile);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [interval, setInterval_] = useState<PremiumInterval>("monthly");
   const [portalPending, setPortalPending] = useState(false);
   const configured = isPaymentsConfigured();
+  const selected = PREMIUM_PRICE_LIST.find((p) => p.interval === interval) ?? PREMIUM_PRICE_LIST[0]!;
+  const pastDue = subscription.status === "past_due";
+  const cancelled = subscription.status === "cancelled";
+  const periodEndLabel = subscription.currentPeriodEnd
+    ? new Date(subscription.currentPeriodEnd).toLocaleDateString("pt-BR")
+    : null;
 
   // Após o pagamento, a ativação chega pelo provedor (servidor). Reconsultamos
   // o plano algumas vezes até o servidor confirmar.
@@ -170,12 +178,34 @@ function PremiumPage() {
           <p className="text-muted-foreground mt-0.5 text-[12px]">
             {isPremium
               ? `Status: ${STATUS_LABEL[subscription.status]}${
-                  subscription.currentPeriodEnd
-                    ? ` · renova em ${new Date(subscription.currentPeriodEnd).toLocaleDateString("pt-BR")}`
-                    : ""
+                  periodEndLabel ? `${cancelled ? " · acesso até " : " · renova em "}${periodEndLabel}` : ""
                 }`
               : "Você tem acesso a todos os jogos gratuitos, recordes, ranking, XP e conquistas."}
           </p>
+
+          {pastDue ? (
+            <p
+              role="status"
+              className="border-neon-yellow/50 bg-neon-yellow/10 text-neon-yellow mt-3 flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[12px] leading-relaxed"
+            >
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.6} aria-hidden="true" />
+              <span>
+                Não conseguimos confirmar sua última cobrança. Seu acesso Premium segue ativo enquanto
+                tentamos novamente — atualize o cartão em “Gerenciar assinatura” para não perder o acesso.
+              </span>
+            </p>
+          ) : null}
+
+          {cancelled ? (
+            <p
+              role="status"
+              className="border-foreground/15 text-muted-foreground mt-3 rounded-xl border px-3 py-2.5 text-[12px] leading-relaxed"
+            >
+              Assinatura cancelada. Você continua com o Premium
+              {periodEndLabel ? ` até ${periodEndLabel}` : " até o fim do período já pago"} e depois volta ao
+              plano gratuito automaticamente.
+            </p>
+          ) : null}
 
           {isPremium ? (
             <button
@@ -205,23 +235,55 @@ function PremiumPage() {
         {!isPremium ? (
           <section className="border-primary/30 bg-primary/5 mt-8 rounded-2xl border px-4 py-5 text-center">
             <p className="ui-label text-primary flex items-center justify-center gap-2 text-[10px]">
-              <Crown className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden="true" /> ASSINATURA MENSAL
+              <Crown className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden="true" /> ESCOLHA SEU PLANO
             </p>
-            <p className="text-foreground mt-2 text-2xl font-bold">
-              {PREMIUM_PLAN.amountLabel}
-              <span className="text-muted-foreground ml-1.5 text-[12px] font-semibold">
-                {PREMIUM_PLAN.intervalLabel}
-              </span>
-            </p>
-            <p className="text-muted-foreground mx-auto mt-1 max-w-md text-[12px] leading-relaxed">
-              Cancele quando quiser pelo gerenciamento da assinatura. O acesso Premium é liberado pelo
-              servidor logo após a confirmação do pagamento.
+
+            <div
+              role="radiogroup"
+              aria-label="Periodicidade da assinatura"
+              className="mt-3 grid gap-2 sm:grid-cols-2"
+            >
+              {PREMIUM_PRICE_LIST.map((option) => (
+                <button
+                  key={option.priceId}
+                  type="button"
+                  role="radio"
+                  aria-checked={option.interval === interval}
+                  onClick={() => {
+                    setInterval_(option.interval);
+                    setShowCheckout(false);
+                  }}
+                  className={cn(
+                    "rounded-2xl border px-4 py-3.5 text-left transition-colors",
+                    option.interval === interval
+                      ? "border-primary/70 bg-primary/10"
+                      : "border-foreground/10 bg-surface-2/40",
+                  )}
+                >
+                  <span className="ui-label text-accent text-[10px]">{option.label}</span>
+                  <span className="text-foreground mt-1 block text-xl font-bold">
+                    {option.amountLabel}
+                    <span className="text-muted-foreground ml-1.5 text-[11px] font-semibold">
+                      {option.intervalLabel}
+                    </span>
+                  </span>
+                  {option.note ? (
+                    <span className="text-neon-green mt-0.5 block text-[11px] font-semibold">{option.note}</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-muted-foreground mx-auto mt-3 max-w-md text-[12px] leading-relaxed">
+              Cancele quando quiser pelo gerenciamento da assinatura — o acesso continua até o fim do período
+              já pago. A liberação do Premium é feita pelo servidor após a confirmação do pagamento.
             </p>
 
             {configured ? (
               showCheckout ? (
                 <PremiumCheckout
-                  priceId={PREMIUM_PLAN.priceId}
+                  key={selected.priceId}
+                  priceId={selected.priceId}
                   returnUrl={`${window.location.origin}/premium?checkout=success`}
                 />
               ) : (
@@ -230,7 +292,7 @@ function PremiumPage() {
                   onClick={() => setShowCheckout(true)}
                   className="bg-primary text-primary-foreground focus-visible:ring-primary/60 mt-4 inline-flex min-h-11 items-center justify-center rounded-full px-6 text-[12px] font-bold focus-visible:ring-2 focus-visible:outline-none"
                 >
-                  ASSINAR O PREMIUM 👑
+                  ASSINAR {selected.fullLabel} 👑
                 </button>
               )
             ) : (

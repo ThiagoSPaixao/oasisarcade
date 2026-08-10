@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/arcade/MobileNav";
 import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
 import { getRankedGames } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
+import { PremiumBadge } from "@/components/premium/PremiumLock";
 import { cn } from "@/lib/utils";
 
 
@@ -147,6 +148,7 @@ function RankingPage() {
                       {row.username === myUsername ? (
                         <span className="text-primary ml-2 text-[10px] font-bold">VOCÊ</span>
                       ) : null}
+                      {row.isPremium ? <PremiumBadge className="ml-2 align-middle" /> : null}
                     </p>
 
                     <p className="text-muted-foreground text-[11px]">Level {row.level}</p>

@@ -11,7 +11,8 @@
 export type PlanId = "free" | "premium";
 
 /** Estados normalizados da assinatura. Novos planos entram sem reescrita. */
-export type SubscriptionStatus = "free" | "active" | "expired" | "cancelled";
+export type SubscriptionStatus = "free" | "active" | "past_due" | "expired" | "cancelled";
+
 
 export type SubscriptionState = {
   plan: PlanId;
@@ -27,7 +28,7 @@ export const FREE_SUBSCRIPTION: SubscriptionState = {
   currentPeriodEnd: null,
 };
 
-const STATUSES: SubscriptionStatus[] = ["free", "active", "expired", "cancelled"];
+const STATUSES: SubscriptionStatus[] = ["free", "active", "past_due", "expired", "cancelled"];
 
 /** Normaliza o payload do servidor (nunca confia em formato). */
 export function toSubscriptionState(raw: unknown): SubscriptionState {
@@ -40,7 +41,10 @@ export function toSubscriptionState(raw: unknown): SubscriptionState {
   return {
     plan,
     status,
-    isPremium: row["isPremium"] === true && plan === "premium" && status === "active",
+    isPremium:
+      row["isPremium"] === true &&
+      plan === "premium" &&
+      (status === "active" || status === "past_due" || status === "cancelled"),
     currentPeriodEnd: typeof row["currentPeriodEnd"] === "string" ? row["currentPeriodEnd"] : null,
   };
 }
@@ -53,9 +57,11 @@ export const PLAN_LABEL: Record<PlanId, string> = {
 export const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   free: "Gratuito",
   active: "Ativo",
+  past_due: "Pagamento pendente",
   expired: "Expirado",
-  cancelled: "Cancelado",
+  cancelled: "Cancelado (acesso até o fim do período)",
 };
+
 
 export type GameAccessReason = "ok" | "premium_required" | "coming_soon" | "unknown_game";
 
