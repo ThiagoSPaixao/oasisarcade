@@ -50,10 +50,3 @@ export const submitScoreSecure = createServerFn({ method: "POST" })
     }
     return isRecord === true;
   });
-
-    if (error) {
-      console.error("[simulate_subscription]", error);
-      throw new Error("Não foi possível atualizar o plano");
-    }
-    return row;
-  });
