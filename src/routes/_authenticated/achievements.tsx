@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Lock, Trophy } from "lucide-react";
 
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
+import { MobileNav } from "@/components/arcade/MobileNav";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import type { AchievementState } from "@/lib/gamification/types";
 
@@ -68,10 +69,16 @@ function AchievementCard({ achievement }: { achievement: AchievementState }) {
 function AchievementsPage() {
   const stateQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
   const achievements = (stateQuery.data?.achievements ?? []).filter((a) => !a.hidden || a.unlockedAt);
-  const unlocked = achievements.filter((a) => a.unlockedAt).length;
+  const unlockedList = achievements.filter((a) => a.unlockedAt);
+  const locked = achievements.filter((a) => !a.unlockedAt);
+  const unlocked = unlockedList.length;
+  const overallPct = achievements.length
+    ? Math.round((unlocked / achievements.length) * 100)
+    : 0;
 
   return (
-    <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
+    <ArcadeShell className="px-4 py-5 pb-28 sm:px-6">
+
       <div className="mx-auto w-full max-w-3xl">
         <div className="mb-4 flex items-center gap-3">
           <Link
@@ -89,18 +96,59 @@ function AchievementsPage() {
           </div>
         </div>
 
+        <div
+          className="bg-surface-2 mt-1 h-2 w-full overflow-hidden rounded-full"
+          role="progressbar"
+          aria-valuenow={overallPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Progresso geral das conquistas"
+        >
+          <div
+            className="from-accent to-neon-green h-full rounded-full bg-gradient-to-r transition-[width] duration-700"
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+
+        {stateQuery.isError ? (
+          <p className="border-primary/30 text-muted-foreground mt-4 rounded-2xl border px-4 py-3 text-xs">
+            Não foi possível carregar suas conquistas. Tente novamente em instantes.
+          </p>
+        ) : null}
+
         {stateQuery.isLoading ? (
-          <p className="ui-label text-accent text-xs">CARREGANDO...</p>
+          <p className="ui-label text-accent mt-4 text-xs">CARREGANDO...</p>
         ) : achievements.length === 0 ? (
-          <p className="text-muted-foreground text-sm">Nenhuma conquista disponível ainda.</p>
+          <p className="text-muted-foreground mt-4 text-sm">
+            Jogue sua primeira partida para começar a desbloquear conquistas.
+          </p>
         ) : (
-          <ul className="grid gap-2.5 sm:grid-cols-2">
-            {achievements.map((achievement) => (
-              <AchievementCard key={achievement.slug} achievement={achievement} />
-            ))}
-          </ul>
+          <>
+            {locked.length > 0 ? (
+              <section className="mt-6">
+                <h2 className="ui-label text-accent text-xs">EM PROGRESSO</h2>
+                <ul className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+                  {locked.map((achievement) => (
+                    <AchievementCard key={achievement.slug} achievement={achievement} />
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {unlockedList.length > 0 ? (
+              <section className="mt-6">
+                <h2 className="ui-label text-neon-green text-xs">DESBLOQUEADAS</h2>
+                <ul className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+                  {unlockedList.map((achievement) => (
+                    <AchievementCard key={achievement.slug} achievement={achievement} />
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </>
         )}
       </div>
+      <MobileNav />
     </ArcadeShell>
   );
 }
