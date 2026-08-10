@@ -12,8 +12,10 @@ export const fetchSubscriptionStateSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { serverPaymentEnv } = await import("@/lib/payment-env.server");
     const { data, error } = await supabaseAdmin.rpc("subscription_state_for", {
       _user_id: context.userId,
+      _environment: serverPaymentEnv(),
     });
     if (error) {
       console.error("[subscription_state]", error);
@@ -31,9 +33,11 @@ export const authorizeGameAccessSecure = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => slugSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { serverPaymentEnv } = await import("@/lib/payment-env.server");
     const { data: allowed, error } = await supabaseAdmin.rpc("can_play_game_for", {
       _user_id: context.userId,
       _game_slug: data.slug,
+      _environment: serverPaymentEnv(),
     });
     if (error) {
       console.error("[can_play_game]", error);

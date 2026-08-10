@@ -22,8 +22,10 @@ export const startGameSessionSecure = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => sessionStartSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { serverPaymentEnv } = await import("@/lib/payment-env.server");
     const { data: sessionId, error } = await supabaseAdmin.rpc("start_game_session_for", {
       _user_id: context.userId,
+      _environment: serverPaymentEnv(),
       _game_slug: data.slug,
     });
     if (error) {
@@ -39,8 +41,10 @@ export const submitScoreSecure = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => scoreSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { serverPaymentEnv } = await import("@/lib/payment-env.server");
     const { data: isRecord, error } = await supabaseAdmin.rpc("submit_score_for", {
       _user_id: context.userId,
+      _environment: serverPaymentEnv(),
       _game_slug: data.slug,
       _score: data.score,
       _session_id: data.sessionId,
