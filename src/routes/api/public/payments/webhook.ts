@@ -4,16 +4,21 @@ import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
 type PlanId = "free" | "premium";
 type MappedStatus = { plan: PlanId; status: string };
 
-/** Tradução dos estados do provedor para o modelo do Oásis Arcade. */
+/**
+ * Tradução dos estados do provedor para o modelo do Oásis Arcade.
+ * O banco (subscription_state_for) decide o acesso final: cancelamento mantém
+ * o Premium até o fim do período pago e cobrança pendente preserva o acesso.
+ */
 function mapStatus(providerStatus: string): MappedStatus {
   switch (providerStatus) {
     case "active":
     case "trialing":
-    case "past_due":
       return { plan: "premium", status: "active" };
+    case "past_due":
+      return { plan: "premium", status: "past_due" };
     case "canceled":
     case "cancelled":
-      return { plan: "free", status: "cancelled" };
+      return { plan: "premium", status: "cancelled" };
     case "unpaid":
     case "incomplete_expired":
       return { plan: "free", status: "expired" };
@@ -21,6 +26,7 @@ function mapStatus(providerStatus: string): MappedStatus {
       return { plan: "free", status: "free" };
   }
 }
+
 
 function isoFromUnix(seconds: unknown): string | null {
   return typeof seconds === "number" && seconds > 0 ? new Date(seconds * 1000).toISOString() : null;
