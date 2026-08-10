@@ -1,5 +1,5 @@
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { createPremiumCheckoutSecure } from "@/lib/payments.functions";
 
 /**
@@ -8,7 +8,7 @@ import { createPremiumCheckoutSecure } from "@/lib/payments.functions";
 export function PremiumCheckout({ priceId, returnUrl }: { priceId: string; returnUrl: string }) {
   const fetchClientSecret = async (): Promise<string> => {
     const result = await createPremiumCheckoutSecure({
-      data: { priceId, returnUrl, environment: getStripeEnvironment() },
+      data: { priceId, returnUrl },
     });
     if ("error" in result) throw new Error(result.error);
     return result.clientSecret;

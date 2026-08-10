@@ -8,10 +8,10 @@ import { MobileNav } from "@/components/arcade/MobileNav";
 import { PaymentTestModeBanner } from "@/components/premium/PaymentTestModeBanner";
 import { PremiumCheckout } from "@/components/premium/PremiumCheckout";
 import { useRefreshSubscription, useSubscription } from "@/hooks/use-subscription";
-import { createPremiumPortalSecure } from "@/lib/payments.functions";
+import { createPremiumPortalSecure, syncPremiumSubscriptionSecure } from "@/lib/payments.functions";
 import { PREMIUM_PRICE_LIST, type PremiumInterval } from "@/lib/subscription/plan-catalog";
 import { STATUS_LABEL } from "@/lib/subscription/access";
-import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -79,13 +79,17 @@ function PremiumPage() {
     if (checkout !== "success") return;
     setShowCheckout(false);
     toast.success("Pagamento recebido! Ativando seu Premium...");
+    // Não dependemos do webhook: conferimos a assinatura direto no provedor.
     let tries = 0;
-    const timer = setInterval(() => {
+    const tick = async () => {
       tries += 1;
-      void refresh();
+      await syncPremiumSubscriptionSecure({}).catch(() => undefined);
+      await refresh();
       void loadProfile();
       if (tries >= 6) clearInterval(timer);
-    }, 2500);
+    };
+    void tick();
+    const timer = setInterval(() => void tick(), 2500);
     return () => clearInterval(timer);
   }, [checkout, refresh, loadProfile]);
 
@@ -93,7 +97,7 @@ function PremiumPage() {
     setPortalPending(true);
     try {
       const result = await createPremiumPortalSecure({
-        data: { environment: getStripeEnvironment(), returnUrl: `${window.location.origin}/premium` },
+        data: { returnUrl: `${window.location.origin}/premium` },
       });
       if ("error" in result) throw new Error(result.error);
       window.open(result.url, "_blank", "noopener,noreferrer");
