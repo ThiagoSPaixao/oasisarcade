@@ -1,17 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { GamePlayer } from "@/components/games/GamePlayer";
-import { UpgradeDialog } from "@/components/upgrade/UpgradeDialog";
-import { fetchBestScore, fetchGame, saveScoreIfRecord, simulateSubscription } from "@/lib/arcade-api";
+import { PremiumLock } from "@/components/premium/PremiumLock";
+import { fetchBestScore, fetchGame, saveScoreIfRecord } from "@/lib/arcade-api";
 import { dispatchGamificationEvent, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { celebrateOutcome } from "@/lib/gamification/feedback";
 import { resolveSlug } from "@/lib/games/catalog";
+import { authorizeGameAccessSecure } from "@/lib/subscription.functions";
+import { useSubscription } from "@/hooks/use-subscription";
 import { useAuthStore } from "@/stores/auth-store";
-import type { PlanStatus } from "@/types/arcade";
-
 
 export const Route = createFileRoute("/_authenticated/game/$slug")({
   component: GameRoute,
@@ -19,13 +19,11 @@ export const Route = createFileRoute("/_authenticated/game/$slug")({
 
 function GameRoute() {
   const params = Route.useParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const profile = useAuthStore((s) => s.profile);
   const loadProfile = useAuthStore((s) => s.loadProfile);
   const setProfile = useAuthStore((s) => s.setProfile);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
-  const [pending, setPending] = useState(false);
+  const { access, isLoading: planLoading } = useSubscription();
 
   // Slug canônico do Game Registry (resolve aliases antigos como "nave"/"arkanoid").
   const slug = resolveSlug(params.slug);
@@ -47,12 +45,19 @@ function GameRoute() {
   });
 
   const game = gameQuery.data;
-  const locked = !!game?.is_premium && profile?.plano_status !== "premium";
 
-  useEffect(() => {
-    if (locked) setUpgradeOpen(true);
-  }, [locked]);
+  // Decisão local só define o que renderizar; a autorização real vem do servidor.
+  const localAccess = access(game);
+  const authQuery = useQuery({
+    queryKey: ["game-access", slug],
+    queryFn: () => authorizeGameAccessSecure({ data: { slug: slug as string } }),
+    enabled: knownSlug && !!game?.is_premium,
+    staleTime: 60_000,
+  });
 
+  const authorized = game?.is_premium ? authQuery.data === true : localAccess.allowed;
+  const checking =
+    gameQuery.isLoading || planLoading || (!!game?.is_premium && authQuery.isLoading);
 
   const onGameOver = async (score: number) => {
     if (!slug) return;
@@ -76,45 +81,22 @@ function GameRoute() {
     }
   };
 
-  const onSelectPlan = async (plan: PlanStatus) => {
-    setPending(true);
-    try {
-      const updated = await simulateSubscription(plan);
-      if (updated) setProfile(updated);
-      toast.success(plan === "premium" ? "Player 2 ativado! Aproveite." : "Você voltou para o plano grátis.");
-      if (plan === "premium") setUpgradeOpen(false);
-      else navigate({ to: "/dashboard" });
-    } catch {
-      toast.error("Não foi possível atualizar seu plano.");
-    } finally {
-      setPending(false);
-    }
-  };
-
   return (
     <ArcadeShell className="game-screen px-3 py-3 sm:px-6 sm:py-4">
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
         {!knownSlug ? (
           <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
-        ) : gameQuery.isLoading ? (
+        ) : checking ? (
           <p className="ui-label text-accent text-xs">CARREGANDO...</p>
         ) : !game ? (
           <p className="ui-label text-primary text-xs">JOGO NÃO ENCONTRADO</p>
+        ) : !authorized ? (
+          // Motor do jogo nem é montado sem autorização.
+          <PremiumLock gameName={game.name} />
         ) : (
-
           <GamePlayer game={game} best={bestQuery.data ?? 0} onGameOver={(score) => void onGameOver(score)} />
         )}
       </div>
-      <UpgradeDialog
-        open={upgradeOpen}
-        onOpenChange={(open) => {
-          setUpgradeOpen(open);
-          if (!open && locked) navigate({ to: "/dashboard" });
-        }}
-        current={profile?.plano_status ?? "free"}
-        onSelect={(plan) => void onSelectPlan(plan)}
-        pending={pending}
-      />
     </ArcadeShell>
   );
 }
