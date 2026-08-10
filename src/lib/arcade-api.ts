@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { grantXpSecure, simulateSubscriptionSecure, submitScoreSecure } from "@/lib/player.functions";
+import { grantXpSecure, submitScoreSecure } from "@/lib/player.functions";
 import { mergeCatalog, toCatalogGame, type CatalogGame } from "@/lib/games/catalog";
 import type { Game, Profile } from "@/types/arcade";
 
@@ -122,11 +122,6 @@ export async function grantXp(amount: number): Promise<Profile | null> {
   return (row as Profile) ?? null;
 }
 
-/** Development-only plan simulation, executed server-side. */
-export async function simulateSubscription(plan: "free" | "premium"): Promise<Profile | null> {
-  const row = await simulateSubscriptionSecure({ data: { plan } });
-  return (row as Profile) ?? null;
-}
 
 /** Public leaderboard backed by a privacy-safe view (no internal user ids exposed). */
 export async function fetchLeaderboard(slug: string, limit = 20): Promise<LeaderboardRow[]> {

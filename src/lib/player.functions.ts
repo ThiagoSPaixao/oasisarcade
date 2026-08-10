@@ -12,7 +12,6 @@ const scoreSchema = z.object({
   gameVersion: z.string().max(32).optional(),
 });
 
-const planSchema = z.object({ plan: z.enum(["free", "premium"]) });
 
 /** Grants XP server-side; the client never sends xp/level. */
 export const grantXpSecure = createServerFn({ method: "POST" })
@@ -52,16 +51,6 @@ export const submitScoreSecure = createServerFn({ method: "POST" })
     return isRecord === true;
   });
 
-/** Development-only subscription simulation (no payment gateway in this sprint). */
-export const simulateSubscriptionSecure = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => planSchema.parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin.rpc("simulate_subscription_for", {
-      _user_id: context.userId,
-      _plan: data.plan,
-    });
     if (error) {
       console.error("[simulate_subscription]", error);
       throw new Error("Não foi possível atualizar o plano");
