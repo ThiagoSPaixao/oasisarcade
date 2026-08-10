@@ -609,7 +609,7 @@ export function TetrisGame({ onGameOver }: { onGameOver: (score: number) => void
         ) : null}
         <GameOverlay
           title="TETRIS"
-          hint="Analógico move · centro gira · botão ao lado desce rápido"
+          hint="Setas movem · GIRAR gira a peça · DESCER faz descida rápida"
           onStart={() => (status === "paused" ? setStatus("running") : start())}
         />
       </div>
