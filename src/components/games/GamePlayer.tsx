@@ -122,7 +122,8 @@ export function GamePlayer({
             }
           >
             {controls === "tetris" ? (
-              <TetrisPad />
+              <TetrisPad mode={controlMode} />
+
             ) : controls === "directional" ? (
               controlMode === "analog" ? (
                 <AnalogPad noActions />
