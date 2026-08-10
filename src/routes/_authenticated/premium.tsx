@@ -17,7 +17,7 @@ import { useAuthStore } from "@/stores/auth-store";
 
 export const Route = createFileRoute("/_authenticated/premium")({
   component: PremiumPage,
-  validateSearch: (search: Record<string, unknown>): { checkout?: "success" } => ({
+  validateSearch: (search: Record<string, unknown>): { checkout?: "success" | undefined } => ({
     checkout: search["checkout"] === "success" ? "success" : undefined,
   }),
   head: () => ({
