@@ -168,3 +168,22 @@ export async function cancelProviderSubscriptions(params: {
   }
   return cancelled;
 }
+
+/** Tradução dos estados do provedor para o modelo do Oásis Arcade. */
+export function mapProviderStatus(providerStatus: string): { plan: "free" | "premium"; status: string } {
+  switch (providerStatus) {
+    case "active":
+    case "trialing":
+      return { plan: "premium", status: "active" };
+    case "past_due":
+      return { plan: "premium", status: "past_due" };
+    case "canceled":
+    case "cancelled":
+      return { plan: "premium", status: "cancelled" };
+    case "unpaid":
+    case "incomplete_expired":
+      return { plan: "free", status: "expired" };
+    default:
+      return { plan: "free", status: "free" };
+  }
+}
