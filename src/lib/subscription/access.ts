@@ -41,7 +41,10 @@ export function toSubscriptionState(raw: unknown): SubscriptionState {
   return {
     plan,
     status,
-    isPremium: row["isPremium"] === true && plan === "premium" && status === "active",
+    isPremium:
+      row["isPremium"] === true &&
+      plan === "premium" &&
+      (status === "active" || status === "past_due" || status === "cancelled"),
     currentPeriodEnd: typeof row["currentPeriodEnd"] === "string" ? row["currentPeriodEnd"] : null,
   };
 }
@@ -54,9 +57,11 @@ export const PLAN_LABEL: Record<PlanId, string> = {
 export const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   free: "Gratuito",
   active: "Ativo",
+  past_due: "Pagamento pendente",
   expired: "Expirado",
-  cancelled: "Cancelado",
+  cancelled: "Cancelado (acesso até o fim do período)",
 };
+
 
 export type GameAccessReason = "ok" | "premium_required" | "coming_soon" | "unknown_game";
 
