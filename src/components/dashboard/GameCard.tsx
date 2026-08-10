@@ -54,7 +54,11 @@ export function GameCard({
         <div className="min-w-0">
           <h3 className="text-foreground truncate text-sm font-semibold tracking-tight">{game.name}</h3>
           <p className="text-muted-foreground text-[11px]">
-            {inDevelopment ? "Este Clássico está em desenvolvimento" : `High Score · ${best ?? 0}`}
+            {inDevelopment
+              ? "Este Clássico está em desenvolvimento"
+              : locked
+                ? "Jogo Premium · toque para saber mais"
+                : `High Score · ${best ?? 0}`}
           </p>
         </div>
         {inDevelopment ? null : (
