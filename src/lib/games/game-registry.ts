@@ -14,7 +14,7 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     ),
     cover: "/assets/cover-tetris-neon.jpg",
     controls: "tetris",
-    controlHint: "Analógico move · centro (A) gira · botão ao lado desce rápido",
+    controlHint: "Setas movem · GIRAR gira a peça · DESCER faz descida rápida",
     difficultyHint: "Peças caem mais rápido e cada linha vale mais.",
     supportedOptions: ["difficulty", "tetrisFixedPad", "tetrisGhost"],
     supportsRanking: true,
