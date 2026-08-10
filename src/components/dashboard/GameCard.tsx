@@ -83,7 +83,7 @@ export function GameCard({
         <Link
           to="/game/$slug"
           params={{ slug: game.slug }}
-          aria-label={`Jogar ${game.name}`}
+          aria-label={locked ? `${game.name} · jogo Premium` : `Jogar ${game.name}`}
           className="border-foreground/10 bg-surface-2 block overflow-hidden rounded-2xl border transition-transform active:scale-[0.98]"
         >
           {body}
