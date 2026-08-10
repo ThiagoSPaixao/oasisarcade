@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft, Crown, Gamepad2, Sparkles, Trophy, Wrench } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Crown, Gamepad2, Sparkles, Trophy } from "lucide-react";
 
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { MobileNav } from "@/components/arcade/MobileNav";
@@ -9,7 +9,6 @@ import { PaymentTestModeBanner } from "@/components/premium/PaymentTestModeBanne
 import { PremiumCheckout } from "@/components/premium/PremiumCheckout";
 import { useRefreshSubscription, useSubscription } from "@/hooks/use-subscription";
 import { createPremiumPortalSecure } from "@/lib/payments.functions";
-import { devSetPlanSecure } from "@/lib/subscription.functions";
 import { PREMIUM_PRICE_LIST, type PremiumInterval } from "@/lib/subscription/plan-catalog";
 import { STATUS_LABEL } from "@/lib/subscription/access";
 import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
@@ -57,55 +56,6 @@ const BENEFITS = [
     text: "Novos recursos do arcade chegam antes para quem é Premium.",
   },
 ];
-
-function DevPlanTools() {
-  const refresh = useRefreshSubscription();
-  const loadProfile = useAuthStore((s) => s.loadProfile);
-  const [pending, setPending] = useState(false);
-
-  const setPlan = async (plan: "free" | "premium") => {
-    setPending(true);
-    try {
-      await devSetPlanSecure({ data: { plan } });
-      await refresh();
-      await loadProfile();
-      toast.success(`Plano de teste: ${plan.toUpperCase()}`);
-    } catch {
-      toast.error("Ferramenta de teste indisponível neste ambiente.");
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <section className="border-neon-green/30 bg-surface-2/40 mt-8 rounded-2xl border px-4 py-4">
-      <p className="ui-label text-neon-green flex items-center gap-2 text-[10px]">
-        <Wrench className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden="true" /> FERRAMENTA DEV/TESTE
-      </p>
-      <p className="text-muted-foreground mt-1 text-[11px]">
-        Alternância de plano apenas para desenvolvimento e testes. Não é compra e não existe em produção.
-      </p>
-      <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => void setPlan("premium")}
-          className="border-neon-yellow/50 text-neon-yellow min-h-11 rounded-full border px-4 text-[11px] font-semibold disabled:opacity-60"
-        >
-          Ativar PREMIUM (teste)
-        </button>
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => void setPlan("free")}
-          className="border-foreground/20 text-muted-foreground min-h-11 rounded-full border px-4 text-[11px] font-semibold disabled:opacity-60"
-        >
-          Voltar para FREE (teste)
-        </button>
-      </div>
-    </section>
-  );
-}
 
 function PremiumPage() {
   const { checkout } = Route.useSearch();
@@ -303,7 +253,6 @@ function PremiumPage() {
           </section>
         ) : null}
 
-        {import.meta.env.DEV ? <DevPlanTools /> : null}
 
         <p className="text-muted-foreground mt-8 text-center text-[11px]">
           Dúvidas sobre o Premium? Fale com{" "}
