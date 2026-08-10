@@ -10,6 +10,7 @@ import { AvatarPickerDialog } from "@/components/dashboard/AvatarPickerDialog";
 import { PlayerProgressCard } from "@/components/dashboard/PlayerProgressCard";
 import { StreakCard } from "@/components/dashboard/StreakCard";
 import { StatsPanel } from "@/components/dashboard/StatsPanel";
+import { AccountPanel } from "@/components/profile/AccountPanel";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -51,7 +52,7 @@ function ProfilePage() {
 
   const stateQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
   const state = stateQuery.data;
-  const { isPremium: premium } = useSubscription();
+  const { isPremium: premium, subscription } = useSubscription();
   const achievements = (state?.achievements ?? []).filter((a) => !a.hidden || a.unlockedAt);
   const unlocked = achievements.filter((a) => a.unlockedAt).length;
 
@@ -128,7 +129,11 @@ function ProfilePage() {
               }`}
             >
               <Crown className="h-3 w-3" strokeWidth={1.4} />
-              {premium ? "Oásis Premium · Ativo" : "Plano gratuito · Conhecer Premium"}
+              {premium
+                ? subscription.isComped
+                  ? "Oásis Premium · Cortesia"
+                  : `Oásis Premium · ${subscription.interval === "yearly" ? "Anual" : "Mensal"}`
+                : "Plano gratuito · Conhecer Premium"}
             </Link>
           </div>
         </section>
@@ -167,6 +172,7 @@ function ProfilePage() {
         </Link>
 
         <StatsPanel state={state} />
+        <AccountPanel email={email} />
       </div>
       <MobileNav />
     </ArcadeShell>
