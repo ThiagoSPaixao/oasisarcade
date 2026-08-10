@@ -70,3 +70,31 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Deploy na Vercel (limitações)
+
+O app é TanStack Start com backend (server functions, ranking, XP, webhook de
+pagamento). O build padrão do projeto é gerado para o runtime da Lovable
+(Cloudflare). Para a Vercel, o `vercel.json` deste repositório força o preset
+correto:
+
+```json
+{ "installCommand": "bun install", "buildCommand": "NITRO_PRESET=vercel bun run build" }
+```
+
+Variáveis necessárias na Vercel (Project → Settings → Environment Variables):
+
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`
+- `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (mesmos valores, sem o prefixo VITE)
+- `SUPABASE_SERVICE_ROLE_KEY` (não disponível na Lovable Cloud)
+- `STRIPE_LIVE_API_KEY` / `STRIPE_SANDBOX_API_KEY`, `PAYMENTS_LIVE_WEBHOOK_SECRET`
+  / `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `LOVABLE_API_KEY`
+
+Sem essas chaves, o front aparece mas ranking/XP/pagamento falham na Vercel.
+Os pagamentos são gerenciados pela Lovable, então as chaves de pagamento do
+ambiente Lovable não podem ser copiadas: para pagamento real, use o site
+publicado pela Lovable (produção) ou configure sua própria conta Stripe na
+Vercel.
+
+Depois de cada alteração: só aparece na Vercel após o commit chegar ao GitHub e
+o build da Vercel terminar com sucesso (verifique a aba Deployments → Logs).
