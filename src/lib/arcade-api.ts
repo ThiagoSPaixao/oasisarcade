@@ -130,7 +130,7 @@ export async function fetchLeaderboard(slug: string, limit = 20): Promise<Leader
   const safeLimit = Math.min(100, Math.max(1, Math.floor(limit)));
   const { data, error } = await supabase
     .from("leaderboard_public")
-    .select("username, level, score, scored_at")
+    .select("username, level, score, scored_at, is_premium")
     .eq("game_slug", slug)
     .order("score", { ascending: false })
     .order("scored_at", { ascending: true })
@@ -142,6 +142,8 @@ export async function fetchLeaderboard(slug: string, limit = 20): Promise<Leader
     level: row.level ?? 1,
     score: row.score ?? 0,
     created_at: row.scored_at ?? new Date(0).toISOString(),
+    isPremium: row.is_premium === true,
   }));
 }
+
 
