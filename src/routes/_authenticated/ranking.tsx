@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
+import { MobileNav } from "@/components/arcade/MobileNav";
 import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
 import { getRankedGames } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
@@ -157,6 +158,7 @@ function RankingPage() {
           )}
         </div>
       </div>
+      <MobileNav />
     </ArcadeShell>
   );
 }
