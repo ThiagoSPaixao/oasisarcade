@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Crown, Trophy } from "lucide-react";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
+import { MobileNav } from "@/components/arcade/MobileNav";
 import { fetchGames, fetchLeaderboard, type LeaderboardRow } from "@/lib/arcade-api";
 import { getRankedGames } from "@/lib/games/catalog";
 import { useAuthStore } from "@/stores/auth-store";
@@ -46,10 +47,11 @@ function RankingPage() {
 
 
   const rows: LeaderboardRow[] = boardQuery.data ?? [];
-
+  const myRow = myUsername ? rows.find((row) => row.username === myUsername) : undefined;
+  const activeGameName = games.find((game) => game.slug === activeSlug)?.name ?? "";
 
   return (
-    <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
+    <ArcadeShell className="px-4 py-5 pb-28 sm:px-6">
       <div className="mx-auto w-full max-w-3xl">
         <div className="mb-5 flex items-center justify-between">
           <Link
@@ -86,7 +88,33 @@ function RankingPage() {
           ))}
         </div>
 
+        {!boardQuery.isLoading ? (
+          <div className="border-primary/35 bg-primary/5 mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border px-4 py-3.5">
+            <div className="min-w-0">
+              <p className="ui-label text-primary text-[10px]">SUA POSIÇÃO {activeGameName ? `· ${activeGameName}` : ""}</p>
+              <p className="text-foreground mt-0.5 truncate text-sm font-semibold">
+                {myRow ? `#${myRow.rank} — ${myRow.score} pontos` : "Você ainda não pontuou neste jogo"}
+              </p>
+              {!myRow ? (
+                <p className="text-muted-foreground mt-0.5 text-[11px]">
+                  Jogue uma partida para entrar no ranking deste jogo.
+                </p>
+              ) : null}
+            </div>
+            {activeSlug ? (
+              <Link
+                to="/game/$slug"
+                params={{ slug: activeSlug }}
+                className="border-primary/50 text-primary shrink-0 rounded-full border px-3.5 py-2 text-[11px] font-semibold"
+              >
+                JOGAR
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="glass mt-4 overflow-hidden rounded-2xl border border-accent/20">
+
           {boardQuery.isLoading ? (
             <p className="text-muted-foreground p-6 text-center text-xs">Carregando ranking...</p>
           ) : rows.length === 0 ? (
@@ -130,6 +158,7 @@ function RankingPage() {
           )}
         </div>
       </div>
+      <MobileNav />
     </ArcadeShell>
   );
 }

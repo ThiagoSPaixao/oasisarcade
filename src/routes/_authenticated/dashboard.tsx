@@ -24,7 +24,11 @@ import {
   getRecentlyPlayed,
 } from "@/lib/games/catalog";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
-import { ProgressPanel } from "@/components/dashboard/ProgressPanel";
+import { PlayerProgressCard } from "@/components/dashboard/PlayerProgressCard";
+import { DailyChallengeCard } from "@/components/dashboard/DailyChallengeCard";
+import { StreakCard } from "@/components/dashboard/StreakCard";
+import { StatsPanel } from "@/components/dashboard/StatsPanel";
+import { MobileNav } from "@/components/arcade/MobileNav";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSoundStore } from "@/stores/sound-store";
 import { setMusicTheme, startMusic } from "@/lib/sound";
@@ -112,7 +116,7 @@ function DashboardPage() {
   };
 
   return (
-    <ArcadeShell className="px-4 py-5 pb-16 sm:px-6">
+    <ArcadeShell className="px-4 py-5 pb-28 sm:px-6">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-3 flex items-center justify-between">
           <Link
@@ -124,13 +128,17 @@ function DashboardPage() {
           <SettingsMenu />
         </div>
 
-
         <DashboardHeader profile={profile} onSignOut={() => void handleSignOut()} />
 
-        <ProgressPanel state={gamificationQuery.data} />
+        {gamificationQuery.isError ? (
+          <p className="border-primary/30 text-muted-foreground mt-3 rounded-2xl border px-4 py-3 text-xs">
+            Não foi possível carregar seus dados. Tente novamente em instantes.
+          </p>
+        ) : null}
 
-
-
+        <PlayerProgressCard profile={profile} state={gamificationQuery.data} loading={gamificationQuery.isLoading} />
+        <DailyChallengeCard challenge={gamificationQuery.data?.challenge} loading={gamificationQuery.isLoading} />
+        <StreakCard stats={gamificationQuery.data?.stats} />
 
         <GameCarousel
           games={games}
@@ -140,31 +148,38 @@ function DashboardPage() {
           onToggleFavorite={(slug) => void onToggleFavorite(slug)}
         />
 
-        {newGames.length > 0 ? (
-          <GameRail title="🆕 NOVOS JOGOS">{newGames.map(renderCard)}</GameRail>
-        ) : null}
-
         {recentGames.length > 0 ? (
           <GameRail title="▶️ JOGAR NOVAMENTE">{recentGames.map(renderCard)}</GameRail>
+        ) : null}
+
+        {newGames.length > 0 ? (
+          <GameRail title="🆕 NOVOS JOGOS">{newGames.map(renderCard)}</GameRail>
         ) : null}
 
         {featuredGames.length > 0 ? (
           <GameRail title="🔥 EM DESTAQUE">{featuredGames.map(renderCard)}</GameRail>
         ) : null}
 
-        <GameRail title="MEUS FAVORITOS" empty={favoriteGames.length === 0}>
+        <GameRail
+          title="❤️ MEUS FAVORITOS"
+          empty={favoriteGames.length === 0}
+          emptyMessage="Você ainda não favoritou nenhum jogo. Toque no coração de um jogo para guardá-lo aqui."
+        >
           {favoriteGames.map(renderCard)}
         </GameRail>
 
         {comingSoonGames.length > 0 ? (
-          <GameRail title="EM BREVE">{comingSoonGames.map(renderCard)}</GameRail>
+          <GameRail title="⏳ EM BREVE">{comingSoonGames.map(renderCard)}</GameRail>
         ) : null}
+
+        <StatsPanel state={gamificationQuery.data} />
 
         <p className="ui-label text-muted-foreground mt-10 text-center text-[10px] leading-relaxed">
           OÁSIS ARCADE · DESENVOLVIDO POR{" "}
           <span className="text-neon-green">ThiagoS.Paixão</span>
         </p>
       </div>
+      <MobileNav />
     </ArcadeShell>
   );
 }
