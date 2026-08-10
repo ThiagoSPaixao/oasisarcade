@@ -73,7 +73,8 @@ export function DashboardHeader({ profile, onSignOut }: { profile: Profile | nul
 
       <div className="flex shrink-0 items-center gap-2">
         <Link
-          to="/upgrade"
+          to="/premium"
+          aria-label={premium ? "Seu plano: Premium" : "Conhecer o Oásis Premium"}
           className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition-colors ${
             premium
               ? "border-neon-yellow/60 text-neon-yellow"

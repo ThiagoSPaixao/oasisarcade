@@ -120,13 +120,14 @@ function ProfilePage() {
             <p className="text-foreground truncate text-base font-semibold">{profile?.username ?? "Player"}</p>
             <p className="text-muted-foreground truncate text-[11px]">{email}</p>
             <Link
-              to="/upgrade"
+              to="/premium"
+              aria-label={premium ? "Seu plano: Oásis Premium" : "Conhecer o Oásis Premium"}
               className={`mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold ${
                 premium ? "border-neon-yellow/60 text-neon-yellow" : "border-accent/40 text-accent"
               }`}
             >
               <Crown className="h-3 w-3" strokeWidth={1.4} />
-              {premium ? "Player PRO" : "Player 1"}
+              {premium ? "Oásis Premium · Ativo" : "Plano gratuito · Conhecer Premium"}
             </Link>
           </div>
         </section>
