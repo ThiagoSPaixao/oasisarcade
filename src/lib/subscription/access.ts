@@ -28,7 +28,7 @@ export const FREE_SUBSCRIPTION: SubscriptionState = {
   currentPeriodEnd: null,
 };
 
-const STATUSES: SubscriptionStatus[] = ["free", "active", "expired", "cancelled"];
+const STATUSES: SubscriptionStatus[] = ["free", "active", "past_due", "expired", "cancelled"];
 
 /** Normaliza o payload do servidor (nunca confia em formato). */
 export function toSubscriptionState(raw: unknown): SubscriptionState {
