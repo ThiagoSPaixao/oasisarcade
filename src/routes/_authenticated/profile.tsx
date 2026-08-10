@@ -12,6 +12,7 @@ import { StreakCard } from "@/components/dashboard/StreakCard";
 import { StatsPanel } from "@/components/dashboard/StatsPanel";
 import { fetchGamificationState, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { useAuthStore } from "@/stores/auth-store";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -50,7 +51,7 @@ function ProfilePage() {
 
   const stateQuery = useQuery({ queryKey: GAMIFICATION_QUERY_KEY, queryFn: fetchGamificationState });
   const state = stateQuery.data;
-  const premium = profile?.plano_status === "premium";
+  const { isPremium: premium } = useSubscription();
   const achievements = (state?.achievements ?? []).filter((a) => !a.hidden || a.unlockedAt);
   const unlocked = achievements.filter((a) => a.unlockedAt).length;
 
