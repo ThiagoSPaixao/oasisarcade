@@ -192,6 +192,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          environment: string
+          event_id: string
+          event_type: string
+          provider: string
+          received_at: string
+          user_id: string | null
+        }
+        Insert: {
+          environment: string
+          event_id: string
+          event_type: string
+          provider?: string
+          received_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          event_type?: string
+          provider?: string
+          received_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -260,28 +287,49 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
+          current_period_start: string | null
+          environment: string
           id: string
           plan: Database["public"]["Enums"]["plan_status"]
+          price_id: string | null
+          provider: string | null
+          provider_customer_id: string | null
+          provider_subscription_id: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
           id?: string
           plan?: Database["public"]["Enums"]["plan_status"]
+          price_id?: string | null
+          provider?: string | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
           id?: string
           plan?: Database["public"]["Enums"]["plan_status"]
+          price_id?: string | null
+          provider?: string | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -485,6 +533,22 @@ export type Database = {
       }
     }
     Functions: {
+      apply_provider_subscription: {
+        Args: {
+          _cancel_at_period_end?: boolean
+          _current_period_end: string
+          _current_period_start: string
+          _environment: string
+          _plan: Database["public"]["Enums"]["plan_status"]
+          _price_id: string
+          _provider: string
+          _provider_customer_id: string
+          _provider_subscription_id: string
+          _status: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       can_play_game_for: {
         Args: { _game_slug: string; _user_id: string }
         Returns: boolean
@@ -571,6 +635,15 @@ export type Database = {
           _user_id: string
         }
         Returns: Json
+      }
+      register_payment_event: {
+        Args: {
+          _environment: string
+          _event_id: string
+          _event_type: string
+          _user_id?: string
+        }
+        Returns: boolean
       }
       simulate_subscription: {
         Args: { _plan: Database["public"]["Enums"]["plan_status"] }
