@@ -28,6 +28,7 @@ import { PlayerProgressCard } from "@/components/dashboard/PlayerProgressCard";
 import { DailyChallengeCard } from "@/components/dashboard/DailyChallengeCard";
 import { StreakCard } from "@/components/dashboard/StreakCard";
 import { StatsPanel } from "@/components/dashboard/StatsPanel";
+import { useSubscription } from "@/hooks/use-subscription";
 import { MobileNav } from "@/components/arcade/MobileNav";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSoundStore } from "@/stores/sound-store";
@@ -77,6 +78,7 @@ function DashboardPage() {
   const scores = scoresQuery.data ?? {};
   const lastPlayed = lastPlayedQuery.data ?? {};
   // Plano com autoridade do servidor (assinatura), usado só para o visual do catálogo.
+  const { subscription } = useSubscription();
   const isPremiumUser = subscription.isPremium;
 
   // Vitrines derivadas do catálogo (Game Registry + banco), sem listas fixas na UI.
