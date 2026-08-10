@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { ArcadeShell } from "@/components/arcade/ArcadeShell";
 import { GamePlayer } from "@/components/games/GamePlayer";
 import { PremiumLock } from "@/components/premium/PremiumLock";
-import { fetchBestScore, fetchGame, saveScoreIfRecord } from "@/lib/arcade-api";
+import { fetchBestScore, fetchGame, saveScoreIfRecord, startGameSession } from "@/lib/arcade-api";
 import { dispatchGamificationEvent, GAMIFICATION_QUERY_KEY } from "@/lib/gamification/events";
 import { celebrateOutcome } from "@/lib/gamification/feedback";
 import { resolveSlug } from "@/lib/games/catalog";
@@ -59,10 +59,26 @@ function GameRoute() {
   const checking =
     gameQuery.isLoading || planLoading || (!!game?.is_premium && authQuery.isLoading);
 
+  // Sessão da partida emitida pelo servidor: sem ela nenhuma pontuação/XP é aceito.
+  const sessionRef = useRef<string | null>(null);
+  const openSession = useCallback(async () => {
+    if (!slug || !authorized) return;
+    sessionRef.current = await startGameSession(slug);
+  }, [slug, authorized]);
+
+  useEffect(() => {
+    void openSession();
+  }, [openSession]);
+
   const onGameOver = async (score: number) => {
     if (!slug) return;
+    const sessionId = sessionRef.current;
+    if (!sessionId) {
+      toast.error("Sessão de jogo expirada. Recarregue a página.");
+      return;
+    }
     try {
-      const isRecord = await saveScoreIfRecord(slug, score);
+      const isRecord = await saveScoreIfRecord(slug, score, sessionId);
 
       if (isRecord) {
         toast.success(`Novo recorde: ${score} pontos!`);
@@ -70,7 +86,7 @@ function GameRoute() {
         await queryClient.invalidateQueries({ queryKey: ["scores"] });
       }
       // Gamificação: XP da partida, streak, desafio diário e conquistas — tudo server-side.
-      const outcome = await dispatchGamificationEvent({ type: "game_over", slug, score, isRecord });
+      const outcome = await dispatchGamificationEvent({ type: "game_over", slug, sessionId, score, isRecord });
       if (outcome) {
         celebrateOutcome(outcome);
         if (profile) setProfile({ ...profile, xp: outcome.xp, level: outcome.level });
@@ -78,6 +94,9 @@ function GameRoute() {
       }
     } catch {
       toast.error("Não foi possível salvar sua pontuação.");
+    } finally {
+      // Próxima partida começa com uma sessão nova.
+      await openSession();
     }
   };
 

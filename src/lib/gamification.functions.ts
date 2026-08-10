@@ -4,13 +4,15 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const resultSchema = z.object({
   slug: z.string().min(1).max(64),
+  sessionId: z.string().uuid(),
   score: z.number().int().min(0).max(100_000_000),
   isRecord: z.boolean().optional(),
 });
 
 /**
  * Processa o fim de uma partida: XP da partida, streak, desafio diário e conquistas.
- * O cliente só informa o que aconteceu; o banco decide todas as recompensas.
+ * O banco valida a sessão da partida (tempo jogado e pontuação plausível) antes
+ * de conceder qualquer recompensa.
  */
 export const processGameResultSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -21,6 +23,7 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
       _user_id: context.userId,
       _game_slug: data.slug,
       _score: data.score,
+      _session_id: data.sessionId,
       _is_record: data.isRecord ?? false,
     });
     if (error) {

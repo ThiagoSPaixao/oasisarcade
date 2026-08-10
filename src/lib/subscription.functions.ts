@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const planSchema = z.object({ plan: z.enum(["free", "premium"]) });
 const slugSchema = z.object({ slug: z.string().min(1).max(64) });
 
 /**
@@ -41,34 +40,4 @@ export const authorizeGameAccessSecure = createServerFn({ method: "POST" })
       throw new Error("Não foi possível verificar seu acesso");
     }
     return allowed === true;
-  });
-
-/**
- * FERRAMENTA DE DESENVOLVIMENTO/TESTE — não é um fluxo de compra.
- * Só responde quando o ambiente habilita explicitamente
- * (ARCADE_DEV_PLAN_TOOLS=true ou NODE_ENV diferente de production).
- * Nenhuma tela de produção depende desta função.
- */
-export const devSetPlanSecure = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => planSchema.parse(data))
-  .handler(async ({ data, context }) => {
-    const enabled =
-      process.env["ARCADE_DEV_PLAN_TOOLS"] === "true" || process.env["NODE_ENV"] !== "production";
-    if (!enabled) throw new Error("Ferramenta de teste desabilitada neste ambiente");
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.rpc("simulate_subscription_for", {
-      _user_id: context.userId,
-      _plan: data.plan,
-    });
-    if (error) {
-      console.error("[dev_set_plan]", error);
-      throw new Error("Não foi possível alterar o plano de teste");
-    }
-    const { data: state, error: stateError } = await supabaseAdmin.rpc("subscription_state_for", {
-      _user_id: context.userId,
-    });
-    if (stateError) throw new Error("Não foi possível carregar seu plano");
-    return state;
   });
