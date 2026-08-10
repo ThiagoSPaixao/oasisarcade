@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.validate_game_session_for(uuid, text, uuid, integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.get_leaderboard(text, integer) FROM PUBLIC, anon, authenticated;
