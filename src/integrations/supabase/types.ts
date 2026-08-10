@@ -129,6 +129,47 @@ export type Database = {
           },
         ]
       }
+      game_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          game_slug: string
+          id: string
+          started_at: string
+          user_id: string
+          validated_at: string | null
+          validated_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          game_slug: string
+          id?: string
+          started_at?: string
+          user_id: string
+          validated_at?: string | null
+          validated_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          game_slug?: string
+          id?: string
+          started_at?: string
+          user_id?: string
+          validated_at?: string | null
+          validated_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_game_slug_fkey"
+            columns: ["game_slug"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       games: {
         Row: {
           category: Database["public"]["Enums"]["game_category"]
@@ -260,6 +301,7 @@ export type Database = {
           game_version: string | null
           id: string
           score: number
+          session_id: string | null
           submitted_at: string
           user_id: string
         }
@@ -270,6 +312,7 @@ export type Database = {
           game_version?: string | null
           id?: string
           score: number
+          session_id?: string | null
           submitted_at?: string
           user_id: string
         }
@@ -280,6 +323,7 @@ export type Database = {
           game_version?: string | null
           id?: string
           score?: number
+          session_id?: string | null
           submitted_at?: string
           user_id?: string
         }
@@ -507,17 +551,7 @@ export type Database = {
       }
     }
     Views: {
-      leaderboard_public: {
-        Row: {
-          game_slug: string | null
-          is_premium: boolean | null
-          level: number | null
-          score: number | null
-          scored_at: string | null
-          username: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       apply_provider_subscription: {
@@ -568,31 +602,12 @@ export type Database = {
         Args: { _game_slug: string; _limit?: number }
         Returns: {
           created_at: string
+          is_premium: boolean
           level: number
           rank: number
           score: number
-          user_id: string
           username: string
         }[]
-      }
-      grant_xp: {
-        Args: { _amount: number }
-        Returns: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          level: number
-          plano_status: Database["public"]["Enums"]["plan_status"]
-          updated_at: string
-          username: string
-          xp: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
       }
       grant_xp_for: {
         Args: { _amount: number; _user_id: string }
@@ -619,6 +634,7 @@ export type Database = {
           _game_slug: string
           _is_record?: boolean
           _score: number
+          _session_id: string
           _user_id: string
         }
         Returns: Json
@@ -632,56 +648,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      simulate_subscription: {
-        Args: { _plan: Database["public"]["Enums"]["plan_status"] }
-        Returns: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          level: number
-          plano_status: Database["public"]["Enums"]["plan_status"]
-          updated_at: string
-          username: string
-          xp: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      simulate_subscription_for: {
-        Args: {
-          _plan: Database["public"]["Enums"]["plan_status"]
-          _user_id: string
-        }
-        Returns: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          level: number
-          plano_status: Database["public"]["Enums"]["plan_status"]
-          updated_at: string
-          username: string
-          xp: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      submit_score: {
-        Args: {
-          _difficulty?: string
-          _duration_ms?: number
-          _game_slug: string
-          _game_version?: string
-          _score: number
-        }
-        Returns: boolean
+      start_game_session_for: {
+        Args: { _game_slug: string; _user_id: string }
+        Returns: string
       }
       submit_score_for: {
         Args: {
@@ -690,11 +659,21 @@ export type Database = {
           _game_slug: string
           _game_version?: string
           _score: number
+          _session_id: string
           _user_id: string
         }
         Returns: boolean
       }
       subscription_state_for: { Args: { _user_id: string }; Returns: Json }
+      validate_game_session_for: {
+        Args: {
+          _game_slug: string
+          _score: number
+          _session_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       xp_for_level: { Args: { _level: number }; Returns: number }
     }
     Enums: {
