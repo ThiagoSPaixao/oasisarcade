@@ -39,10 +39,10 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
 export const fetchGamificationStateSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin.rpc("get_gamification_state_for", {
-      _user_id: context.userId,
-    });
+    // RPC escopada em auth.uid(): não depende da chave de serviço do servidor.
+    const { data: row, error } = await (
+      context.supabase.rpc as unknown as (fn: string) => Promise<{ data: unknown; error: unknown }>
+    )("my_gamification_state");
     if (error) {
       console.error("[get_gamification_state]", error);
       throw new Error("Não foi possível carregar sua progressão");
