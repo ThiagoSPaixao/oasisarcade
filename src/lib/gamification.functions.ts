@@ -41,11 +41,13 @@ export const fetchGamificationStateSecure = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     // RPC escopada em auth.uid(): não depende da chave de serviço do servidor.
     const { data: row, error } = await (
-      context.supabase.rpc as unknown as (fn: string) => Promise<{ data: unknown; error: unknown }>
+      context.supabase.rpc as unknown as (
+        fn: string,
+      ) => Promise<{ data: Record<string, unknown> | null; error: unknown }>
     )("my_gamification_state");
     if (error) {
       console.error("[get_gamification_state]", error);
       throw new Error("Não foi possível carregar sua progressão");
     }
-    return row;
+    return row ?? null;
   });
