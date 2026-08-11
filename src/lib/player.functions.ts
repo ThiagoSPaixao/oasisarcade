@@ -21,10 +21,13 @@ export const startGameSessionSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => sessionStartSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data: sessionId, error } = await supabaseAdmin.rpc("start_game_session_for", {
-      _user_id: context.userId,
+    // RPC escopada em auth.uid(): funciona em qualquer hospedagem, mesmo sem chave de serviço.
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: unknown }>;
+    const { data: sessionId, error } = await rpc("my_start_game_session", {
       _environment: serverPaymentEnv(),
       _game_slug: data.slug,
     });
@@ -40,10 +43,12 @@ export const submitScoreSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => scoreSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data: isRecord, error } = await supabaseAdmin.rpc("submit_score_for", {
-      _user_id: context.userId,
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: unknown }>;
+    const { data: isRecord, error } = await rpc("my_submit_score", {
       _environment: serverPaymentEnv(),
       _game_slug: data.slug,
       _score: data.score,

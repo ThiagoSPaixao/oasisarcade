@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 
 const resultSchema = z.object({
   slug: z.string().min(1).max(64),
@@ -18,10 +19,12 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => resultSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data: row, error } = await supabaseAdmin.rpc("process_game_result_for", {
-      _user_id: context.userId,
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: Json | null; error: unknown }>;
+    const { data: row, error } = await rpc("my_process_game_result", {
       _environment: serverPaymentEnv(),
       _game_slug: data.slug,
       _score: data.score,
@@ -39,13 +42,15 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
 export const fetchGamificationStateSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin.rpc("get_gamification_state_for", {
-      _user_id: context.userId,
-    });
+    // RPC escopada em auth.uid(): não depende da chave de serviço do servidor.
+    const { data: row, error } = await (
+      context.supabase.rpc as unknown as (
+        fn: string,
+      ) => Promise<{ data: Json | null; error: unknown }>
+    )("my_gamification_state");
     if (error) {
       console.error("[get_gamification_state]", error);
       throw new Error("Não foi possível carregar sua progressão");
     }
-    return row;
+    return row ?? null;
   });
