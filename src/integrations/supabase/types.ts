@@ -633,6 +633,33 @@ export type Database = {
       }
       level_for_xp: { Args: { _xp: number }; Returns: number }
       my_gamification_state: { Args: never; Returns: Json }
+      my_process_game_result: {
+        Args: {
+          _environment?: string
+          _game_slug: string
+          _is_record?: boolean
+          _score: number
+          _session_id: string
+        }
+        Returns: Json
+      }
+      my_start_game_session: {
+        Args: { _environment?: string; _game_slug: string }
+        Returns: string
+      }
+      my_submit_score: {
+        Args: {
+          _difficulty?: string
+          _duration_ms?: number
+          _environment?: string
+          _game_slug: string
+          _game_version?: string
+          _score: number
+          _session_id: string
+        }
+        Returns: boolean
+      }
+      my_subscription_state: { Args: { _environment?: string }; Returns: Json }
       process_game_result_for: {
         Args: {
           _environment?: string
