@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 
 const slugSchema = z.object({ slug: z.string().min(1).max(64) });
 
@@ -11,10 +12,13 @@ const slugSchema = z.object({ slug: z.string().min(1).max(64) });
 export const fetchSubscriptionStateSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data, error } = await supabaseAdmin.rpc("subscription_state_for", {
-      _user_id: context.userId,
+    // RPC escopada em auth.uid(): não depende da chave de serviço do servidor.
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: Json | null; error: unknown }>;
+    const { data, error } = await rpc("my_subscription_state", {
       _environment: serverPaymentEnv(),
     });
     if (error) {
@@ -32,10 +36,12 @@ export const authorizeGameAccessSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => slugSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data: allowed, error } = await supabaseAdmin.rpc("can_play_game_for", {
-      _user_id: context.userId,
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: unknown }>;
+    const { data: allowed, error } = await rpc("my_can_play_game", {
       _game_slug: data.slug,
       _environment: serverPaymentEnv(),
     });
