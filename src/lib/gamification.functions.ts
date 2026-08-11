@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 
 const resultSchema = z.object({
   slug: z.string().min(1).max(64),
@@ -43,7 +44,7 @@ export const fetchGamificationStateSecure = createServerFn({ method: "POST" })
     const { data: row, error } = await (
       context.supabase.rpc as unknown as (
         fn: string,
-      ) => Promise<{ data: Record<string, unknown> | null; error: unknown }>
+      ) => Promise<{ data: Json | null; error: unknown }>
     )("my_gamification_state");
     if (error) {
       console.error("[get_gamification_state]", error);
