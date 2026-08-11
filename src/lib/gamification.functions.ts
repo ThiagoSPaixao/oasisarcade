@@ -19,10 +19,12 @@ export const processGameResultSecure = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => resultSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { serverPaymentEnv } = await import("@/lib/payment-env.server");
-    const { data: row, error } = await supabaseAdmin.rpc("process_game_result_for", {
-      _user_id: context.userId,
+    const rpc = context.supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: Json | null; error: unknown }>;
+    const { data: row, error } = await rpc("my_process_game_result", {
       _environment: serverPaymentEnv(),
       _game_slug: data.slug,
       _score: data.score,
