@@ -632,6 +632,7 @@ export type Database = {
         }
       }
       level_for_xp: { Args: { _xp: number }; Returns: number }
+      my_gamification_state: { Args: never; Returns: Json }
       process_game_result_for: {
         Args: {
           _environment?: string
