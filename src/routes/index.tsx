@@ -10,19 +10,26 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Oásis Arcade — fliperama de jogos clássicos 8-bits" },
+      { title: "Oásis Arcade — jogos arcade retrô com ranking e XP" },
       {
         name: "description",
         content:
-          "Oásis Arcade por ThiagoS.Paixão: Tetris, Snake, Jogo da Memória, Space Shooter e mais clássicos 8-bits com sons retrô direto no navegador.",
+          "Jogue clássicos arcade, conquiste XP, suba no ranking e participe dos desafios do Oásis Arcade.",
       },
-      { property: "og:title", content: "Oásis Arcade — clássicos 8-bits no navegador" },
+      { property: "og:title", content: "Oásis Arcade" },
       {
         property: "og:description",
-        content: "Entre no fliperama neon e jogue Tetris, Snake, Memória e Space Shooter com sons 8-bit.",
+        content:
+          "Jogue clássicos arcade, conquiste XP, suba no ranking e participe dos desafios do Oásis Arcade.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Oásis Arcade" },
+      {
+        name: "twitter:description",
+        content:
+          "Jogue clássicos arcade, conquiste XP, suba no ranking e participe dos desafios do Oásis Arcade.",
+      },
     ],
   }),
   component: LandingPage,

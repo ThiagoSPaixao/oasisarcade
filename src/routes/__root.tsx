@@ -80,12 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Oásis Arcade — fliperama de clássicos 8-bits" },
+      { title: "Oásis Arcade" },
       {
         name: "description",
-        content: "Jogue clássicos 8-bits no navegador, bata recordes e suba de nível no Oásis Arcade.",
+        content:
+          "Jogue clássicos arcade, conquiste XP, suba no ranking e participe dos desafios do Oásis Arcade.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Oásis Arcade" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [

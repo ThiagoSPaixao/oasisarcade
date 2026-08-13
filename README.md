@@ -1,100 +1,92 @@
-# Arcade Oasis
+# Oásis Arcade
 
-Crie uma plataforma completa chamada "Retrô Arcade" usando React + TypeScript + Tailwind CSS com Supabase para autenticação e banco de dados. A plataforma deve ser Mobile-First e ter design nostálgico de arcade (cores neon, fontes pixeladas).
+Uma plataforma de jogos arcade retrô com ranking, XP, desafios e experiências
+competitivas.
 
-Requisitos funcionais:
+## Sobre
 
-1. Autenticação: Tela de login e registro (email/senha). Rotas protegidas (apenas /login e /register são públicas). Após login, redirecionar para /dashboard.
+O Oásis Arcade é uma aplicação web mobile-first com estética neon 8-bit onde o
+jogador cria sua conta e evolui jogando clássicos de fliperama. A plataforma
+inclui:
 
-2. Dashboard (Home): 
+- jogos retrô jogáveis diretamente no navegador;
+- contas de usuário com perfil e avatar;
+- XP e níveis calculados no servidor;
+- ranking global por jogo;
+- favoritos e histórico de partidas ("jogar novamente");
+- desafios diários;
+- conquistas;
+- streak de dias jogados;
+- arquitetura preparada para recursos Premium.
 
-   - Header com avatar, nome do usuário, nível/XP, plano atual (free/premium) e botão de logout.
+## Jogos
 
-   - Banner principal destacando "Jogo do Dia" com botão "Jogar Agora".
+Jogos disponíveis atualmente (todos com pontuação integrada ao ranking e ao
+sistema de XP):
 
-   - Grade de jogos organizada em categorias: "Mais Jogados", "Clássicos 8-Bits", "Meus Favoritos". Cada card tem thumbnail, nome, badge "Grátis" ou "Premium", e botão "Jogar".
+| Jogo | Slug | Status |
+| --- | --- | --- |
+| Tetris | `tetris` | Disponível |
+| Snake | `snake` | Disponível |
+| Jogo da Memória | `memoria` | Disponível |
+| Space Shooter | `space-shooter` | Disponível |
+| Breakout | `breakout` | Disponível |
+| Pong | `pong` | Disponível |
+| Space Invaders | `space-invaders` | Disponível |
+| Mini Racer | `mini-racer` | Disponível |
 
-3. Jogos:
+Jogos cadastrados no catálogo sem implementação aparecem automaticamente como
+"Em breve" na interface.
 
-   - Tela genérica GamePlayer que carrega o jogo selecionado.
+## Tecnologias
 
-   - Implementar o jogo Snake (funcional) usando Canvas, com controles por teclado e D-Pad virtual (para mobile). O Snake deve salvar a pontuação no Supabase (tabela user_scores) se for maior que o recorde.
+- React 19 + TypeScript
+- TanStack Start (roteamento por arquivos e server functions) + TanStack Query
+- Vite
+- Tailwind CSS
+- Zustand (estado global de auth, som, configurações e jogos)
+- Supabase (autenticação, banco de dados e regras de acesso)
+- Stripe (assinatura Oásis Premium)
+- Vercel (hospedagem)
 
-   - Para Tetris, Arkanoid e Jogo de Nave, criar placeholders com mensagem "Em breve!".
+## Arquitetura
 
-   - D-Pad: componentes direcionais (cima, baixo, esquerda, direita) e botões A/B, que emitem eventos para o jogo ativo.
+- Roteamento por arquivos em `src/routes`, com área autenticada isolada.
+- Catálogo de jogos centralizado em um Game Registry, com carregamento sob
+  demanda de cada jogo (code-splitting).
+- Regras de progressão (XP, nível, streak, conquistas, desafios) e validação de
+  pontuação executadas no servidor/banco; o cliente apenas envia resultados de
+  partida.
+- Assinatura Premium confirmada por webhook de pagamento; o plano do jogador é
+  sempre resolvido no servidor.
+- Componentes de UI reutilizáveis com design system próprio em `src/styles.css`.
 
-4. Banco de Dados (Supabase):
+## Status
 
-   - Criar tabelas: profiles, games, user_scores, subscriptions (conforme esquema fornecido).
+Projeto em desenvolvimento ativo.
 
-   - Implementar RLS para proteger os dados.
+## Desenvolvimento
 
-5. Assinaturas:
-
-   - Página/modal "Upgrade" com dois planos: Player 1 (grátis) e Player 2 (premium). Exibir benefícios e preços fictícios.
-
-   - O campo plano_status no perfil deve ser atualizado ao simular uma assinatura.
-
-6. Estilo: 
-
-   - Fundo escuro com elementos neon, bordas pixeladas, fontes "Press Start 2P" e "Inter".
-
-   - Totalmente responsivo: em mobile, D-Pad ocupa a parte inferior; em desktop, pode ficar ao lado do jogo.
-
-   - Animações sutis (scanline, glow).
-
-7. Estrutura de componentes modular, com pastas organizadas (components, contexts, hooks, lib, types, routes, styles). Use Zustand para estado global (auth e game).
-
-Entregue o código completo, com todas as funcionalidades acima, pronto para ser executado no Lovable.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://oasisarcade.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/0a246f14-0d45-43e0-95df-f8a8b981b047).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requisitos: Node.js e npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
 npm i
 npm run dev
 ```
 
-## Deploy na Vercel (limitações)
+Scripts principais: `npm run dev`, `npm run build`, `npm run lint`,
+`npm run format`.
 
-O app é TanStack Start com backend (server functions, ranking, XP, webhook de
-pagamento). O build padrão do projeto é gerado para o runtime da Lovable
-(Cloudflare). Para a Vercel, o `vercel.json` deste repositório força o preset
-correto:
+As variáveis de ambiente necessárias são configuradas no ambiente de
+hospedagem. Nenhum segredo deve ser versionado.
 
-```json
-{ "installCommand": "bun install", "buildCommand": "NITRO_PRESET=vercel bun run build" }
-```
+## Deploy
 
-Variáveis necessárias na Vercel (Project → Settings → Environment Variables):
+O build de produção é gerado com Vite/Nitro. Para a Vercel, o `vercel.json`
+deste repositório define o preset de build adequado. As variáveis públicas do
+Supabase e as chaves de servidor (pagamento e banco) precisam ser configuradas
+no painel do provedor de hospedagem antes do deploy.
 
-- `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`
-- `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (mesmos valores, sem o prefixo VITE)
-- `SUPABASE_SERVICE_ROLE_KEY` (não disponível na Lovable Cloud)
-- `STRIPE_LIVE_API_KEY` / `STRIPE_SANDBOX_API_KEY`, `PAYMENTS_LIVE_WEBHOOK_SECRET`
-  / `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `LOVABLE_API_KEY`
+## Créditos
 
-Sem essas chaves, o front aparece mas ranking/XP/pagamento falham na Vercel.
-Os pagamentos são gerenciados pela Lovable, então as chaves de pagamento do
-ambiente Lovable não podem ser copiadas: para pagamento real, use o site
-publicado pela Lovable (produção) ou configure sua própria conta Stripe na
-Vercel.
-
-Depois de cada alteração: só aparece na Vercel após o commit chegar ao GitHub e
-o build da Vercel terminar com sucesso (verifique a aba Deployments → Logs).
+Desenvolvido por ThiagoS.Paixão.
