@@ -32,8 +32,8 @@ sistema de XP):
 | Space Shooter | `space-shooter` | Disponível |
 | Breakout | `breakout` | Disponível |
 | Pong | `pong` | Disponível |
-| Space Invaders | `space-invaders` | Disponível |
-| Mini Racer | `mini-racer` | Disponível |
+| Space Invaders | `space-invaders` | Em breve (desativado) |
+| Mini Racer | `mini-racer` | Em breve (desativado) |
 
 Jogos cadastrados no catálogo sem implementação aparecem automaticamente como
 "Em breve" na interface.
