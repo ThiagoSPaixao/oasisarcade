@@ -94,13 +94,12 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportsXp: true,
     musicTheme: null,
   },
+  // Space Invaders e Mini Racer estão temporariamente desativados (component:
+  // null), então o catálogo os exibe como "Em breve". O código dos jogos segue
+  // no projeto: basta religar o lazy import para reativá-los.
   "space-invaders": {
     slug: "space-invaders",
-    component: lazy(() =>
-      import("@/components/games/SpaceInvadersGame").then((m) => ({
-        default: m.SpaceInvadersGame,
-      })),
-    ),
+    component: null,
     cover: "/assets/cover-space-invaders.jpg",
     controls: "full",
     controlHint: "← → movem a nave · A atira · B pausa",
@@ -109,14 +108,10 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportsRanking: true,
     supportsXp: true,
     musicTheme: null,
-    isNew: true,
-    featured: true,
   },
   "mini-racer": {
     slug: "mini-racer",
-    component: lazy(() =>
-      import("@/components/games/MiniRacerGame").then((m) => ({ default: m.MiniRacerGame })),
-    ),
+    component: null,
     cover: "/assets/cover-mini-racer.jpg",
     controls: "directional",
     controlHint: "← → (ou D-Pad) trocam de faixa · desvie e pegue moedas",
@@ -125,7 +120,6 @@ export const GAME_REGISTRY: Record<GameSlug, GameDefinition> = {
     supportsRanking: true,
     supportsXp: true,
     musicTheme: null,
-    isNew: true,
   },
 };
 
