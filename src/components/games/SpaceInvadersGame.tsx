@@ -191,6 +191,7 @@ export function SpaceInvadersGame({ onGameOver }: { onGameOver: (score: number) 
       return true;
     });
 
+    let died = false;
     enemyShotsRef.current = enemyShotsRef.current.filter((shot) => {
       shot.y += shot.vy;
       if (shot.y > H + 10) return false;
@@ -202,12 +203,18 @@ export function SpaceInvadersGame({ onGameOver }: { onGameOver: (score: number) 
       livesRef.current -= 1;
       play("miss");
       if (livesRef.current <= 0) {
+        died = true;
         setStatus("over");
         play("gameover");
         onGameOver(scoreRef.current);
       }
       return false;
     });
+    if (died) {
+      draw();
+      return;
+    }
+
 
     // Onda derrotada ou invasores chegaram na base.
     if (alive.length === 0) {
